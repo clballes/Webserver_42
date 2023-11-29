@@ -11,10 +11,32 @@ This project focuses on implementing an HTTP server in C++ to facilitate communi
 ## Chapter II: General Rules
 1. **Stability:** The program should not crash under any circumstances, including running out of memory. Unexpected quitting is not acceptable.
 2. **Makefile:** Submission must include a Makefile for compiling source files without relinking.
-3. **Makefile Rules:** The Makefile must contain the rules $(NAME), all, clean, fclean, and re.
-4. **Compilation Flags:** Code should be compiled with c++ using the flags -Wall -Wextra -Werror.
-5. **C++ 98 Standard:** Code must comply with the C++ 98 standard and remain compilable with the flag -std=c++98.
-6. **Development Practices:** Use C++ features whenever possible; prefer C++ versions over C functions. External libraries and Boost libraries are prohibited.
+3. **C++ 98 Standard:** Code must comply with the C++ 98 standard and remain compilable with the flag -std=c++98.
 
-## Conclusion
-This HTTP server implementation adheres to strict coding standards, emphasizing stability, efficient resource delivery, and compliance with the C++ 98 standard. The Makefile ensures easy compilation, and development practices encourage the use of C++ features while avoiding external libraries and Boost libraries.
+## Chapter III: Mandatory part - Webserv
+Develop a HTTP server in C++ 98. Some requirements include:
+
+- Take a configuration file as an argument or use a default path.
+- The server must never block, and the client can be bounced properly if necessary.
+- Use non-blocking I/O operations with a single `poll()` (or equivalent).
+- Implement necessary HTTP methods (GET, POST, DELETE).
+- Stress-test the server to ensure availability.
+- Support multiple ports in the configuration file.
+
+### III.1 Requirements
+- A request to your server should never hang forever.
+- The server must be compatible with a chosen web browser.
+- HTTP response status codes must be accurate.
+- Serve default error pages if none are provided.
+- Clients must be able to upload files.
+
+### III.3 Configuration file
+- Configure server ports, hosts, and server names.
+- Set up default error pages.
+- Limit client body size.
+- Define routes with accepted HTTP methods, redirections, directories, etc.
+
+### Conclusion
+This project revolves around creating a custom HTTP server in C++ 98, named "webserv." The server is designed to handle various HTTP protocols, allowing it to store, process, and deliver web pages to clients. The key requirements include non-blocking operations, compatibility with different web browsers, accurate HTTP response status codes, default error pages, support for serving static websites, and the ability to handle GET, POST, and DELETE methods.
+
+The server configuration is defined in a configuration file, inspired by NGINX configuration. Users can specify ports, hosts, server names, default error pages, limit client body size, set up routes with specific rules (accepted HTTP methods, redirection, directory listing, etc.), and configure CGI execution for certain file extensions. The server must also handle uploaded files, ensuring proper CGI execution, and maintain resilience by never hanging indefinitely.
