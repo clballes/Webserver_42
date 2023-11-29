@@ -1,5 +1,4 @@
-# HTTP Server Implementation in C++
-
+# 42 Project: HTTP Basic Server Implementation in C++
 ## Overview
 This project focuses on implementing an HTTP server in C++ to facilitate communication between clients (web browsers or web crawlers) and a web server. The HTTP protocol is fundamental for distributed, collaborative, hypermedia information systems, forming the backbone of data communication for the World Wide Web.
 
