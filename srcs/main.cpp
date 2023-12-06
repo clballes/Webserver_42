@@ -1,4 +1,5 @@
-#include "./inc/Config.hpp"
+// #include "./inc/Server.hpp"
+#include "./inc/ServerOptions.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -9,11 +10,11 @@ int main(int argc, char *argv[])
     }
     else
     {
-        Config config;
+        ServerOptions serverConf(argv[1]);
         try
         {
-            config.ConfigServer(argv[1]);
-            config.configLocation();
+            // config.ConfigServer(argv[1]);
+            // config.configLocation();
             // std::cout << "servername: "<< config.getServer().server_name << std::endl;
             // std::cout << "location: "<< config.getServer().mapLocations->path << std::endl;
         }
