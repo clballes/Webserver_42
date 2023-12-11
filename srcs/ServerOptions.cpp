@@ -96,6 +96,7 @@ void ServerOptions::configLocation()
 }
 
 // ------------------------- EXCEPTION FUNCTIONS -----------------------------------
+
 const char * ServerOptions::FailOpen::what() const throw()
 {
     return "Error: Cannot open the file, file not found.";
