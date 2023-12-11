@@ -32,12 +32,12 @@ class ServerOptions
         ~ServerOptions();
 
         //creem el mapa de Server pero nomes server
-        void configServer();
+        bool configServer(const std::string& serverConfig);
         void configLocation();  
 
         //parsing functions
         void parseConfigFile();
-        std::string trim(const std::string& str);
+        std::string trim(const std::string& input);
 
         //exceptions
         class FailOpen : public std::exception

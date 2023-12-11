@@ -4,10 +4,12 @@
 
 ServerOptions::ServerOptions()
 {
-    std::cout << "Constructor called " << std::endl;
+    // std::cout << "Constructor called " << std::endl;
 }
 
-ServerOptions::ServerOptions(std::string filename) //faig el open i ho carrego tot en una llista
+//Faig el open i ho carrego tot en una llista trimming spaces tabs x davant i darrere, Printejo la llista final
+
+ServerOptions::ServerOptions(std::string filename)
 {
     std::cout << "Constructor called with " << filename << std::endl;
     std::ifstream configFile(filename);
@@ -18,15 +20,14 @@ ServerOptions::ServerOptions(std::string filename) //faig el open i ho carrego t
     while (std::getline(configFile, line))
     {
         line = trim(line);
-        if (!line.empty()) {
+        if (!line.empty() && line[0] != '#') {
             this->listConfig.push_back(line);
         }
     }
     // Print the list
     for (std::list<std::string>::iterator it = listConfig.begin(); it != listConfig.end(); ++it)
     {
-        if (std::next(it) != listConfig.end())
-            std::cout << *it << std::endl;
+        std::cout << *it << std::endl;
     }
 }
 
@@ -50,38 +51,43 @@ ServerOptions::~ServerOptions()
 
 // ------------------------- MEMBER FUNCTIONS -----------------------------------
 
+std::string ServerOptions::trim(const std::string& input)
+{
+    std::string result;
+
+    bool leadingSpacesOrTabs = true;
+
+    for (std::size_t i = 0; i < input.length(); ++i) {
+        if (input[i] == ' ' || input[i] == '\t') {
+            if (!leadingSpacesOrTabs) {
+                result += ' ';
+                leadingSpacesOrTabs = true;
+            }
+        } else {
+            result += input[i];
+            leadingSpacesOrTabs = false;
+        }
+    }
+    return result;
+}
 
 void ServerOptions::parseConfigFile()
 {
-    //check tottot
+    for (std::list<std::string>::iterator it = listConfig.begin(); it != listConfig.end(); ++it) {
+        // std::cout << *it << std::endl;
+    }
 }
 
-std::string ServerOptions::trim(const std::string& str)
+bool ServerOptions::configServer(const std::string& serverConfig)
 {
-    std::string::const_iterator it = str.begin();
-    std::string::const_iterator it_end = str.end();
-    while (it != str.end() && isspace(*it)) {
-        ++it;
-    }
-    while (it_end != str.begin() && isspace(*(it_end - 1))) {
-        --it_end;
-    }
-    return std::string(it, it_end);
-}
+    std::size_t pos = serverConfig.find("server");
 
-void ServerOptions::configServer()
-{
-    std::string input = "   server{   ";
-
-    // Find the position of "server{"
-    size_t pos = input.find("server{");
-
-    // Check if "server{" is found
     if (pos != std::string::npos) {
-        // Print the substring after "server{" (including possible spaces)
-        std::cout << "Words after 'server{' : " << input.substr(pos + 7) << std::endl;
+        std::cout << "Server found " << pos << "la string es: " << serverConfig << std::endl;
+        return true;
     } else {
-        std::cout << "Sequence 'server{' not found in the input string." << std::endl;
+        std::cout << "Sequence '{' not found in the input string." << std::endl;
+        return false;
     }
 }
 

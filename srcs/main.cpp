@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
         ServerOptions serverConf(argv[1]);
         try
         {
+            serverConf.parseConfigFile();
             // config.ConfigServer(argv[1]);
             // config.configLocation();
             // std::cout << "servername: "<< config.getServer().server_name << std::endl;
