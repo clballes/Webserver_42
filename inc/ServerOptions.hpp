@@ -26,6 +26,7 @@ class ServerOptions
 {
     public:
         ServerOptions();
+        ServerOptions(std::list<std::string>*);
         ServerOptions(std::string filename); //fem open i posem tot en una llista
         ServerOptions(ServerOptions & src);
         // ServerOptions & operator=(ServerOptions & src);

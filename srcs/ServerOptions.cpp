@@ -9,6 +9,12 @@ ServerOptions::ServerOptions()
 
 //Faig el open i ho carrego tot en una llista trimming spaces tabs x davant i darrere, Printejo la llista final
 
+ServerOptions::ServerOptions(std::list<std::string>*)
+{
+    std::cout << "hola" << std::endl;
+}
+
+
 ServerOptions::ServerOptions(std::string filename)
 {
     std::cout << "Constructor called with " << filename << std::endl;
