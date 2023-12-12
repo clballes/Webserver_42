@@ -18,17 +18,10 @@ int main(int argc, char *argv[])
             for (unsigned long int i = 0; i < parsing.getNumServer(); ++i)
             {
                 ServerOptions serverConf(arrayOfLists[i]);
+                serverConf.parseConfigFile();
                 // std::cout << "-------------Sublist------------" << i + 1 << std::endl;
             }
         }
-            // while(server)
-            // {
-            //     ServerOptions serverConf(argv[1]);
-            //     serverConf.parseConfigFile();
-            // }
-            // config.ConfigServer(argv[1]);
-            // config.configLocation();
-
         catch(const std::exception & e)
         {
             std::cout << e.what() << std::endl;

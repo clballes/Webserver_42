@@ -4,39 +4,13 @@
 
 ServerOptions::ServerOptions()
 {
-    // std::cout << "Constructor called " << std::endl;
+    std::cout << "Constructor called " << std::endl;
 }
 
-//Faig el open i ho carrego tot en una llista trimming spaces tabs x davant i darrere, Printejo la llista final
-
+//assign la sublist en la llista top
 ServerOptions::ServerOptions(std::list<std::string>* list)
 {
-     for (std::list<std::string>::iterator it = list->begin(); it != list->end(); ++it) {
-        std::cout << *it << std::endl;
-    }
-}
-
-
-ServerOptions::ServerOptions(std::string filename)
-{
-    std::cout << "Constructor called with " << filename << std::endl;
-    std::ifstream configFile(filename);
-    std::string line;
-    if (!configFile.is_open()){
-        throw FailOpen();
-    }
-    while (std::getline(configFile, line))
-    {
-        line = trim(line);
-        if (!line.empty() && line[0] != '#') {
-            this->listConfig.push_back(line);
-        }
-    }
-    // Print the list
-    for (std::list<std::string>::iterator it = listConfig.begin(); it != listConfig.end(); ++it)
-    {
-        std::cout << *it << std::endl;
-    }
+    this->listConfig.assign(list->begin(), list->end());
 }
 
 ServerOptions::ServerOptions(ServerOptions & src)
@@ -59,44 +33,26 @@ ServerOptions::~ServerOptions()
 
 // ------------------------- MEMBER FUNCTIONS -----------------------------------
 
-std::string ServerOptions::trim(const std::string& input)
-{
-    std::string result;
-
-    bool leadingSpacesOrTabs = true;
-
-    for (std::size_t i = 0; i < input.length(); ++i) {
-        if (input[i] == ' ' || input[i] == '\t') {
-            if (!leadingSpacesOrTabs) {
-                result += ' ';
-                leadingSpacesOrTabs = true;
-            }
-        } else {
-            result += input[i];
-            leadingSpacesOrTabs = false;
-        }
-    }
-    return result;
-}
-
+//he tret els brackets del server
 void ServerOptions::parseConfigFile()
 {
-    for (std::list<std::string>::iterator it = listConfig.begin(); it != listConfig.end(); ++it) {
-        // std::cout << *it << std::endl;
-    }
-}
+    //  std::list<std::string>::iterator it2;
+    // for (it2 = listConfig.begin(); it2 != listConfig.end(); ++it2) {
+    //     std::cout << *it2 << std::endl;
+    // }
 
-bool ServerOptions::configServer(const std::string& serverConfig)
-{
-    std::size_t pos = serverConfig.find("server");
+    std::list<std::string>::iterator it = listConfig.begin();
+    std::list<std::string>::iterator itEnd = listConfig.end();
+        std::advance(itEnd, -1);  // Move the iterator to the last element
 
-    if (pos != std::string::npos) {
-        std::cout << "Server found " << pos << "la string es: " << serverConfig << std::endl;
-        return true;
-    } else {
-        std::cout << "Sequence '{' not found in the input string." << std::endl;
-        return false;
+    if (*itEnd == "}" && *it == "{") {
+            listConfig.erase(itEnd);
+            listConfig.erase(it);
     }
+    else {
+        std::cout << "'}' not found in the list, error in the server directive" << std::endl;
+    }
+
 }
 
 void ServerOptions::configLocation()

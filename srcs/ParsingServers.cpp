@@ -61,7 +61,7 @@ std::string ParsingServers::trim2(const std::string& input)
     return result;
 }
 
-void ParsingServers::numServers()
+void ParsingServers::numServers() //aixo esta malament si un server falla els guarda els dos
 {
     int count = 0;
     for (std::list<std::string>::iterator it = this->listConfig.begin(); it != this->listConfig.end(); ++it)
@@ -71,6 +71,11 @@ void ParsingServers::numServers()
             if (it->length() == 6){
                 count++;
             }
+            else
+            {
+                std::cerr << " ------ error server ---------" << std::endl;
+                break ;
+            }   
         }
     }
     this->servers = count;

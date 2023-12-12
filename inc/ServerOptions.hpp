@@ -27,18 +27,17 @@ class ServerOptions
     public:
         ServerOptions();
         ServerOptions(std::list<std::string>*);
-        ServerOptions(std::string filename); //fem open i posem tot en una llista
+        // ServerOptions(std::string filename); //fem open i posem tot en una llista
         ServerOptions(ServerOptions & src);
         // ServerOptions & operator=(ServerOptions & src);
         ~ServerOptions();
 
         //creem el mapa de Server pero nomes server
         bool configServer(const std::string& serverConfig);
-        void configLocation();  
+        void configLocation();
 
         //parsing functions
         void parseConfigFile();
-        std::string trim(const std::string& input);
 
         //exceptions
         class FailOpen : public std::exception
@@ -48,9 +47,7 @@ class ServerOptions
         };
 
     private:
-        // std::map<std::string, std::string> mapOptionsServer;
         std::list<std::string> listConfig;
-        // int servers; to knnow how many objects we have to create with the info concrete
 };
 
 #endif
