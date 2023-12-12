@@ -9,9 +9,11 @@ ServerOptions::ServerOptions()
 
 //Faig el open i ho carrego tot en una llista trimming spaces tabs x davant i darrere, Printejo la llista final
 
-ServerOptions::ServerOptions(std::list<std::string>*)
+ServerOptions::ServerOptions(std::list<std::string>* list)
 {
-    std::cout << "hola" << std::endl;
+     for (std::list<std::string>::iterator it = list->begin(); it != list->end(); ++it) {
+        std::cout << *it << std::endl;
+    }
 }
 
 

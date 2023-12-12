@@ -12,13 +12,9 @@ ParsingServers::ParsingServers(std::string filename) : servers(0)
         line = trim2(line);
         parsingBrackets(line);
     }
-    // PRINT THE LIST
-    // for (std::list<std::string>::iterator it = listConfig.begin(); it != listConfig.end(); ++it) {
-    //     std::cout << *it << std::endl;
-    // }
     //CHECK HOW MANY SERVERS WE HAVE, REGARDING BRAKETS
     numServers();
-    // //split the list in array
+    // split the list in array without server directive but with brackets
     splitServer();
     // printArray();
 }
@@ -31,6 +27,9 @@ ParsingServers::ParsingServers(ParsingServers & src)
 ParsingServers::~ParsingServers()
 {
     std::cout << "destructor called cal alliberar memoria" << std::endl;
+    for (std::vector<std::list<std::string>*>::iterator it = this->arrayOfLists.begin(); it != this->arrayOfLists.end(); ++it) {
+        delete *it;
+    }
 }
 // ParsingServers::ParsingServers & operator=(ParsingServers & src);
 
