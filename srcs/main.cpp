@@ -1,6 +1,17 @@
 // #include "./inc/Server.hpp"
 #include "./inc/ServerOptions.hpp"
-#include "./inc/ParsingServers.hpp"
+// #include "./inc/ParsingServers.hpp"
+#include <iostream>
+#include <list>
+
+std::string trim3(const std::string& input);
+std::string trim2(const std::string& input);
+void        printArray();
+void        parsingBrackets(std::string &line,  std::list<std::string>&listConfig);
+int        numServers(std::list<std::string>listConfig);
+void        splitServer();
+void        ParsingServers(std::string filename, std::list<std::string>&listConfig);
+
 
 int main(int argc, char *argv[])
 {
@@ -11,16 +22,16 @@ int main(int argc, char *argv[])
     }
     else
     {
-        ParsingServers parsing(argv[1]);
-        std::vector<std::list<std::string>*>arrayOfLists = parsing.getArrList();
+        std::list<std::string>listConf;
+        ParsingServers(argv[1], listConf);
+        // std::vector<std::list<std::string>*>arrayOfLists = parsing.getArrList();
         try
         {
-            for (unsigned long int i = 0; i < parsing.getNumServer(); ++i)
-            {
-                ServerOptions serverConf(arrayOfLists[i]);
-                serverConf.parseConfigFile();
-                // std::cout << "-------------Sublist------------" << i + 1 << std::endl;
-            }
+            // for (unsigned long int i = 0; i < 2; ++i) //vectr size
+            // {
+            //     ServerOptions serverConf(arrayOfLists[i]);
+            //     serverConf.parseConfigFile();
+            // }
         }
         catch(const std::exception & e)
         {

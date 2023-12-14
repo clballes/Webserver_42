@@ -34,7 +34,7 @@ ServerOptions::~ServerOptions()
 // ------------------------- MEMBER FUNCTIONS -----------------------------------
 
 //he tret els brackets del server
-void ServerOptions::parseConfigFile()
+void ServerOptions::parseConfigFile() //contar els bacekts
 {
     //  std::list<std::string>::iterator it2;
     // for (it2 = listConfig.begin(); it2 != listConfig.end(); ++it2) {

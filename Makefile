@@ -6,7 +6,7 @@ SRC = srcs/
 INC = inc/
 # Sources
 SRCS = $(SRC)main.cpp  $(SRC)ServerOptions.cpp $(SRC)ParsingServers.cpp
-LIB = $(INC)ServerOptions.hpp $(INC)Location.hpp $(INC)ParsingServers.hpp
+LIB = $(INC)ServerOptions.hpp $(INC)Location.hpp
 # create obj and resources
 OBJ = $(SRCS:%.cpp=%.o)
 DEPS = $(SRCS:%.cpp=%.d)
