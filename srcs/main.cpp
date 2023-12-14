@@ -1,16 +1,16 @@
 // #include "./inc/Server.hpp"
 #include "./inc/ServerOptions.hpp"
-// #include "./inc/ParsingServers.hpp"
 #include <iostream>
 #include <list>
 
-std::string trim3(const std::string& input);
-std::string trim2(const std::string& input);
-void        printArray();
-void        parsingBrackets(std::string &line,  std::list<std::string>&listConfig);
+std::string trim_sp(const std::string& input);
+std::string trim(const std::string& input);
+// void        printArray();
+void        addElements(std::string &line,  std::list<std::string>&listConfig);
 int        numServers(std::list<std::string>listConfig);
-void        splitServer();
-void        ParsingServers(std::string filename, std::list<std::string>&listConfig);
+// void        splitServer();
+int        ParsingServers(std::string filename, std::list<std::string>&listConfig);
+int        check_brackets(std::list<std::string>&listConfig);
 
 
 int main(int argc, char *argv[])
@@ -23,7 +23,11 @@ int main(int argc, char *argv[])
     else
     {
         std::list<std::string>listConf;
-        ParsingServers(argv[1], listConf);
+        int res = ParsingServers(argv[1], listConf);
+        if(res)
+        {
+            std::cerr << "Cannot execute; parsing incorrect syntax" << std::endl;
+        }
         // std::vector<std::list<std::string>*>arrayOfLists = parsing.getArrList();
         try
         {
