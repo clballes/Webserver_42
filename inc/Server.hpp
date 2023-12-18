@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <map>
+#include <list>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "ServerOptions.hpp"
@@ -23,27 +24,23 @@
 class Server
 {
     public:
-        Server();
+        Server(std::list<std::string>list2);
         Server(const ServerOptions &options);
         Server(Server & src);
         // Server & operator=(Server & src);
         ~Server();
         
         //server functions
-        void populateServer();
-
-        //metodes
-        // void setLocation();
+        void populateServer(std::list<std::string>listServer);
+        void populateLocation(std::list<std::string>listServer);
 
     private:
-        std::map<std::string, std::string> mapConfigServer;
         std::string server_name;
         std::string listen;
         std::string root;
         std::string index;
         std::string allow_methods;
-        std::map<Location, std::string> mapLocation;
-        struct sockaddr_in server_address;
+        // struct sockaddr_in server_address;
 };
 
 #endif
