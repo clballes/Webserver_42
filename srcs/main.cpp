@@ -29,11 +29,12 @@ int main(int argc, char *argv[])
         }
         try{
             std::vector<std::list<std::string> >arrayOfLists = splitServer(numServers(listConfig), listConfig);
-            std::vector<Server*> serverVector; //array or dque han de ser punters
-            serverVector.reserve(arrayOfLists.size()); 
+            std::cout << arrayOfLists.size() << std::endl;
+            std::vector<Server> serverVector(2); //array or dque han de ser punters
+            // serverVector.reserve(2); 
                 // std::cout << "a" << std::endl;
             for (size_t i = 0; i < 2; ++i) { //construy dos veces el copy y el construcotrrrr, entonces se me destruye dos veces tbien
-                serverVector.push_back(new Server(arrayOfLists[i]));
+                serverVector[i] = Server(); //Server(arrayOfLists[i]);
             }
         }
         catch (const std::exception & e)

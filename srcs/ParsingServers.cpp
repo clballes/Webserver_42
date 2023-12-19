@@ -217,11 +217,11 @@ int    ParsingServers(std::string filename, std::list<std::string>&listConfig)
     // int servers = numServers(listConfig);
     // if(!servers)
     // {
-    //     std::list<std::string>::iterator it = listConfig.begin();
-    //     for(; it != listConfig.end(); ++it)
-    //     {
-    //         std::cout << *it << std::endl;
-    //     }
+        // std::list<std::string>::iterator it = listConfig.begin();
+        // for(; it != listConfig.end(); ++it)
+        // {
+        //     std::cout << *it << std::endl;
+        // }
     //     std::cerr << "Syntax error: server directive syntax" << std::endl;
     //     return 1;
     // }
