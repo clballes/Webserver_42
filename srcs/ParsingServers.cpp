@@ -3,6 +3,9 @@
 #include <list>
 #include <vector>
 #include <fstream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 // ------- TRIM FUNCTIONS -------
 std::string trim_sp(const std::string& input)
@@ -79,6 +82,7 @@ int    check_brackets(std::list<std::string>&listConfig)
     return 0;
 }
 
+// ----- SPLITSERVER ----------------
 std::vector<std::list<std::string> > splitServer(int servers, std::list<std::string>listConfig){
     std::vector<std::list<std::string> >arrayOfLists(servers);
     std::list<std::string>::iterator it = listConfig.begin();
@@ -107,7 +111,6 @@ void        addElements(std::string &line,  std::list<std::string>&listConfig);
 void addBrackets(std::string &line, std::list<std::string>&listConfig, size_t pos,  std::string bracket)
 {
     if (pos == 0 && line.length() != 1){
-        // std::cout << "first: "<<line << std::endl;
         std::string substring = line.substr(pos + 1);
         listConfig.push_back(bracket);
         listConfig.push_back(trim_sp(substring));
@@ -122,16 +125,8 @@ void addBrackets(std::string &line, std::list<std::string>&listConfig, size_t po
         }
         listConfig.push_back(trim_sp(substring));
         listConfig.push_back(bracket);
-        // for(size_t i = 0; i < sub2.length();i++)
-        // {
-        //     if (!isspace(sub2[i])){
-        //         listConfig.push_back(trim_sp(sub2));
-        //         break;
-        //     }
-        // }
     }
     else if(pos == 0 && line.length() == 1){
-    //   std::cout << "3rd: "<< line << std::endl;
       listConfig.push_back(bracket);
     }
     else
@@ -140,50 +135,47 @@ void addBrackets(std::string &line, std::list<std::string>&listConfig, size_t po
     }
 }
 
+// void    addElements(std::string &line, std::list<std::string>&listConfig)
+// {
+//     size_t start = 0;
+//     size_t end;
+//     end = line.find_first_of("{}", start);
+//     while (end != std::string::npos || start == 0)
+//     {
+//         std::string sub = line.substr(start, end);
+//         listConfig.push_back(sub);
+//         start = end + 1;
+//         end = line.find_first_of("{}", start);
+//     }
+
+// }
+/*
+    if (!line.empty() && line[0] != '#'){
+        listConfig.push_back(trim_sp(line));
+    }
+    else if (pos_open != std::string::npos){
+        addBrackets(line, listConfig, pos_open, "{");
+    }
+    else if(pos_closed != std::string::npos){
+        addBrackets(line, listConfig, pos_closed, "}");
+    }
+    */
+
+
 void    addElements(std::string &line, std::list<std::string>&listConfig)
 {
     size_t pos_open = line.find("{");
     size_t pos_closed = line.find("}");
-    int count = 0;
-    for (std::size_t i = 0; i < line.length(); ++i) {
-        if (line[i] == '{') {
-            ++count;
-        }
-        else if(line[i] == '}'){
-            count++;
-        }
-    }
-    if (!line.empty() && line[0] != '#' && count == 0){
+    if (!line.empty() && line[0] != '#'){
         listConfig.push_back(trim_sp(line));
     }
     else if (pos_open != std::string::npos){
-        if (count != 1)
-        {
-            std::cout << "la line es: -- "<< line << std::endl;
-
-        }
         addBrackets(line, listConfig, pos_open, "{");
     }
     else if(pos_closed != std::string::npos){
-        // if (count != 1)
-        // {
-        //     while(count--)
-        //     {
-        //         std::cout << "la line es: -- "<< line << std::endl;
-        //         size_t pos_closed = line.find("}");
-        //         std::cout << pos_closed << std::endl;
-        //         if (substring != 1)
-        //         {
-        //             std::string substring = line.substr(0, pos_closed + 1);
-        //         }
-        //         line = line.substr(pos_closed + 1, line.length());
-        //         std::cout << "substring es:"<< substring << std::endl;
-        //     }
-        // }
-        // else
-            addBrackets(line, listConfig, pos_closed, "}");
+        addBrackets(line, listConfig, pos_closed, "}");
     }
-}
+} 
 
 // void   printArray()
 // {
@@ -202,30 +194,36 @@ int    ParsingServers(std::string filename, std::list<std::string>&listConfig)
     if (!configFile.is_open()){
         std::cerr << "ERROR OPENING FILE!" << std::endl;
     }
+
     while (std::getline(configFile, line))
     {
         line = trim(line);
         addElements(line, listConfig);
     }
-    // CHECK directives are closed
-    int brackets = check_brackets(listConfig);
-    if (brackets)
-    {
-        std::cout << brackets << std::endl;
-        std::cerr << "Syntax Error: Mising brackets" << std::endl;
-        return 1;
-    }
-    // CHECK how many servers we have and that is correct syntax
-    int servers = numServers(listConfig);
-    if(!servers)
-    {
-        std::cerr << "Syntax error: server directive syntax" << std::endl;
-        return 1;
-    }
     // std::list<std::string>::iterator it = listConfig.begin();
     // for(; it != listConfig.end(); ++it)
     // {
     //     std::cout << *it << std::endl;
+    // }
+    // CHECK directives are closed
+    // int brackets = check_brackets(listConfig);
+    // if (brackets)
+    // {
+    //     std::cout << brackets << std::endl;
+    //     std::cerr << "Syntax Error: Mising brackets" << std::endl;
+    //     return 1;
+    // }
+    // // CHECK how many servers we have and that is correct syntax
+    // int servers = numServers(listConfig);
+    // if(!servers)
+    // {
+    //     std::list<std::string>::iterator it = listConfig.begin();
+    //     for(; it != listConfig.end(); ++it)
+    //     {
+    //         std::cout << *it << std::endl;
+    //     }
+    //     std::cerr << "Syntax error: server directive syntax" << std::endl;
+    //     return 1;
     // }
     return 0;
 }
