@@ -24,9 +24,10 @@
 class Server
 {
     public:
-        Server(std::list<std::string>list2);
-        Server(const ServerOptions &options);
-        Server(Server & src);
+        Server();
+        Server(const std::list<std::string>& list);
+        // Server(const ServerOptions &options);
+        Server(const Server & src);
         // Server & operator=(Server & src);
         ~Server();
         

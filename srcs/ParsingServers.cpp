@@ -79,29 +79,26 @@ int    check_brackets(std::list<std::string>&listConfig)
     return 0;
 }
 
-// void splitServer() // no utilitzar corchetes i tuilitzar el metode i fer servir referenceis i no allocar memoria
-// {
-//     unsigned long int i = this->servers;
-//     std::list<std::string>::iterator it = this->listConfig.begin();
-//     while (it != this->listConfig.end() && i != 0) {
-//     if (*it == "server")
-//         {
-//             std::list<std::string>* subList = new std::list<std::string>;
-//             if (i > this->arrayOfLists.size()) {
-//                 this->arrayOfLists.resize(i, nullptr);
-//             }
-//             this->arrayOfLists[i - 1] = subList;
-//             ++it;
-//             while (it != this->listConfig.end() && *it != "server") {
-//                 arrayOfLists[i - 1]->push_back(*it);
-//                 ++it;
-//             }
-//             if (it != this->listConfig.end() && *it == "server") {
-//                 --i;
-//             }
-//         }
-//     }
-// }
+std::vector<std::list<std::string> > splitServer(int servers, std::list<std::string>listConfig){
+    std::vector<std::list<std::string> >arrayOfLists(servers);
+    std::list<std::string>::iterator it = listConfig.begin();
+    while (it != listConfig.end() && servers!= 0) {
+    if (*it == "server")
+        {
+            std::list<std::string> subList;
+            arrayOfLists[servers- 1] = subList;
+            ++it;
+            while (it != listConfig.end() && *it != "server") {
+                arrayOfLists[servers- 1].push_back(*it);
+                ++it;
+            }
+            if (it != listConfig.end() && *it == "server") {
+                --servers;
+            }
+        }
+    }
+    return arrayOfLists;
+}
 
 // ----- CREATE LIST FUNCTIONS  ----- Create the list seaprating each element by brackets in a new line
 
@@ -231,8 +228,4 @@ int    ParsingServers(std::string filename, std::list<std::string>&listConfig)
     //     std::cout << *it << std::endl;
     // }
     return 0;
-    // std::cout << servers << std::endl;
-    // // split the list in array without server directive but with brackets
-    // splitServer();
-    // printArray();
 }

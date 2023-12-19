@@ -2,29 +2,26 @@
 
 // ---------------- INIZIALIZATION FUNCTIONS -----------------------
 
-Server:: Server(std::list<std::string>list2)
+Server:: Server()
 {
-    std::cout << "Constructor called " << std::endl;
-    // std::list<std::string>::iterator it = list2.begin();
-    // for(; it != list2.end(); ++it)
-    // {
-    //     std::cout << *it << std::endl;
-    // }
-    populateServer(list2);
+    std::cout << "Constructor " << std::endl;
+
 }
 
-Server::Server(const ServerOptions &options)
+
+Server::Server(const std::list<std::string>& list)
+{
+    std::cout << "Constructor default called Server" << std::endl;
+    (void)list;
+    // populateServer(list);
+}
+
+Server::Server(const Server &options)
 {
     (void)options;
-    std::cout << "Constructor called " <<  std::endl;
-    //constructr checkeo el Server, pasarli el fd
+    std::cout << "Copy constructor called " <<  std::endl;
 }
 
-Server::Server(Server & src)
-{
-    std::cout << "Copy called" << std::endl;
-    *this = src;
-}
 
 // Server & Server::operator=(Server & src)
 // {
@@ -35,7 +32,7 @@ Server::Server(Server & src)
 
 Server::~Server()
 {
-    std::cout << "Destructor called" << std::endl;
+    std::cout << "Destructor called Server" << std::endl;
 }
 
 // ------------------------- MEMBER FUNCTIONS -----------------------------------
@@ -44,8 +41,6 @@ void Server::populateServer(std::list<std::string>listServer)
 {
     std::list<std::string>::iterator itB = listServer.begin();
     std::list<std::string>::iterator itLoc = listServer.end();
-
-    // Find the iterator pointing to the first occurrence of "location"
     for (; itB != listServer.end(); ++itB) {
         if (itB->find("location") != std::string::npos) {
             itLoc = itB;
@@ -53,8 +48,7 @@ void Server::populateServer(std::list<std::string>listServer)
         }
     }
     std::list<std::string>::iterator it = listServer.begin();
-    for(; it != itLoc; ++it)
-    {
+    for(; it != itLoc; ++it){
         if(it->find("server_name") != std::string::npos){
             this->server_name = it->substr(12, it->length());
         }
@@ -70,10 +64,6 @@ void Server::populateServer(std::list<std::string>listServer)
         else if(it->find("allow_methods") != std::string::npos)
         {
             this->allow_methods = it->substr(14, it->length());
-        }   
+        }
     }
-    // std::cout << this->server_name << std::endl;
-    // std::cout << this->index << std::endl;
-    // std::cout << this->allow_methods << std::endl;
-    // std::cout << this->root << std::endl;
 }
