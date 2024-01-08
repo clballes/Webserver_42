@@ -1,4 +1,9 @@
-#include "./inc/Config.hpp"
+/*                                                                            */
+/* webserv.cpp                                                                */
+/* clballes <clballes@student.42barcelona.com>                                */
+/* Mon Jan  8 12:17:22 2024                                                   */
+
+#include "Config.hpp"
 
 int main(int argc, char *argv[])
 {
