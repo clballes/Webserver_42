@@ -6,32 +6,35 @@
 #include "ServerConf.hpp"
 
 // ---------------- INIZIALIZATION FUNCTIONS -----------------------
-ServerConf::ServerConf()
+ServerConf::ServerConf (void)
 {
     std::cout << "Constructor called " << std::endl;
 }
 
-ServerConf::ServerConf(ServerConf & src)
+ServerConf::ServerConf (ServerConf& src)
 {
     std::cout << "Copy called" << std::endl;
     *this = src;
 }
 
-// ServerConf & ServerConf::operator=(ServerConf & src)
-// {
-//     this->map = src.map;
-//     std::cout << "Operator called" << std::endl;
-//     return *this;
-// }
+ServerConf& 
+ServerConf::operator= (ServerConf& src)
+{
+	// this->map = src.map;
+	(void) src;
+	std::cout << "operator= called" << std::endl;
+	return *this;
+}
 
-ServerConf::~ServerConf()
+ServerConf::~ServerConf (void)
 {
     std::cout << "Destructor called" << std::endl;
 }
 
 // ------------------------- MEMBER FUNCTIONS -----------------------------------
 
-void ServerConf::ServerConfList(std::string filename)
+void
+ServerConf::ServerConfList (std::string filename)
 {
     this->filename = filename;
     std::ifstream configFile(filename);
@@ -49,22 +52,30 @@ void ServerConf::ServerConfList(std::string filename)
             this->listServerConf.push_back(std::string(it, line.end()));
         }
     }
+
     // Print the list
     // for (std::list<std::string>::iterator it = listServerConf.begin(); it != listServerConf.end(); ++it)
     // {
     //     if (std::next(it) != listServerConf.end())
     //         std::cout << *it << std::endl;
     // }
+
     configFile.close();
     parseServerConf(); //parseamos configuration
 }
 
-void ServerConf::parseServerConf()
+void
+ServerConf::parseServerConf (void)
 {
-    std::list<std::string>::iterator it = std::find(this->listServerConf.begin(), this->listServerConf.end(), "server  {");
-    if (it != this->listServerConf.end()) {
+    std::list<std::string>::iterator it;
+		
+	it = std::find(this->listServerConf.begin(), this->listServerConf.end(), "server  {");
+    if (it != this->listServerConf.end())
+	{
         std::cout << "Found 'server' in the list!" << std::endl;
-    } else {
+    }
+	else
+	{
         std::cout << "'server' not found in the list." << std::endl;
     }
 }
@@ -73,7 +84,8 @@ void ServerConf::parseServerConf()
 
 // ------------------------- EXCEPTION FUNCTIONS -----------------------------------
 
-const char * ServerConf::FailOpen::what() const throw()
+const char*
+ServerConf::FailOpen::what(void) const throw()
 {
     return "Error: Cannot open the file, file not found.";
 }
