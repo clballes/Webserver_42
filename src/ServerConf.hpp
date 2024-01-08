@@ -18,7 +18,7 @@ class ServerConf
 
         ServerConf (void);
         ServerConf (ServerConf&);
-        // ServerConf& operator= (ServerConf&);
+        ServerConf& operator= (ServerConf&);
         ~ServerConf (void);
         
 		void ServerConfList (std::string);
