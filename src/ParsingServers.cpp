@@ -108,14 +108,6 @@ void    addElements(std::string &line, std::list<std::string>&listConfig)
     size_t start = 0;
     size_t end;
     end = line.find_first_of("{}", start);
-    int i = 0;
-    int count = 0;
-    while(line[i])
-    {
-        if (line[i] == '{' || line[i] == '}')
-            count++;
-        i++;
-    }
     if (end == std::string::npos)
     {
         listConfig.push_back(line);
@@ -125,17 +117,15 @@ void    addElements(std::string &line, std::list<std::string>&listConfig)
     {
         while (end != std::string::npos || start == 0)
         {
-            std::cout << "start: "<< start << std::endl;
-            std::cout << "end: "<< end << std::endl;
             std::string sub = line.substr(start, end - start);
-            if (!sub.empty())
-                listConfig.push_back(sub);
+            if (!sub.empty() || sub.length() != 0)
+            {
+                listConfig.push_back(trim_sp(sub));
+            }
             start = end + 1;
             end = line.find_first_of("{}", start);
-            if (start == end)
-            {
-                listConfig.push_back(line.substr(end, 1));
-            }
+            if (end == std::string::npos)
+                listConfig.push_back(trim_sp(line.substr(start - 1, 1)));
         }
     }
 }
@@ -150,8 +140,10 @@ int    parsingServers(std::string filename, std::list<std::string>&listConfig)
     while (std::getline(configFile, line))
     {
         line = trim(line);
-        if (line[0] != '#')
+        if (line[0] != '#' && line.length()!= 0)
+        {
             addElements(line, listConfig);
+        }
     }
     std::list<std::string>::iterator it = listConfig.begin();
     std::cout << "PRINTING LIST -------" << std::endl;
