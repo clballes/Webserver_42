@@ -1,14 +1,7 @@
-/* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Config.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: clballes <clballes@student.42barcel>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/04 11:56:41 by clballes          #+#    #+#             */
-/*   Updated: 2024/01/08 12:39:12 by mpuig-ma         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+/* ServerConf.hpp                                                             */
+/* clballes <clballes@student.42barcelona.com>                                */
+/* Mon Jan  8 12:56:22 2024                                                   */
 
 #ifndef _SERVER_CONF_HPP_
 # define _SERVER_CONF_HPP_
@@ -22,12 +15,14 @@
 class ServerConf
 {
     public:
-        ServerConf();
-        ServerConf(ServerConf & src);
-        // ServerConf & operator=(ServerConf & src);
-        ~ServerConf();
-        void ServerConfList(std::string filename);
-        void parseServerConf();
+
+        ServerConf (void);
+        ServerConf (ServerConf&);
+        // ServerConf& operator= (ServerConf&);
+        ~ServerConf (void);
+        
+		void ServerConfList (std::string);
+        void parseServerConf (void);
 
         class FailOpen : public std::exception
         {
@@ -36,8 +31,9 @@ class ServerConf
         };
 
     private:
-        std::string filename;
-        std::list<std::string>listServerConf;
+
+        std::string					filename;
+        std::list<std::string>		listServerConf;
 
 };
 
