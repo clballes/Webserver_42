@@ -103,30 +103,27 @@ std::vector<std::list<std::string> > splitServer(int servers, std::list<std::str
 }
 
 // ----- CREATE LIST FUNCTIONS  ----- Create the list seaprating each element by brackets in a new line
-void    addElements(std::string &line, std::list<std::string>&listConfig)
+
+void addElements(std::string& line, std::list<std::string>& listConfig)
 {
     size_t start = 0;
     size_t end;
     end = line.find_first_of("{}", start);
-    if (end == std::string::npos)
+    while (end != std::string::npos)
     {
-        listConfig.push_back(line);
-        return ;
-    }
-    else
-    {
-        while (end != std::string::npos || start == 0)
+        std::string sub = line.substr(start, end - start);
+        if (!sub.empty())
         {
-            std::string sub = line.substr(start, end - start);
-            if (!sub.empty() || sub.length() != 0)
-            {
-                listConfig.push_back(trim_sp(sub));
-            }
-            start = end + 1;
-            end = line.find_first_of("{}", start);
-            if (end == std::string::npos)
-                listConfig.push_back(trim_sp(line.substr(start - 1, 1)));
+            listConfig.push_back(trim_sp(sub));
         }
+        listConfig.push_back(line.substr(end, 1));
+        start = end + 1;
+        end = line.find_first_of("{}", start);
+    }
+    std::string remaining = line.substr(start);
+    if (!remaining.empty())
+    {
+        listConfig.push_back(trim_sp(remaining));
     }
 }
 
