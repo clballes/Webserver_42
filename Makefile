@@ -14,7 +14,8 @@ CPPFLAGS		:=	-MMD -iquotes$(INC_DIR)
 #CPPFLAGS		+=	-g -fsanitize='address,undefined'
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 
-SRC_FILES		:=	$(SRC_DIR)/$(NAME).cpp
+SRC_FILES		:=	$(SRC_DIR)/$(NAME).cpp \
+					$(SRC_DIR)/ServerConf.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
 
@@ -32,7 +33,7 @@ $(NAME): $(OBJ_FILES)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(OBJ_FILES) -o $(basename $@)
 
 clean:
-	rm -r $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)
 
 fclean: clean
 	rm $(NAME)
