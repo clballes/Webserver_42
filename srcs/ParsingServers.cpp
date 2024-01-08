@@ -135,20 +135,45 @@ void addBrackets(std::string &line, std::list<std::string>&listConfig, size_t po
     }
 }
 
-// void    addElements(std::string &line, std::list<std::string>&listConfig)
-// {
-//     size_t start = 0;
-//     size_t end;
-//     end = line.find_first_of("{}", start);
-//     while (end != std::string::npos || start == 0)
-//     {
-//         std::string sub = line.substr(start, end);
-//         listConfig.push_back(sub);
-//         start = end + 1;
-//         end = line.find_first_of("{}", start);
-//     }
+void    addElements(std::string &line, std::list<std::string>&listConfig)
+{
+    size_t start = 0;
+    size_t end;
+    end = line.find_first_of("{}", start);
+    int i = 0;
+    int count = 0;
+    while(line[i])
+    {
+        if (line[i] == '{' || line[i] == '}')
+            count++;
+        i++;
+    }
+    if (end == std::string::npos)
+    {
+        listConfig.push_back(line);
+        return ;
+    }
+    else
+    {
+        while (end != std::string::npos || start == 0)
+        {
+            std::cout << "start: "<< start << std::endl;
+            std::cout << "end: "<< end << std::endl;
+            std::string sub = line.substr(start, end - start);
+            if (!sub.empty())
+                listConfig.push_back(sub);
+            start = end + 1;
+            end = line.find_first_of("{}", start);
+            if (start == end)
+            {
+                listConfig.push_back(line.substr(end, 1));
+            }
+                
 
-// }
+        }
+    }
+}
+
 /*
     if (!line.empty() && line[0] != '#'){
         listConfig.push_back(trim_sp(line));
@@ -162,20 +187,20 @@ void addBrackets(std::string &line, std::list<std::string>&listConfig, size_t po
     */
 
 
-void    addElements(std::string &line, std::list<std::string>&listConfig)
-{
-    size_t pos_open = line.find("{");
-    size_t pos_closed = line.find("}");
-    if (!line.empty() && line[0] != '#'){
-        listConfig.push_back(trim_sp(line));
-    }
-    else if (pos_open != std::string::npos){
-        addBrackets(line, listConfig, pos_open, "{");
-    }
-    else if(pos_closed != std::string::npos){
-        addBrackets(line, listConfig, pos_closed, "}");
-    }
-} 
+// void    addElements(std::string &line, std::list<std::string>&listConfig)
+// {
+//     size_t pos_open = line.find("{");
+//     size_t pos_closed = line.find("}");
+//     if (!line.empty() && line[0] != '#'){
+//         listConfig.push_back(trim_sp(line));
+//     }
+//     else if (pos_open != std::string::npos){
+//         addBrackets(line, listConfig, pos_open, "{");
+//     }
+//     else if(pos_closed != std::string::npos){
+//         addBrackets(line, listConfig, pos_closed, "}");
+//     }
+// } 
 
 // void   printArray()
 // {
@@ -194,17 +219,18 @@ int    ParsingServers(std::string filename, std::list<std::string>&listConfig)
     if (!configFile.is_open()){
         std::cerr << "ERROR OPENING FILE!" << std::endl;
     }
-
     while (std::getline(configFile, line))
     {
         line = trim(line);
         addElements(line, listConfig);
     }
-    // std::list<std::string>::iterator it = listConfig.begin();
-    // for(; it != listConfig.end(); ++it)
-    // {
-    //     std::cout << *it << std::endl;
-    // }
+    std::list<std::string>::iterator it = listConfig.begin();
+        std::cout << "PRINTING LIST -------" << std::endl;
+    
+    for(; it != listConfig.end(); ++it)
+    {
+        std::cout << *it << std::endl;
+    }
     // CHECK directives are closed
     // int brackets = check_brackets(listConfig);
     // if (brackets)
