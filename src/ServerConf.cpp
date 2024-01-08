@@ -1,32 +1,37 @@
-#include "Config.hpp"
+/*                                                                            */
+/* ServerConf.cpp                                                             */
+/* clballes <clballes@student.42barcelona.com>                                */
+/* Mon Jan  8 12:39:29 2024                                                   */
+
+#include "ServerConf.hpp"
 
 // ---------------- INIZIALIZATION FUNCTIONS -----------------------
-Config::Config()
+ServerConf::ServerConf()
 {
     std::cout << "Constructor called " << std::endl;
 }
 
-Config::Config(Config & src)
+ServerConf::ServerConf(ServerConf & src)
 {
     std::cout << "Copy called" << std::endl;
     *this = src;
 }
 
-// Config & Config::operator=(Config & src)
+// ServerConf & ServerConf::operator=(ServerConf & src)
 // {
 //     this->map = src.map;
 //     std::cout << "Operator called" << std::endl;
 //     return *this;
 // }
 
-Config::~Config()
+ServerConf::~ServerConf()
 {
     std::cout << "Destructor called" << std::endl;
 }
 
 // ------------------------- MEMBER FUNCTIONS -----------------------------------
 
-void Config::ConfigList(std::string filename)
+void ServerConf::ServerConfList(std::string filename)
 {
     this->filename = filename;
     std::ifstream configFile(filename);
@@ -41,23 +46,23 @@ void Config::ConfigList(std::string filename)
             ++it;
         }
         if (!line.empty()) {
-            this->listConfig.push_back(std::string(it, line.end()));
+            this->listServerConf.push_back(std::string(it, line.end()));
         }
     }
     // Print the list
-    // for (std::list<std::string>::iterator it = listConfig.begin(); it != listConfig.end(); ++it)
+    // for (std::list<std::string>::iterator it = listServerConf.begin(); it != listServerConf.end(); ++it)
     // {
-    //     if (std::next(it) != listConfig.end())
+    //     if (std::next(it) != listServerConf.end())
     //         std::cout << *it << std::endl;
     // }
     configFile.close();
-    parseConfig(); //parseamos configuration
+    parseServerConf(); //parseamos configuration
 }
 
-void Config::parseConfig()
+void ServerConf::parseServerConf()
 {
-    std::list<std::string>::iterator it = std::find(this->listConfig.begin(), this->listConfig.end(), "server  {");
-    if (it != this->listConfig.end()) {
+    std::list<std::string>::iterator it = std::find(this->listServerConf.begin(), this->listServerConf.end(), "server  {");
+    if (it != this->listServerConf.end()) {
         std::cout << "Found 'server' in the list!" << std::endl;
     } else {
         std::cout << "'server' not found in the list." << std::endl;
@@ -68,7 +73,7 @@ void Config::parseConfig()
 
 // ------------------------- EXCEPTION FUNCTIONS -----------------------------------
 
-const char * Config::FailOpen::what() const throw()
+const char * ServerConf::FailOpen::what() const throw()
 {
     return "Error: Cannot open the file, file not found.";
 }
