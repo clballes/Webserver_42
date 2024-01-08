@@ -11,12 +11,10 @@
 std::string trim_sp(const std::string& input)
 {
     std::string result = input;
-    // Trim trailing spaces and tabs
     size_t lastNonSpace = result.size();
     while (lastNonSpace > 0 && (result[lastNonSpace - 1] == ' ' || result[lastNonSpace - 1] == '\t')) {
         --lastNonSpace;
     }
-    // Erase trailing spaces and tabs
     if (lastNonSpace < result.size()) {
         result.erase(lastNonSpace);
     }
@@ -105,36 +103,6 @@ std::vector<std::list<std::string> > splitServer(int servers, std::list<std::str
 }
 
 // ----- CREATE LIST FUNCTIONS  ----- Create the list seaprating each element by brackets in a new line
-
-void        addElements(std::string &line,  std::list<std::string>&listConfig);
-
-void addBrackets(std::string &line, std::list<std::string>&listConfig, size_t pos,  std::string bracket)
-{
-    if (pos == 0 && line.length() != 1){
-        std::string substring = line.substr(pos + 1);
-        listConfig.push_back(bracket);
-        listConfig.push_back(trim_sp(substring));
-    }
-    else if (pos != 0){
-        // std::cout << "2nd: " << line << std::endl;
-        std::string substring = line.substr(0, pos);
-        if (pos != (line.length() - 1))
-        {
-            std::string sub2 = line.substr(pos + 1, line.length());
-            // std::cout << "------------- sub2 is: -----"  << sub2 << std::endl;
-        }
-        listConfig.push_back(trim_sp(substring));
-        listConfig.push_back(bracket);
-    }
-    else if(pos == 0 && line.length() == 1){
-      listConfig.push_back(bracket);
-    }
-    else
-    {
-        std::cerr << "Error in the directive, brackets parsing list" << std::endl;
-    }
-}
-
 void    addElements(std::string &line, std::list<std::string>&listConfig)
 {
     size_t start = 0;
@@ -168,51 +136,11 @@ void    addElements(std::string &line, std::list<std::string>&listConfig)
             {
                 listConfig.push_back(line.substr(end, 1));
             }
-                
-
         }
     }
 }
 
-/*
-    if (!line.empty() && line[0] != '#'){
-        listConfig.push_back(trim_sp(line));
-    }
-    else if (pos_open != std::string::npos){
-        addBrackets(line, listConfig, pos_open, "{");
-    }
-    else if(pos_closed != std::string::npos){
-        addBrackets(line, listConfig, pos_closed, "}");
-    }
-    */
-
-
-// void    addElements(std::string &line, std::list<std::string>&listConfig)
-// {
-//     size_t pos_open = line.find("{");
-//     size_t pos_closed = line.find("}");
-//     if (!line.empty() && line[0] != '#'){
-//         listConfig.push_back(trim_sp(line));
-//     }
-//     else if (pos_open != std::string::npos){
-//         addBrackets(line, listConfig, pos_open, "{");
-//     }
-//     else if(pos_closed != std::string::npos){
-//         addBrackets(line, listConfig, pos_closed, "}");
-//     }
-// } 
-
-// void   printArray()
-// {
-//     for (unsigned long int i = 0; i < this->servers; ++i) {
-//         std::cout << "-------------Sublist------------" << i + 1 << std::endl;
-//         for (std::list<std::string>::iterator sublistIt = arrayOfLists[i]->begin(); sublistIt != arrayOfLists[i]->end(); ++sublistIt) {
-//             std::cout << *sublistIt << std::endl;
-//         }
-//     }
-// }
-
-int    ParsingServers(std::string filename, std::list<std::string>&listConfig)
+int    parsingServers(std::string filename, std::list<std::string>&listConfig)
 {
     std::ifstream configFile(filename);
     std::string line;
@@ -222,11 +150,11 @@ int    ParsingServers(std::string filename, std::list<std::string>&listConfig)
     while (std::getline(configFile, line))
     {
         line = trim(line);
-        addElements(line, listConfig);
+        if (line[0] != '#')
+            addElements(line, listConfig);
     }
     std::list<std::string>::iterator it = listConfig.begin();
-        std::cout << "PRINTING LIST -------" << std::endl;
-    
+    std::cout << "PRINTING LIST -------" << std::endl;
     for(; it != listConfig.end(); ++it)
     {
         std::cout << *it << std::endl;
@@ -253,3 +181,13 @@ int    ParsingServers(std::string filename, std::list<std::string>&listConfig)
     // }
     return 0;
 }
+
+// void   printArray()
+// {
+//     for (unsigned long int i = 0; i < this->servers; ++i) {
+//         std::cout << "-------------Sublist------------" << i + 1 << std::endl;
+//         for (std::list<std::string>::iterator sublistIt = arrayOfLists[i]->begin(); sublistIt != arrayOfLists[i]->end(); ++sublistIt) {
+//             std::cout << *sublistIt << std::endl;
+//         }
+//     }
+// }
