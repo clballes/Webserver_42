@@ -15,6 +15,7 @@ CPPFLAGS		:=	-MMD -iquotes$(INC_DIR)
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 
 SRC_FILES		:=	$(SRC_DIR)/$(NAME).cpp \
+					$(SRC_DIR)/Server.cpp \
 					$(SRC_DIR)/ServerConf.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
