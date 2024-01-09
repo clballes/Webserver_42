@@ -4,7 +4,10 @@
 /* Mon Jan  8 12:17:22 2024                                                   */
 
 #include "webserv.hpp"
-#include "ServerConf.hpp" // per separat o incloure a webserv.hpp ??
+
+// Per separat o incloure a webserv.hpp ??
+#include "ServerConf.hpp"
+
 #include <iostream>
 
 int
