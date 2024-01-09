@@ -18,8 +18,8 @@ class ServerConf
     public:
 
         ServerConf (void);
-        ServerConf (ServerConf&);
-        ServerConf& operator= (ServerConf&);
+        ServerConf (const ServerConf&);
+        ServerConf& operator= (const ServerConf&);
         ~ServerConf (void);
 
 		// la llista fora, al main, no?

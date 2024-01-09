@@ -6,19 +6,20 @@
 #include "ServerConf.hpp"
 
 // ---------------- INIZIALIZATION FUNCTIONS -----------------------
+
 ServerConf::ServerConf (void)
 {
     std::cout << "Constructor called " << std::endl;
 }
 
-ServerConf::ServerConf (ServerConf& src)
+ServerConf::ServerConf (const ServerConf& src)
 {
     std::cout << "Copy called" << std::endl;
     *this = src;
 }
 
 ServerConf& 
-ServerConf::operator= (ServerConf& src)
+ServerConf::operator= (const ServerConf& src)
 {
 	// this->map = src.map;
 	(void) src;
