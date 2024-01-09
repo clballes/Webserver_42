@@ -6,6 +6,7 @@
 #ifndef _SERVER_CONF_HPP_
 # define _SERVER_CONF_HPP_
 
+# include "webserv.hpp"
 # include <iostream>
 # include <fstream>
 # include <list>
