@@ -13,6 +13,11 @@ main (int argc, const char **argv)
 {
 	std::string		conf_file;
 
+	#ifdef SILENCE_LOGS
+	std::ofstream	log_file("logs.txt");
+	std::clog.rdbuf(log_file.rdbuf());
+	#endif
+
 	conf_file = DEFAULT_CONF;
     if (argc > 2)
     {
@@ -23,19 +28,7 @@ main (int argc, const char **argv)
 	if (argv[1] != NULL)
 		conf_file.assign(argv[1]);
 
-	// parsing servers posa tot en una llista
-	std::list<std::string>listConfig;
-	if(parsingServers(argv[1], listConfig) == EXIT_FAILURE){
-		return EXIT_FAILURE;
-	}
-		// AIXO PER FER ARRAY DE SERVERS
-		// std::vector<std::list<std::string> >arrayOfLists = splitServer(numServers(listConfig), listConfig);
-		// std::cout << arrayOfLists.size() << std::endl;
-		// std::vector<Server> serverVector(2); //array or dque han de ser punters
-		// // serverVector.reserve(2); 
-		// 	// std::cout << "a" << std::endl;
-		// for (size_t i = 0; i < 2; ++i) { //construy dos veces el copy y el construcotrrrr, entonces se me destruye dos veces tbien
-		// 	serverVector[i] = Server(); //Server(arrayOfLists[i]);
-		// }
+	Server	server_instance;
+
 	return (EXIT_SUCCESS);
 }
