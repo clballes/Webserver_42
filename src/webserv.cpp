@@ -3,21 +3,10 @@
 /* clballes <clballes@student.42barcelona.com>                                */
 /* Mon Jan  8 12:17:22 2024                                                   */
 
-#include "webserv.hpp"
-#include "ServerConf.hpp" // per separat o incloure a webserv.hpp ??
+#include "Server.hpp"
+#include "ParsingServers.hpp"
 #include <iostream>
 #include <list>
-
-//functions for parsing
-std::string trim_sp(const std::string& input);
-std::string trim(const std::string& input);
-// void        printArray();
-void        addElements(std::string &line,  std::list<std::string>&listConfigig);
-int         numServers(std::list<std::string>listConfig);
-std::vector<std::list<std::string> >        splitServer(int servers, std::list<std::string>listConfig);
-int         parsingServers(std::string filename, std::list<std::string>&listConfig);
-int         check_brackets(std::list<std::string>&listConfig);
-
 
 int
 main (int argc, const char **argv)
@@ -48,8 +37,5 @@ main (int argc, const char **argv)
 		// for (size_t i = 0; i < 2; ++i) { //construy dos veces el copy y el construcotrrrr, entonces se me destruye dos veces tbien
 		// 	serverVector[i] = Server(); //Server(arrayOfLists[i]);
 		// }
-	// ServerConf	server_conf(conf_file);
-	// ServerConf	server_conf;
-
 	return (EXIT_SUCCESS);
 }

@@ -1,47 +1,51 @@
-/* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: clballes <clballes@student.42barcel>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/04 11:56:41 by clballes          #+#    #+#             */
-/*   Updated: 2023/12/04 11:56:44 by clballes         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+/* Server.hpp                                                                 */
+/* clballes <clballes@student.42barcelona.com>                                */
+/* Mon Jan  8 12:56:22 2024                                                   */
 
-#ifndef __SERVER_HPP__
-#define __SERVER_HPP__
+#ifndef _SERVER_HPP_
+# define _SERVER_HPP_
 
-#include <iostream>
-#include <map>
-#include <list>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include "ServerOptions.hpp"
-#include "Location.hpp"
+# include <iostream>
+# include <fstream>
+# include <list>
+# include <exception>
+# include <string>
+# include "webserv.hpp"
 
 class Server
 {
     public:
-        Server();
-        Server(const std::list<std::string>& list);
-        // Server(const ServerOptions &options);
-        Server(const Server & src);
-        // Server & operator=(Server & src);
-        ~Server();
-        
-        //server functions
+
+        Server (void);
+        Server (Server&);
+        Server& operator= (Server&);
+        ~Server (void);
+
         void populateServer(std::list<std::string>listServer);
-        void populateLocation(std::list<std::string>listServer);
+
+		void	setPort (int); // must use htons()
+		void	setAddr (int); // rep INADDR_ANY (macro)
+		int		getPort (void) const;
+		int		getAddr (void) const;
 
     private:
-        std::string server_name;
+
+		struct sockaddr_in			s_address;
+		// s_address.sin_family rep AF_INET (macro)
+		// s_address.sin_port rep htons(int)
+		// s_address.sin_addr.s_addr rep INADDR_ANY (macro), de moment
+		std::size_t					client_max_body_size; // 0 == infinit
+		std::string					server_name;
+        std::string					filename;
+        std::list<std::string>		listServer;
+        
+        
         std::string listen;
         std::string root;
         std::string index;
         std::string allow_methods;
-        // struct sockaddr_in server_address;
+
 };
 
-#endif
+# endif /* Server.hpp */

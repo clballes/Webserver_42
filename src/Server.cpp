@@ -1,38 +1,33 @@
-#include "./inc/Server.hpp"
+/*                                                                            */
+/* Server.cpp                                                                 */
+/* clballes <clballes@student.42barcelona.com>                                */
+/* Mon Jan  8 12:39:29 2024                                                   */
+
+#include "Server.hpp"
 
 // ---------------- INIZIALIZATION FUNCTIONS -----------------------
-
-Server:: Server()
+Server::Server (void)
 {
-    std::cout << "Constructor " << std::endl;
-
+    std::cout << "Constructor called " << std::endl;
 }
 
-
-Server::Server(const std::list<std::string>& list)
+Server::Server (Server& src)
 {
-    std::cout << "Constructor default called Server" << std::endl;
-    (void)list;
-    // populateServer(list);
+    std::cout << "Copy called" << std::endl;
+    *this = src;
 }
 
-Server::Server(const Server &options)
+Server& 
+Server::operator= (Server& src)
 {
-    (void)options;
-    std::cout << "Copy constructor called " <<  std::endl;
+	(void) src;
+	std::cout << "operator= called" << std::endl;
+	return *this;
 }
 
-
-// Server & Server::operator=(Server & src)
-// {
-//     this->map = src.map;
-//     std::cout << "Operator called" << std::endl;
-//     return *this;
-// }
-
-Server::~Server()
+Server::~Server (void)
 {
-    std::cout << "Destructor called Server" << std::endl;
+    std::cout << "Destructor called" << std::endl;
 }
 
 // ------------------------- MEMBER FUNCTIONS -----------------------------------
