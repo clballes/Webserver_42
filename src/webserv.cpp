@@ -34,12 +34,10 @@ main (int argc, const char **argv)
 	if (argv[1] != NULL)
 		conf_file.assign(argv[1]);
 
-	// Podriem fer:
+	// parsing servers posa tot en una llista
 	std::list<std::string>listConfig;
-	int res = parsingServers(argv[1], listConfig);
-	if(res){
-		std::cerr << "Cannot execute; parsing incorrect syntax" << std::endl;
-		return (1);
+	if(parsingServers(argv[1], listConfig) == EXIT_FAILURE){
+		return EXIT_FAILURE;
 	}
 		// AIXO PER FER ARRAY DE SERVERS
 		// std::vector<std::list<std::string> >arrayOfLists = splitServer(numServers(listConfig), listConfig);

@@ -133,6 +133,7 @@ int    parsingServers(std::string filename, std::list<std::string>&listConfig)
     std::string line;
     if (!configFile.is_open()){
         std::cerr << "ERROR OPENING FILE!" << std::endl;
+        return (1);
     }
     while (std::getline(configFile, line))
     {
@@ -142,19 +143,22 @@ int    parsingServers(std::string filename, std::list<std::string>&listConfig)
             addElements(line, listConfig);
         }
     }
+
+
     std::list<std::string>::iterator it = listConfig.begin();
     std::cout << "PRINTING LIST -------" << std::endl;
     for(; it != listConfig.end(); ++it)
     {
         std::cout << *it << std::endl;
     }
+
     // CHECK directives are closed
     // int brackets = check_brackets(listConfig);
     // if (brackets)
     // {
     //     std::cout << brackets << std::endl;
     //     std::cerr << "Syntax Error: Mising brackets" << std::endl;
-    //     return 1;
+    //     return EXIT_FAILURE;
     // }
     // // CHECK how many servers we have and that is correct syntax
     // int servers = numServers(listConfig);

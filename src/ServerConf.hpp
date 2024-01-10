@@ -11,6 +11,7 @@
 # include <list>
 # include <exception>
 # include <string>
+# include "webserv.hpp"
 
 class ServerConf
 {
@@ -38,7 +39,7 @@ class ServerConf
 
     private:
 
-		// struct sockaddr_in			s_address;
+		struct sockaddr_in			s_address;
 		// s_address.sin_family rep AF_INET (macro)
 		// s_address.sin_port rep htons(int)
 		// s_address.sin_addr.s_addr rep INADDR_ANY (macro), de moment

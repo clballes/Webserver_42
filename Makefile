@@ -37,7 +37,7 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 fclean: clean
-	rm $(NAME)
+	rm -f $(NAME)
 
 re: fclean
 	$(MAKE)
