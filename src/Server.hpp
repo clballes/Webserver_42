@@ -3,8 +3,8 @@
 /* clballes <clballes@student.42barcelona.com>                                */
 /* Mon Jan  8 12:56:22 2024                                                   */
 
-#ifndef _SERVER_HPP_
-# define _SERVER_HPP_
+#ifndef _WEBSERV_SERVER_HPP_
+# define _WEBSERV_SERVER_HPP_
 
 # include "webserv.hpp"
 # include <iostream>
