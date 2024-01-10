@@ -3,9 +3,10 @@
 /* clballes <clballes@student.42barcelona.com>                                */
 /* Mon Jan  8 12:17:22 2024                                                   */
 
-#include "webserv.hpp"
-#include "ServerConf.hpp" // per separat o incloure a webserv.hpp ??
+#include "Server.hpp"
+#include "ParsingServers.hpp"
 #include <iostream>
+#include <list>
 
 int
 main (int argc, const char **argv)
@@ -22,9 +23,19 @@ main (int argc, const char **argv)
 	if (argv[1] != NULL)
 		conf_file.assign(argv[1]);
 
-	// Podriem fer:
-	// ServerConf	server_conf(conf_file);
-	ServerConf	server_conf;
-
+	// parsing servers posa tot en una llista
+	std::list<std::string>listConfig;
+	if(parsingServers(argv[1], listConfig) == EXIT_FAILURE){
+		return EXIT_FAILURE;
+	}
+		// AIXO PER FER ARRAY DE SERVERS
+		// std::vector<std::list<std::string> >arrayOfLists = splitServer(numServers(listConfig), listConfig);
+		// std::cout << arrayOfLists.size() << std::endl;
+		// std::vector<Server> serverVector(2); //array or dque han de ser punters
+		// // serverVector.reserve(2); 
+		// 	// std::cout << "a" << std::endl;
+		// for (size_t i = 0; i < 2; ++i) { //construy dos veces el copy y el construcotrrrr, entonces se me destruye dos veces tbien
+		// 	serverVector[i] = Server(); //Server(arrayOfLists[i]);
+		// }
 	return (EXIT_SUCCESS);
 }
