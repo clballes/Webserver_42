@@ -12,7 +12,9 @@ BUILD_DIR		:=	build
 CC				:=	c++
 CPPFLAGS		:=	-MMD -iquotes$(INC_DIR)
 #CPPFLAGS		+=	-g -fsanitize='address,undefined'
+CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
+SILENCE_LOGS	?=	false
 
 SRC_FILES		:=	$(SRC_DIR)/$(NAME).cpp \
 					$(SRC_DIR)/Server.cpp \
@@ -24,7 +26,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re debug
 
 #include $(DEP_FILES)
 
