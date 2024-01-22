@@ -6,11 +6,20 @@
 #ifndef _WEBSERV_SERVER_HPP_
 # define _WEBSERV_SERVER_HPP_
 
+# ifndef WEBSERV_OK
+#  define WEBSERV_OK true
+# endif /* WEBSERV_OK */
+
 # include "webserv.hpp"
 
 # include <iostream>
 # include <string>
 # include <list>
+
+struct directives_s
+{
+	char* id;
+};
 
 class Server
 {
@@ -27,25 +36,29 @@ class Server
 		void setName (const std::string&);
 
 		const struct in_addr& getAddr (void) const;
-		void setAddr (uint32_t); // rep INADDR_ANY (macro)
+		void setAddr (uint32_t);
 	
 		int getPort (void) const;
-		void setPort (int); // must use htons()
+		void setPort (int);
+
+		bool ok (void) const;
+		void listen (void) const;
 
     private:
 
+		bool					_status;
 		struct sockaddr_in		_s_address;
+		struct sockadd_in		_c_address;
 		std::size_t				_client_max_body_size; // 0 == infinit
 
 		std::string				_server_name;
-		std::string				filename;
-		std::list<std::string>	listServer;
-        
-        
-		std::string listen;
-		std::string root;
-		std::string index;
-		std::string allow_methods;
+		std::string				_filename;
+		std::list<std::string>	_listServer;
+
+		std::string _listen;
+		std::string _root;
+		std::string _index;
+		std::string _allow_methods;
 
 };
 

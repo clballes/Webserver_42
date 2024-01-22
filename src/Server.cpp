@@ -7,7 +7,7 @@
 
 // ---------------- INIZIALIZATION FUNCTIONS -----------------------
 
-Server::Server (void)
+Server::Server (void): _status(WEBSERV_OK)
 {
 	std::clog << "[" << this << "] ";
     std::clog << "[Server] Constructor called" << std::endl;
@@ -18,25 +18,28 @@ Server::Server (void)
 	return ;
 }
 
-Server::Server (const Server& src)
+Server::Server (const Server& instance)
 {
 	std::clog << "[" << this << "] ";
     std::clog << "[Server] Copy called" << std::endl;
     
-	*this = src;
+	*this = instance;
 
 	return ;
 }
 
 Server& 
-Server::operator= (const Server& src)
+Server::operator= (const Server& instance)
 {
 	std::clog << "[" << this << "] ";
 	std::clog << "[Server] operator= called" << std::endl;
 
-	(void) src;
+	this->_status = instance._status;
+	this->_s_address = instance._s_address;
+	this->_client_max_body_size = instance._client_max_body_size;
+	this->_server_name = instance._server_name;
 	
-	return *this;
+	return (*this);
 }
 
 Server::~Server (void)
@@ -49,7 +52,40 @@ Server::~Server (void)
 
 // ----------------------- MEMBER FUNCTIONS ----------------------
 
-void Server::populateServer(std::list<std::string>listServer)
+bool
+Server::ok (void) const
+{
+	return (this->_status);
+}
+
+void
+Server::listen (void) const
+{
+	int				kq;
+	int				new_events;
+	struct kevent*	event_list = 0x0;
+
+	std::clog << "[" << this << "] ";
+	std::clog << "started listenning()" << std::endl;
+
+
+	// Prepare the kqueue
+	kq = kqueue();
+
+	// Set event(s) to opened sockets
+	EV_SET( , socketfd_2_listen, EVILT_READ, EV_ADD | EV_ENABLE, 0, 0, 0);
+
+	// Event loop
+	while (this->_status == WEBSERV_OK)
+	{
+		new_events = kevent(kq, 
+	}
+
+	return ;
+}
+
+void
+Server::populateServer (std::list<std::string>listServer)
 {
     std::list<std::string>::iterator itB = listServer.begin();
     std::list<std::string>::iterator itLoc = listServer.end();
@@ -65,17 +101,17 @@ void Server::populateServer(std::list<std::string>listServer)
             this->_server_name = it->substr(12, it->length());
         }
         else if(it->find("listen") != std::string::npos){
-            this->listen = it->substr(7, it->length());
+            this->_listen = it->substr(7, it->length());
         }
         else if(it->find("root") != std::string::npos){
-            this->root = it->substr(5, it->length());
+            this->_root = it->substr(5, it->length());
         }
         else if(it->find("index") != std::string::npos){
-            this->index = it->substr(6, it->length());
+            this->_index = it->substr(6, it->length());
         }
         else if(it->find("allow_methods") != std::string::npos)
         {
-            this->allow_methods = it->substr(14, it->length());
+            this->_allow_methods = it->substr(14, it->length());
         }
     }
 }
@@ -93,6 +129,7 @@ Server::setAddr (uint32_t ip)
 	std::clog << "SET address to 0x" << std::hex << ip << std::endl;
 	
 	this->_s_address.sin_addr.s_addr = ip;
+	(void) this->_s_address;
 
 	return ;
 }

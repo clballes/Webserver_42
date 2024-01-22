@@ -12,7 +12,7 @@ BUILD_DIR		:=	build
 CC				:=	c++
 CPPFLAGS		:=	-MMD -iquotes$(INC_DIR)
 #CPPFLAGS		+=	-g -fsanitize='address,undefined'
-CPPFLAGS		+=	-D SILENCE_LOGS
+#CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 SILENCE_LOGS	?=	false
 
