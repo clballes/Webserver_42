@@ -63,16 +63,29 @@ Server::listen (void) const
 {
 	int				kq;
 	int				new_events;
-	struct kevent*	event_list = 0x0;
+	struct kevent*	changelist = 0x0;
+	int				nchanges = 0;
+	struct kevent*	eventlist = 0x0;
+	int				nevents;
+	struct timespec	timeout = 0x0;
+
+	struct sockaddr_in[] s
 
 	std::clog << "[" << this << "] ";
 	std::clog << "started listenning()" << std::endl;
 
 
-	// Prepare the kqueue
-	kq = kqueue();
 
-	// Set event(s) to opened sockets
+	// Create new kernel event queue.
+	kq = kqueue();
+	if (kq == -1)
+	{
+		std::clog << "[" << this << "] ";
+		std::clog << strerror(errno) << std::endl;
+		std::cerr << strerror(errno) << std::endl;
+	}
+
+	// Initialize kevent struct (macro)
 	EV_SET( , socketfd_2_listen, EVILT_READ, EV_ADD | EV_ENABLE, 0, 0, 0);
 
 	// Event loop
