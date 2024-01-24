@@ -1,3 +1,8 @@
+# lsof
+
 lsof -Pn -i4
-echo
 lsof -PiTCP -sTCP:LISTEN
+
+# netstat
+
+netstat -anvp tcp
