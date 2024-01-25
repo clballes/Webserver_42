@@ -43,6 +43,7 @@ main (int argc, const char** argv)
 	}
 
 	uint32_t ip = ptr->sin_addr.s_addr;
+	(void)ip;
 
 	int s = socket(AF_INET, SOCK_STREAM, 6);
 	std::cout << "s: " << s << std::endl;
