@@ -5,15 +5,31 @@
 
 #include "Server.hpp"
 
-// ---------------- INIZIALIZATION FUNCTIONS -----------------------
+const struct addrinfo
+Server::_hints =
+{
+	AI_ADDRCONFIG | AI_PASSIVE, 
+	AF_INET, 
+	SOCK_STREAM, 
+	IPPROTO_TCP, 
+	0x0,
+	0x0,
+	0x0,
+	0x0
+};
 
-Server::Server (void): _status(WEBSERV_OK)
+// Initialization functions
+
+Server::Server (void): _status(WEBSERV_OK), _addrinfo_list(0x0)
 {
 	std::clog << "[" << this << "] ";
     std::clog << "[Server] Constructor called" << std::endl;
 
 	this->_s_address.sin_family = AF_INET;
-	(void) _client_max_body_size;
+	(void)_client_max_body_size;
+	(void)_hints;
+
+	this->_listen_host.assign("localhost");
 
 	return ;
 }
@@ -47,10 +63,13 @@ Server::~Server (void)
 	std::clog << "[" << this << "] ";
     std::clog << "[Server] Destructor called" << std::endl;
 
+	if (this->_addrinfo_list != 0x0)
+		::freeaddrinfo(this->_addrinfo_list);
+
 	return ;
 }
 
-// ----------------------- MEMBER FUNCTIONS ----------------------
+// Member functions
 
 bool
 Server::ok (void) const
@@ -59,74 +78,126 @@ Server::ok (void) const
 }
 
 void
-Server::listen (void) const
+Server::start (void)
 {
-	int				kq;
-	int				new_events;
-	struct kevent*	changelist = 0x0;
-	int				nchanges = 0;
-	struct kevent*	eventlist = 0x0;
-	int				nevents;
-	struct timespec	timeout = 0x0;
-
-	struct sockaddr_in[] s
-
-	std::clog << "[" << this << "] ";
-	std::clog << "started listenning()" << std::endl;
-
-
-
-	// Create new kernel event queue.
-	kq = kqueue();
-	if (kq == -1)
-	{
-		std::clog << "[" << this << "] ";
-		std::clog << strerror(errno) << std::endl;
-		std::cerr << strerror(errno) << std::endl;
-	}
-
-	// Initialize kevent struct (macro)
-	EV_SET( , socketfd_2_listen, EVILT_READ, EV_ADD | EV_ENABLE, 0, 0, 0);
-
-	// Event loop
-	while (this->_status == WEBSERV_OK)
-	{
-		new_events = kevent(kq, 
-	}
+	this->setaddrinfo();
+	this->socket();
+	this->bind();
+	this->listen();
 
 	return ;
 }
 
 void
-Server::populateServer (std::list<std::string>listServer)
+Server::setaddrinfo (void)
 {
-    std::list<std::string>::iterator itB = listServer.begin();
-    std::list<std::string>::iterator itLoc = listServer.end();
-    for (; itB != listServer.end(); ++itB) {
-        if (itB->find("location") != std::string::npos) {
-            itLoc = itB;
-            break;
-        }
-    }
-    std::list<std::string>::iterator it = listServer.begin();
-    for(; it != itLoc; ++it){
-        if(it->find("server_name") != std::string::npos){
-            this->_server_name = it->substr(12, it->length());
-        }
-        else if(it->find("listen") != std::string::npos){
-            this->_listen = it->substr(7, it->length());
-        }
-        else if(it->find("root") != std::string::npos){
-            this->_root = it->substr(5, it->length());
-        }
-        else if(it->find("index") != std::string::npos){
-            this->_index = it->substr(6, it->length());
-        }
-        else if(it->find("allow_methods") != std::string::npos)
-        {
-            this->_allow_methods = it->substr(14, it->length());
-        }
-    }
+	this->_status = ::getaddrinfo(this->_listen_host.c_str(),
+			"http",
+			&Server::_hints,
+			&this->_addrinfo_list);
+
+	if (this->_status != 0)
+	{
+		std::cerr << "[" << this << "] ";
+		std::cerr << ::gai_strerror(this->_status) << std::endl;
+		return ;
+	}
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::setaddrinfo" << std::endl;
+
+	return ;
+}
+
+void
+Server::socket (void)
+{
+	if (this->_addrinfo_list == 0x0)
+		return ;
+	else if (this->_addrinfo_list[0].ai_addr->sa_family == AF_INET6)
+	{
+		domain = ;
+		type = ;
+		protocol = ;
+	}
+	else
+	{
+		domain = ;
+		type = ;
+		protocol = ;
+		static_cast<struct sockaddr_in*>(this->_addrinfo_list[0])->//sockaddr_in or sockaddr_in6
+	}
+
+	this->_socket = ::socket(domain, type, protocol);
+//			Server::_hints.ai_protocol);
+
+	if (this->_socket == -1)
+	{
+		std::cerr << "[" << this << "] ";
+		std::cerr << ::strerror(errno) << std::endl;
+		this->_status = errno;
+		return ;
+	}
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::socket " << this->_socket << std::endl;
+	
+	// will need to close socket, later
+
+	return ;
+}
+
+void
+Server::bind (void)
+{
+	if (::bind(this->_socket,
+			this->_addrinfo_list[0].ai_addr,
+			this->_addrinfo_list[0].ai_addrlen))
+	{
+		std::cerr << "[" << this << "] ";
+		std::cerr << ::strerror(errno) << std::endl;
+		this->_status = errno;
+		return ;
+	}
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::bind OK " << std::endl;
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::bind socket: " << this->_socket << std::endl;
+	
+	std::clog << "[" << this << "] ";
+	std::clog << "::bind addr: ";
+	if (this->_addrinfo_list[0].ai_addr->sa_family == AF_INET)
+		std::clog << "IPv4";
+	else
+		std::clog << "IPv6";
+	std::clog << std::endl;
+
+	return ;
+}
+
+void
+Server::listen (void)
+{
+	// will need to
+	// set default value for backlog. 0 for now
+	if (::listen(this->_socket, 0) == -1)
+	{
+		std::cerr << ::strerror(errno) << std::endl;
+		return ;
+	}
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::listen" << std::endl;
+
+	return ;
+}
+
+void
+Server::accept (void)
+{
+	return ;
 }
 
 const struct in_addr&

@@ -49,7 +49,7 @@ main (int argc, const char **argv)
 	std::cout << *server_instance << std::endl;
 
 	if (server_instance->ok() == WEBSERV_OK)
-		server_instance->listen();
+		server_instance->start();
 
 	delete server_instance;
 	return (EXIT_SUCCESS);
