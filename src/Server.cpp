@@ -29,7 +29,7 @@ Server::Server (void): _status(WEBSERV_OK), _addrinfo_list(0x0)
 	(void)_client_max_body_size;
 	(void)_hints;
 
-	this->_listen_host.assign("localhost");
+	this->_listen_host.assign("127.0.0.1");
 
 	return ;
 }
@@ -80,10 +80,24 @@ Server::ok (void) const
 void
 Server::start (void)
 {
+	std::clog << "[" << this << "] ";
+	std::clog << "::start CALL" << std::endl;
+
 	this->setaddrinfo();
-	this->socket();
+	if (this->_status != 0)
+		return ;
+	
+	this->socket(); 
+	if (this->_status != 0)
+		return ;
+	
 	this->bind();
+	if (this->_status != 0)
+		return ;
+	
 	this->listen();
+	if (this->_status != 0)
+		return ;
 
 	return ;
 }
@@ -104,7 +118,7 @@ Server::setaddrinfo (void)
 	}
 
 	std::clog << "[" << this << "] ";
-	std::clog << "::setaddrinfo" << std::endl;
+	std::clog << "::setaddrinfo CALL" << std::endl;
 
 	return ;
 }
@@ -112,24 +126,35 @@ Server::setaddrinfo (void)
 void
 Server::socket (void)
 {
+	int domain = AF_INET, type = SOCK_STREAM, protocol = IPPROTO_TCP;
+
 	if (this->_addrinfo_list == 0x0)
 		return ;
-	else if (this->_addrinfo_list[0].ai_addr->sa_family == AF_INET6)
-	{
-		domain = ;
-		type = ;
-		protocol = ;
-	}
-	else
-	{
-		domain = ;
-		type = ;
-		protocol = ;
-		static_cast<struct sockaddr_in*>(this->_addrinfo_list[0])->//sockaddr_in or sockaddr_in6
-	}
+
+	domain = this->_addrinfo_list->ai_family;
+	type = this->_addrinfo_list->ai_socktype;
+	protocol = this->_addrinfo_list->ai_protocol;
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::socket CALL" << std::endl;
+	
+	std::clog << "[" << this << "] ";
+	std::clog << "::socket "
+		<< "domain: " << domain << std::endl;
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::socket "
+		<< "type: " << type << std::endl;
+	
+	std::clog << "[" << this << "] ";
+	std::clog << "::socket "
+		<< "protocol: " << protocol << std::endl;
 
 	this->_socket = ::socket(domain, type, protocol);
-//			Server::_hints.ai_protocol);
+
+	std::clog << "[" << this << "] ";
+	std::clog << "::socket "
+		<< "assigned: " << std::dec << this->_socket << std::endl;
 
 	if (this->_socket == -1)
 	{
@@ -137,12 +162,7 @@ Server::socket (void)
 		std::cerr << ::strerror(errno) << std::endl;
 		this->_status = errno;
 		return ;
-	}
-
-	std::clog << "[" << this << "] ";
-	std::clog << "::socket " << this->_socket << std::endl;
-	
-	// will need to close socket, later
+	} // will need to close socket, later
 
 	return ;
 }
@@ -150,9 +170,12 @@ Server::socket (void)
 void
 Server::bind (void)
 {
+	std::clog << "[" << this << "] ";
+	std::clog << "::bind CALL" << std::endl;
+
 	if (::bind(this->_socket,
-			this->_addrinfo_list[0].ai_addr,
-			this->_addrinfo_list[0].ai_addrlen))
+			this->_addrinfo_list->ai_addr,
+			this->_addrinfo_list->ai_addrlen) == -1)
 	{
 		std::cerr << "[" << this << "] ";
 		std::cerr << ::strerror(errno) << std::endl;
@@ -164,11 +187,8 @@ Server::bind (void)
 	std::clog << "::bind OK " << std::endl;
 
 	std::clog << "[" << this << "] ";
-	std::clog << "::bind socket: " << this->_socket << std::endl;
-	
-	std::clog << "[" << this << "] ";
 	std::clog << "::bind addr: ";
-	if (this->_addrinfo_list[0].ai_addr->sa_family == AF_INET)
+	if (this->_addrinfo_list->ai_addr->sa_family == AF_INET)
 		std::clog << "IPv4";
 	else
 		std::clog << "IPv6";
@@ -180,6 +200,9 @@ Server::bind (void)
 void
 Server::listen (void)
 {
+	std::clog << "[" << this << "] ";
+	std::clog << "::listen" << std::endl;
+	
 	// will need to
 	// set default value for backlog. 0 for now
 	if (::listen(this->_socket, 0) == -1)
@@ -188,8 +211,6 @@ Server::listen (void)
 		return ;
 	}
 
-	std::clog << "[" << this << "] ";
-	std::clog << "::listen" << std::endl;
 
 	return ;
 }
