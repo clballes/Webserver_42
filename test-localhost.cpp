@@ -20,7 +20,7 @@ main (void)
 	struct sockaddr_in addr = {};
 	
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(80);
+	addr.sin_port = htons(443);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	// bind socket to an address
@@ -48,24 +48,33 @@ main (void)
 	// configure accept CALL
 	while ( true )
 	{
-		std::clog << "waiting ::accept CALL" << std::endl;
-
-		int newsockfd = ::accept(sockfd, 
+		int clientsockfd = ::accept(sockfd, 
 				(struct sockaddr*) &client, 
 				&client_addrlen);
 
-		std::clog << "newsockfd: " << newsockfd << std::endl;
-
-		if ( newsockfd < 0 )
+		if ( clientsockfd < 0 )
 		{
 			std::cerr << "::accept " << ::strerror(errno) << std::endl;
 			return (0x4);
 		}
+		
+		std::clog << "::accept " << "clientsockfd: " << clientsockfd << std::endl;
 
-		std::clog << "closing " << newsockfd << std::endl;
-		close(newsockfd);
+		std::clog << "closing " << clientsockfd << std::endl;
+	
+		// send response
+		::write(clientsockfd, "HTTP/1.1 200 OK\r\n", 17);
+		::write(clientsockfd, "
+		::write(clientsockfd, "text/html; charset=utf-8", 24);
+		::write(clientsockfd, "content-length: 113", 19);
+		::write(clientsockfd, "\r\n", 2);
+		::write(clientsockfd, "<html><head></head><body><h1>Hey</h1></body></html>\n", 52);
+
+		// close socket
+		::close(clientsockfd);
 
 	}
+
 
 	// close socket
 	::close(sockfd);
