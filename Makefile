@@ -17,6 +17,7 @@ CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 SILENCE_LOGS	?=	false
 
 SRC_FILES		:=	$(SRC_DIR)/$(NAME).cpp \
+					$(SRC_DIR)/init.cpp \
 					$(SRC_DIR)/Server.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
