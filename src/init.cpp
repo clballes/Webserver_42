@@ -33,7 +33,7 @@ decode_arguments ( int argc, char * const * argv )
 		{
 			case 'v':
 				std::cout << WEBSERV_VER << std::endl;
-				return (EXIT_SUCCESS);
+				exit (EXIT_SUCCESS);
 			case 'l':
 				//std::ofstream log_file;
 				//log_file.open("logs.txt", std::ostream::app);
@@ -44,7 +44,7 @@ decode_arguments ( int argc, char * const * argv )
 				std::cout << "mode: " << optarg << std::endl;
 				break ;
 			case '?':
-				return (EXIT_FAILURE);
+				exit (EXIT_FAILURE);
 			default:
 				break ;
 		}
