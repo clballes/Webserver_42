@@ -5,7 +5,9 @@
 
 #include "Server.hpp"
 
-Server::Server ( unsigned port )
+std::set< const Server *> Server::servers;
+
+Server::Server ( uint16_t port )
 {
 	::memset ( &this->_socket_fd, 0, sizeof( this->_socket_fd ) );
 	this->_socket_fd = ::socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );

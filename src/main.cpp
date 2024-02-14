@@ -45,20 +45,23 @@ main ( int argc, char * const * argv )
 		// For the purpose of testing;
 		// initialize some servers manually.
 
-		std::set< const Server * > servers;
-
 		Server a( 8080 );
-		Server b( 80 );
-		Server c( 424242 );
+		Server::servers.insert( &a );
 
-		servers.insert( &a );
-		servers.insert( &b );
-		servers.insert( &c );
+		Server b( 80 );
+		Server::servers.insert( &b );
+
+		Server c( USHRT_MAX );
+		Server::servers.insert( &c );
+
+		//Server d( 22 ); Server::servers.insert( &d );
+		
+		// --
 
 	// Start listening / accepting connections
 	// ... kqueue
 	
-	::webserv( servers );
+	::webserv( Server::servers );
 
 	return ( EXIT_SUCCESS );
 }

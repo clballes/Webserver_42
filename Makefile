@@ -18,9 +18,11 @@ SILENCE_LOGS	?=	false
 
 SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/webserv.cpp \
+					$(SRC_DIR)/Server.cpp \
+					$(SRC_DIR)/events.cpp \
+					$(SRC_DIR)/loop.cpp \
 					$(SRC_DIR)/getoptions.cpp \
-					$(SRC_DIR)/init.cpp \
-					$(SRC_DIR)/Server.cpp
+					$(SRC_DIR)/init.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
 

@@ -9,17 +9,19 @@
 #include "webserv.hpp"
 #include <set>
 
-#define LOG(s) { std::clog << s << std::endl; }
-
 class Server
 {
 	public:
 
-		Server ( unsigned );
+		Server ( uint16_t );
 		~Server ( void );
 
 		unsigned socket ( void ) const;
 		
+		static std::set< const Server * > servers;
+		typedef std::set< const Server * >:: const_iterator const_iterator;
+		typedef std::set< const Server * >:: iterator iterator;
+
 		friend std::ostream & operator << ( std::ostream&, const Server & );
 
 	private:
