@@ -8,15 +8,12 @@
 
 #define LOG(s) { std::clog << s << std::endl; }
 
-extern bool status = true;
-
 void
 graceful_stop (int n)
 {
 	(void) n;
 	std::clog << "\rGracefully stoppping..." << std::endl;
 	sleep(1);
-	status = false;
 }
 
 // The webserv() call starts multiple Server instances 
@@ -36,6 +33,7 @@ webserv ( const std::set< const Server * > & servers )
 	int fd, kq, n_events;
 
 	(void)timeout; (void) fd; (void)ev; (void)kq; (void)n_events;
+	(void)servers;
 
 	// Create a new kernel event queue.
 

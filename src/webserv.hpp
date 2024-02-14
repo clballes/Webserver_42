@@ -67,6 +67,8 @@
 # include <set>
 # include "Server.hpp"
 
+class Server;
+
 __BEGIN_DECLS extern "C"
 void webserv ( const std::set< const Server * > & servers );
 __END_DECLS

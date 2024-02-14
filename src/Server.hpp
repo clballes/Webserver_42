@@ -24,12 +24,13 @@ class Server
 
 	private:
 
-		int _socket_fd; // _server_socket_fd
-		struct sockaddr_in _server_address;
+		int						_socket_fd; // _server_socket_fd
+		struct sockaddr_in		_server_address;
 
-		int _client_socket_fd;
-		unsigned _client_address_len;
-		struct sockaddr_in _client_address;
+		int						_client_socket_fd;
+		unsigned				_client_address_len;
+		struct sockaddr_in		_client_address;
+
 		// ::accept() can only do one client at a time ??
 };
 
