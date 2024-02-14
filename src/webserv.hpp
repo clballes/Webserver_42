@@ -60,4 +60,15 @@
 # include <sys/stat.h>		/* stat */
 # include <dirent.h>		/* opendir, readdir, closedir */
 
+// This needs to be resorted and reordered properly
+// ...
+
+# include <sys/cdefs.h>
+# include <set>
+# include "Server.hpp"
+
+__BEGIN_DECLS extern "C"
+void webserv ( const std::set< const Server * > & servers );
+__END_DECLS
+
 #endif /* webserv.hpp */

@@ -7,6 +7,7 @@
 # define _WEBSERV_DEFINE_HPP_
 
 # define EXEC_NAME			"webserv"
+# define PROGRAM_NAME		EXEC_NAME
 
 # define webserv_version	1
 # define WEBSERV_VERSION	"1.0"

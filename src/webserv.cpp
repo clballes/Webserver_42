@@ -4,24 +4,11 @@
 /* Thu Jan 25 14:26:11 2024                                                   */
 
 #include "webserv.hpp"
-#include <fstream>
-#include <set>
+#include "Server.hpp"
+
 #define LOG(s) { std::clog << s << std::endl; }
 
-int decode_arguments ( int, char * const * );
-
-int
-main ( int argc, char * const * argv )
-{
-	decode_arguments( argc, argv );
-
-	return (EXIT_SUCCESS);
-}
-
-/*
-void graceful_stop (int);
-
-bool status = true;
+extern bool status = true;
 
 void
 graceful_stop (int n)
@@ -31,7 +18,43 @@ graceful_stop (int n)
 	sleep(1);
 	status = false;
 }
-*/
+
+// The webserv() call starts multiple Server instances 
+// (...) using a kqueue.
+
+void
+webserv ( const std::set< const Server * > & servers )
+{
+	// Configure SIGINT ( signal interrupt )
+	// so as to finish connections and end the program
+	// gracefully.
+	
+	::signal( SIGINT, &graceful_stop );
+
+	static struct timespec timeout = { 1, 0 };
+	struct kevent ev = {};
+	int fd, kq, n_events;
+
+	(void)timeout; (void) fd; (void)ev; (void)kq; (void)n_events;
+
+	// Create a new kernel event queue.
+
+	kq = ::kqueue();
+	if ( kq == -1 )
+	{
+		std::cerr << PROGRAM_NAME;
+		std::cerr << ": " << ::strerror( errno ) << std::endl;
+		exit (0x1); // Caldra comprovar leaks ...
+	}
+
+	// Register an event with the queue for each Server instance.
+
+
+
+	std::clog << kq << ": kqueue properly initialized" << std::endl;
+
+	return ;
+}
 
 // ----
 // _main
@@ -106,56 +129,5 @@ main ( void ) // maybe renamed to webserv_init
 	}
 
 	return (0x0);
-}
-*/
-
-// ----
-// OLD MAIN
-
-/*
-int
-main (int argc, const char **argv)
-{
-	std::string		conf_file;
-
-	#ifdef SILENCE_LOGS
-	std::ofstream log_file;
-	log_file.open("logs.txt", std::ostream::app);
-	std::clog.rdbuf(log_file.rdbuf());
-	#endif
-
-	std::clog << "webserv" << std::endl;
-
-	conf_file.assign(DEFAULT_CONF);
-    if (argc > 2)
-    {
-		std::cout << argv[0] << " [configuration file]";
-		std::cout << std::endl;
-		return (EXIT_SUCCESS);
-    }
-
-	if (argv[1] != NULL)
-		conf_file.assign(argv[1]);
-
-	if (conf_file.compare("-v") == 0
-		|| conf_file.compare("--version") == 0)
-	{
-		std::cout << WEBSERV_VER << std::endl;
-		return (EXIT_SUCCESS);
-	}
-
-	Server* server_instance = new Server;
-	server_instance->setName("puyma.xyz");
-	server_instance->setPort(8000);
-	server_instance->setAddr(INADDR_ANY);
-	server_instance->setAddr(0x1C1C1C1C);
-
-	std::cout << *server_instance << std::endl;
-
-	if (server_instance->ok() == WEBSERV_OK)
-		server_instance->start();
-
-	delete server_instance;
-	return (EXIT_SUCCESS);
 }
 */

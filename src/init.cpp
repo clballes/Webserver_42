@@ -7,9 +7,6 @@
 #include "getoptions.h"
 #include "webserv.hpp"
 
-static int f_verbose = 0;
-// https://www.gnu.org/software/libtool/manual/html_node/C-header-files.html
-
 int
 decode_arguments ( int argc, char * const * argv )
 {
@@ -20,8 +17,7 @@ decode_arguments ( int argc, char * const * argv )
 	
 	const struct option		longopts[] =
 	{
-		{ "version", no_argument, 0x0, 'v'},
-		{ "verbose", no_argument, &f_verbose, 'V'},
+		{ "version", no_argument, 0x0, 'v'}, //{ "verbose", no_argument, &f_verbose, 'V'},
 		{ "log", required_argument, 0x0, 'l'},
 		{ "mode", required_argument, 0x0, 'm'},
 		{ 0, 0, 0, 0 }
@@ -29,12 +25,9 @@ decode_arguments ( int argc, char * const * argv )
 	
 	while ( c != -1 )
 	{
-		c = ::getopt_long ( argc, argv, shortopts, longopts, &option_index );
-		cc = getoptions_long ( argc, argv, shortopts, longopts, &option_index );
-		if ( c == cc )
-			std::clog << "OK: " << cc << std::endl;
-		else
-			stdL::cerr << "KO: " << cc << std::endl;
+		c = getopt_long ( argc, argv, shortopts, longopts, &option_index );
+		(void) cc;
+		//cc = getoptions_long ( argc, argv, shortopts, longopts, &option_index );
 
 		switch ( c )
 		{
@@ -45,7 +38,10 @@ decode_arguments ( int argc, char * const * argv )
 				//std::ofstream log_file;
 				//log_file.open("logs.txt", std::ostream::app);
 				//std::clog.rdbuf(log_file.rdbuf());
-				std::cout << "Logging into " << optarg << std::endl;
+				std::cout << "logging into " << optarg << std::endl;
+				break ;
+			case 'm':
+				std::cout << "mode: " << optarg << std::endl;
 				break ;
 			case '?':
 				return (EXIT_FAILURE);

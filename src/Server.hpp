@@ -3,11 +3,13 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Tue Feb 13 11:46:18 2024                                                   */
 
-#pragma once
-# include "webserv.hpp"
-# include <set>
+#ifndef _SERVER_HPP_
+#define _SERVER_HPP_
 
-# define LOG(s) { std::clog << s << std::endl; }
+#include "webserv.hpp"
+#include <set>
+
+#define LOG(s) { std::clog << s << std::endl; }
 
 class Server
 {
@@ -31,3 +33,4 @@ class Server
 		// ::accept() can only do one client at a time ??
 };
 
+#endif /* !_SERVER_HPP_ */
