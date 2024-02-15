@@ -33,5 +33,6 @@ class ServerConf
 
 		static int file2mem ( std::ifstream &, std::deque< std::string > &,
 				void ( *func )( std::string & ) = 0x0 );
+		static int pre_parse ( std::deque< std::string > & );
 
 };

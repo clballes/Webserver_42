@@ -1,16 +1,18 @@
 /*                                                                            */
 /* parse.cpp                                                                  */
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
-/* Wed Feb 14 17:22:43 2024                                                   */
+/* Thu Feb 15 16:50:45 2024                                                   */
 
-#include "parse.hpp"
+#include "Log.hpp"
 #include "ServerConf.hpp"
+#include <vector>
+#include <deque>
+#include <string>
 
 int
-parse_configuration ( std::ifstream & file )
+ServerConf::pre_parse ( std::deque< std::string > & content )
 {
-	if ( ServerConf::add( file ) == EXIT_FAILURE )
-		return ( EXIT_FAILURE );
+	(void) content;
 
 	return ( EXIT_SUCCESS );
 }

@@ -5,7 +5,6 @@
 
 #include "webserv.hpp"
 #include "init.hpp"
-#include "parse.hpp"
 #include <fstream>
 
 int
@@ -19,6 +18,7 @@ main ( int argc, char * const * argv )
 	// If none is set ( == NULL ), falls back to using DEFAULT_CONF ( macro )
 
 	std::ifstream config_file;
+	
 	config_file.open( argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
 
 	if ( config_file.good() != true )
@@ -28,9 +28,10 @@ main ( int argc, char * const * argv )
 		return ( EXIT_FAILURE );
 	}
 
-	// Parse configuration file.
+	// Add `config_file' is contents.
+	// Server_conf::add() also parses them. 
 	
-	if ( ::parse_configuration( config_file ) == EXIT_FAILURE )
+	if ( ServerConf::add( config_file ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	
 	// Once done, close file;
