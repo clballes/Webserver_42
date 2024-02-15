@@ -7,20 +7,29 @@
 #define _SERVER_HPP_
 
 #include "webserv.hpp"
-#include <set>
+#include "ServerConf.hpp"
+#include <vector>
+
+class ServerConf;
 
 class Server
 {
 	public:
 
 		Server ( uint16_t );
+		Server ( const ServerConf & );
 		~Server ( void );
 
 		unsigned socket ( void ) const;
+
+		//#ifdef DEBUG
+		//void setPort();
+		//void setAddr();
+		//#endif
 		
-		static std::set< const Server * > servers;
-		typedef std::set< const Server * >:: const_iterator const_iterator;
-		typedef std::set< const Server * >:: iterator iterator;
+		static std::vector< const Server * > servers;
+		typedef std::vector< const Server * >:: const_iterator const_iterator;
+		typedef std::vector< const Server * >:: iterator iterator;
 
 		friend std::ostream & operator << ( std::ostream&, const Server & );
 

@@ -5,11 +5,8 @@
 
 #include "webserv.hpp"
 #include "init.hpp"
-
+#include "parse.hpp"
 #include <fstream>
-#include <set>
-
-#define LOG(s) { std::clog << s << std::endl; }
 
 int
 main ( int argc, char * const * argv )
@@ -32,36 +29,51 @@ main ( int argc, char * const * argv )
 	}
 
 	// Parse configuration file.
-	// ...
-	//
+	
+	if ( ::parse_configuration( config_file ) == EXIT_FAILURE )
+		return ( EXIT_FAILURE );
 	
 	// Once done, close file;
 
 	config_file.close();
 
+	// --
+	// This goes to another function 
+
 	// Initialize n Server instances based on the configuration file.
-	// ...
+
+	ServerConf::iterator it = ServerConf::instances.begin();
+
+	while ( it != ServerConf::instances.end() )
+	{
+		Server::servers.push_back( new Server( *(*it) ) );
+		++it;
+	}
+
+	// Return extra memory to the system as <vector> is being used.
+
+	//Server::servers.shrink_to_fit();
+	//better to use reserve() previously
 	
 		// For the purpose of testing;
 		// initialize some servers manually.
 
-		Server a( 8080 );
-		Server::servers.insert( &a );
-
-		Server b( 80 );
-		Server::servers.insert( &b );
-
-		Server c( USHRT_MAX );
-		Server::servers.insert( &c );
-
-		//Server d( 22 ); Server::servers.insert( &d );
+		//Server a( 8080 ); Server::servers.push_back( &a );
+		//Server b( 80 ); Server::servers.push_back( &b );
+		//Server c( USHRT_MAX ); Server::servers.push_back( &c );
+		//Server d( 22 ); Server::servers.push_back( &d );
+		//Server e( 80 ); Server::servers.push_back( &e );
+		//Server f( 00 ); Server::servers.push_back( &f );
 		
 		// --
+
+	// -- 
 
 	// Start listening / accepting connections
 	// ... kqueue
 	
-	::webserv( Server::servers );
+	//::webserv( Server::servers );
+	::webserv();
 
 	return ( EXIT_SUCCESS );
 }

@@ -69,7 +69,7 @@
 
 #define LOG(s) { std::clog << s << std::endl; }
 
-class Server;
+#include "Server.hpp"
 
 __BEGIN_DECLS extern "C"
 void webserv ( void );

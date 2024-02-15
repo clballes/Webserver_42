@@ -5,7 +5,19 @@
 
 #include "Server.hpp"
 
-std::set< const Server *> Server::servers;
+// Initialize static list of servers
+
+std::vector< const Server * >
+Server::servers;
+
+//
+
+Server::Server ( const ServerConf & instance )
+{
+	(void) instance;
+
+	return ;
+}
 
 Server::Server ( uint16_t port )
 {
