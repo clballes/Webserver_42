@@ -5,6 +5,7 @@
 
 #include "webserv.hpp"
 #include "init.hpp"
+#include "parse.hpp"
 #include <fstream>
 
 int
@@ -17,26 +18,37 @@ main ( int argc, char * const * argv )
 	// Open ( or try to ) a configuration file.
 	// If none is set ( == NULL ), falls back to using DEFAULT_CONF ( macro )
 
-	std::ifstream config_file;
+	std::string conf_filename;
+	std::ifstream conf_file;
 	
-	config_file.open( argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
+	conf_filename = (argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
 
-	if ( config_file.good() != true )
+	// isRegularFile() is in `parse.cpp', for the moment.
+
+	if ( isRegularFile( conf_filename ) == false )
+	{
+		std::cerr << PROGRAM_NAME;
+		std::cerr << ": " << conf_filename;
+		std::cerr << ": not a file" << std::endl;
+		return ( EXIT_FAILURE );
+	}
+
+	if ( conf_file.good() != true )
 	{
 		std::cerr << ( argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
 		std::cerr << ": " << ::strerror( errno ) << std::endl;
 		return ( EXIT_FAILURE );
 	}
 
-	// Add `config_file' is contents.
+	// Add `conf_file' is contents.
 	// Server_conf::add() also parses them. 
 	
-	if ( ServerConf::add( config_file ) == EXIT_FAILURE )
+	if ( ServerConf::add( conf_file ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	
 	// Once done, close file;
 
-	config_file.close();
+	conf_file.close();
 
 	// --
 	// This goes to another function 

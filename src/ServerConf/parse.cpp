@@ -8,11 +8,180 @@
 #include <vector>
 #include <deque>
 #include <string>
+#include "parse.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <sys/stat.h>
 
 int
 ServerConf::pre_parse ( std::deque< std::string > & content )
 {
-	(void) content;
+	if ( count_brackets( content ) == EXIT_FAILURE )
+	{
+		std::cerr << PROGRAM_NAME;
+		std::cerr << ": syntax error: brackets" << std::endl;
+		return ( EXIT_FAILURE );
+	}
+	if ( numServers( content ) <= 0 )
+	{
+		std::cerr << PROGRAM_NAME;
+		std::cerr << ": syntax error: missing server directive" << std::endl;
+		return ( EXIT_FAILURE );
+	}
 
 	return ( EXIT_SUCCESS );
+}
+
+int
+count_brackets ( std::deque< std::string > & content )
+{
+	int brace = 0;
+
+	for ( std::deque< std::string>::iterator it = content.begin();
+			it != content.end(); ++it )
+	{
+		if ( brace < 0 )
+			return ( EXIT_FAILURE );
+
+		if ( *it == "{" )
+			++brace;
+		else if ( *it == "}" )
+			--brace;
+	}
+
+	if ( brace != 0 )
+		return ( EXIT_FAILURE );
+
+	return ( EXIT_FAILURE );
+}
+
+// ----
+//
+
+bool
+isRegularFile( const std::string & filename )
+{
+    struct stat file_info;
+
+    if ( stat( filename.c_str(), &file_info ) != 0 )
+        return ( false );
+
+    return ( S_ISREG( file_info.st_mode ) );
+}
+
+int
+numServers( std::deque< std::string > & content )
+{
+    int count;
+   
+	count = 0;
+    for ( std::deque< std::string >::iterator it = content.begin();
+			it != content.end(); ++it )
+    {
+        if ( it->find("server") != std::string::npos )
+        {
+            if (it->length() == 6 && (*it)[it->length()] == '\0')
+                ++count;
+        }
+    }
+
+    return (count);
+}
+
+std::string
+trim_sp( const std::string & input )
+{
+    std::string result = input;
+    size_t lastNonSpace = result.size();
+
+	while ( lastNonSpace > 0
+			&& (result[lastNonSpace - 1] == ' '
+				|| result[lastNonSpace - 1] == '\t'))
+        --lastNonSpace;
+
+    if ( lastNonSpace < result.size() )
+        result.erase( lastNonSpace );
+
+    return (result);
+}
+
+std::string
+trim( const std::string & input )
+{
+    std::string result;
+    bool leadingSpacesOrTabs = true;
+
+    for ( std::size_t i = 0; i < input.length(); ++i )
+	{
+        if (input[i] == ' ' || input[i] == '\t')
+		{
+            if (!leadingSpacesOrTabs)
+			{
+                result += ' ';
+                leadingSpacesOrTabs = true;
+            }
+        }
+		else
+		{
+            result += input[i];
+            leadingSpacesOrTabs = false;
+        }
+    }
+
+    return (result);
+}
+
+void
+addElements( std::string & line, std::deque< std::string > & content )
+{
+    size_t start = 0;
+    size_t end = line.find_first_of("{}", start);
+    
+	while ( end != std::string::npos && end < line.length() )
+    {
+        std::string sub = line.substr( start, end - start );
+        
+		if ( !sub.empty() )
+            content.push_back( trim_sp( sub ) );
+        
+		content.push_back( line.substr( end, 1 ) );
+        start = end + 1;
+        end = line.find_first_of( "{}", start );
+    }
+    
+	std::string remaining = line.substr( start );
+
+    if ( !remaining.empty() )
+		content.push_back( trim_sp( remaining ) );
+
+	return ;
+}
+
+std::vector< std::deque< std::string > >
+splitServer( std::deque< std::string > content )
+{
+    int servers = numServers( content );
+
+    std::vector<std::deque<std::string> > arrayOfLists( servers );
+    std::deque<std::string>::iterator it = content.begin();
+    
+	while ( it != content.end() && servers!= 0 )
+	{
+		if ( *it == "server" )
+        {
+            std::deque<std::string> subList;
+            arrayOfLists[servers- 1] = subList;
+            ++it;
+            
+			while ( it != content.end() && *it != "server" ) 
+                arrayOfLists[servers- 1].push_back(*it);
+                ++it;
+            
+			if (it != content.end() && *it == "server")
+                --servers;
+        }
+    }
+    
+	return (arrayOfLists);
 }

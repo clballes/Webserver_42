@@ -9,6 +9,7 @@
 #include <vector>
 #include <deque>
 #include <string>
+#include "parse.hpp"
 
 int
 ServerConf::add ( std::ifstream & file )
@@ -29,10 +30,13 @@ ServerConf::add ( std::ifstream & file )
 	if ( ServerConf::pre_parse( mem ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	// Parse `mem' is contents.
-
 	// Split into `server {}' blocks.
+	// call to splitServers() which may be renamed split2blocks()
+	// or similar.
 	// ...
+
+	// Parse `mem' is contents.
+	// do for each server {} block extracted avobe
 
 	// Create a new instance `ServerConf'
 	// for each `server {}' block.
