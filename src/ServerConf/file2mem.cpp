@@ -8,12 +8,14 @@
 #include <fstream>
 #include <deque>
 #include <string>
+#include "parse.hpp"
 
 int
-ServerConf::file2mem ( std::ifstream & file, std::deque< std::string > & mem,
-		void ( *func )( std::string & ) )
+ServerConf::file2mem ( std::ifstream & file, std::deque< std::string > & mem )
 {
 	std::string line;
+
+	LOG( "call: file2mem " )
 
 	while ( file.good() && ( file.rdstate() & std::ifstream::eofbit ) == 0 )
 	{
@@ -24,24 +26,23 @@ ServerConf::file2mem ( std::ifstream & file, std::deque< std::string > & mem,
 		// If there is nothing in that line or is a comment `#',
 		// skip to next iteration.
 
-		if ( line.length() == 0 && line.at(0) == '#' )
+		if ( line.length() == 0 || line.at(0) == '#' )
 			continue ;
 
-		// Call `func'(tion) with `line'
-		// in order to normalize what's added to `mem'.
-
-		if ( func != 0x0 )
-			func( line );
-		
 		// Add (by copy) `line' to `mem'(ory).
-
+		// In c++11 can be improved by using move copy constructor.
+		
 		mem.push_back( line );
 	}
 
 	// Check if while loop ended because of file.good() being false.
 
-	if ( file.good() == false )
+	if ( file.good() == false && file.eof() != true )
+	{
+		std::cerr << PROGRAM_NAME;
+		std::cerr << ": error file2mem" << std::endl;
 		return ( EXIT_FAILURE );
-
+	}
+	
 	return ( EXIT_SUCCESS );
 }

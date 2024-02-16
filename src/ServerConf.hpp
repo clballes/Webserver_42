@@ -16,11 +16,13 @@ class ServerConf
 	public:
 
 		friend class Server;
-		static std::deque< const ServerConf * >instances;
-		static int add ( std::ifstream & );
-		
-		typedef std::deque< const ServerConf * >::const_iterator const_iterator;
+	
 		typedef std::deque< const ServerConf * >::iterator iterator;
+		typedef std::deque< const ServerConf * >::const_iterator const_iterator;
+		
+		static std::deque< const ServerConf * >instances;
+		
+		static int add ( std::ifstream & );
 
 	private:
 		
@@ -31,8 +33,9 @@ class ServerConf
 		ServerConf & operator = ( const ServerConf & );
 		~ServerConf ( void );
 
-		static int file2mem ( std::ifstream &, std::deque< std::string > &,
-				void ( *func )( std::string & ) = 0x0 );
+		static int file2mem ( std::ifstream &, std::deque< std::string > & );
+		static void normalize ( std::deque< std::string > & );
+		static void split_elements ( std::deque< std::string > & );
 		static int pre_parse ( std::deque< std::string > & );
 
 };

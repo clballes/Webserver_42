@@ -89,6 +89,7 @@ numServers( std::deque< std::string > & content )
     return (count);
 }
 
+/*
 std::string
 trim_sp( const std::string & input )
 {
@@ -105,58 +106,7 @@ trim_sp( const std::string & input )
 
     return (result);
 }
-
-std::string
-trim( const std::string & input )
-{
-    std::string result;
-    bool leadingSpacesOrTabs = true;
-
-    for ( std::size_t i = 0; i < input.length(); ++i )
-	{
-        if (input[i] == ' ' || input[i] == '\t')
-		{
-            if (!leadingSpacesOrTabs)
-			{
-                result += ' ';
-                leadingSpacesOrTabs = true;
-            }
-        }
-		else
-		{
-            result += input[i];
-            leadingSpacesOrTabs = false;
-        }
-    }
-
-    return (result);
-}
-
-void
-addElements( std::string & line, std::deque< std::string > & content )
-{
-    size_t start = 0;
-    size_t end = line.find_first_of("{}", start);
-    
-	while ( end != std::string::npos && end < line.length() )
-    {
-        std::string sub = line.substr( start, end - start );
-        
-		if ( !sub.empty() )
-            content.push_back( trim_sp( sub ) );
-        
-		content.push_back( line.substr( end, 1 ) );
-        start = end + 1;
-        end = line.find_first_of( "{}", start );
-    }
-    
-	std::string remaining = line.substr( start );
-
-    if ( !remaining.empty() )
-		content.push_back( trim_sp( remaining ) );
-
-	return ;
-}
+*/
 
 std::vector< std::deque< std::string > >
 splitServer( std::deque< std::string > content )

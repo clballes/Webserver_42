@@ -15,15 +15,16 @@ main ( int argc, char * const * argv )
 
 	decode_arguments( argc, argv );
 
-	// Open ( or try to ) a configuration file.
-	// If none is set ( == NULL ), falls back to using DEFAULT_CONF ( macro )
-
 	std::string conf_filename;
 	std::ifstream conf_file;
+	
+	// If argv[optind] is set ( == NULL ),
+	// falls back to using DEFAULT_CONF ( macro )
 	
 	conf_filename = (argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
 
 	// isRegularFile() is in `parse.cpp', for the moment.
+	// Check if `conf_filename' is a regular file.
 
 	if ( isRegularFile( conf_filename ) == false )
 	{
@@ -32,6 +33,12 @@ main ( int argc, char * const * argv )
 		std::cerr << ": not a file" << std::endl;
 		return ( EXIT_FAILURE );
 	}
+	
+	// Open ( or try to ) `conf_file'.
+	
+	conf_file.open( conf_filename );
+
+	// Check if file has been properly opened.
 
 	if ( conf_file.good() != true )
 	{
@@ -39,16 +46,21 @@ main ( int argc, char * const * argv )
 		std::cerr << ": " << ::strerror( errno ) << std::endl;
 		return ( EXIT_FAILURE );
 	}
+	LOG( conf_filename << ": open OK" )
 
 	// Add `conf_file' is contents.
 	// Server_conf::add() also parses them. 
 	
 	if ( ServerConf::add( conf_file ) == EXIT_FAILURE )
+	{
+		conf_file.close();
 		return ( EXIT_FAILURE );
+	}
 	
 	// Once done, close file;
 
 	conf_file.close();
+	LOG( conf_filename << ": closed" )
 
 	// --
 	// This goes to another function 
