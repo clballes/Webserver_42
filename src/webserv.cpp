@@ -39,7 +39,11 @@ webserv ( void )
 
 	// For each Server instance,
 	// register an event with the queue.
-	
+
+	// WIP: maybe just set_init_events (sockets mainly)
+	// ; there will be more events to register later,
+	// during program execution and loop execution.
+
 	set_events( kq );
 
 	// Start listening for registered events

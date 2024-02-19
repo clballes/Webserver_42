@@ -14,9 +14,7 @@ void
 ServerConf::normalize ( std::deque< std::string > & mem )
 {
 	std::deque< std::string >::iterator it;
-
-	LOG( "call: normalize" )
-
+	
 	it = mem.begin();
 	while ( it != mem.end() )
 	{

@@ -14,9 +14,6 @@
 int
 ServerConf::add ( std::ifstream & file )
 {
-
-	LOG( "call: add" )
-
 	// Check if file has been properly opened.
 
 	if ( file.good() == false )
@@ -27,18 +24,20 @@ ServerConf::add ( std::ifstream & file )
 	std::deque< std::string > mem;
 	if ( ServerConf::file2mem( file, mem ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-
+	
+	// Split lines by `{}' and directives.
+	ServerConf::split_elements( mem );
+	
 	// Normalize `mem' contents:
 	// Removes comments, trims `isspace()' characters
 	
 	ServerConf::normalize( mem );
-	
-	// Split lines by `{}' and directives.
-	ServerConf::split_elements( mem );
 
 	// Log what is stored in `mem'
-//	for ( std::deque< std::string >::iterator it = mem.begin();
-//			it != mem.end(); ++it ) { LOG( *it ); }
+	LOG( "----" )
+	for ( std::deque< std::string >::iterator it = mem.begin();
+			it != mem.end(); ++it ) { LOG( *it ); }
+	LOG( "----" )
 	// ----
 
 	// Pre-parse `mem' is contents.

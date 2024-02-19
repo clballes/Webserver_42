@@ -7,56 +7,51 @@
 #include <deque>
 #include <iterator>
 #include "parse.hpp"
+#include <algorithm>
 
-static void split_line ( std::deque< std::string >::iterator,
+static std::deque< std::string >::iterator split_line ( 
+		std::deque< std::string >::iterator,
 		std::deque< std::string > & );
 
 void
 ServerConf::split_elements ( std::deque< std::string > & mem )
 {
-	std::reverse_iterator< std::deque< std::string >::iterator > it;
-	
-	LOG( "call: split_elements" )
+	std::deque< std::string >::iterator it = mem.begin();
 
-	it = mem.rbegin();
-	while ( it != mem.rend() )
+	while ( it != mem.end() )
 	{
-		split_line( ( it + 1 ).base(), mem );
+		if ( it->find_first_of( "{}", 0 ) != std::string::npos )
+			it = split_line( it, mem );
 		++it;
 	}
 
 	return ;
 }
 
-void
-split_line ( std::deque< std::string>::iterator line,
+// renamed from addElements
+
+std::deque< std::string >::iterator
+split_line ( std::deque< std::string >::iterator it,
 		std::deque< std::string > & mem )
 {
-	std::string::size_type start, end, len;
+	std::string::size_type start = 0, end;
+	std::string line( *it );
 
-	LOG( "=> " << *line )
+	it = mem.erase( it ) - 1;
 
-	start = 0;
-	while ( start < line->length() )
+	end = line.find_first_of( "{}", start );
+	while ( end != std::string::npos )
 	{
-		len = 0;
-		while ( line->at( len + start ) != '\0' && line->at( len + start ) != '{' && line->at( len + start ) != '}' )
-		{
-			++len;
-		}
+		if ( ( end - start ) > 0 )
+			it = mem.insert( ++it, line.substr( start, ( end - start ) ) );
+		it = mem.insert( ++it, line.substr( end, 1 ) );
 
-		if (len == 0)
-			++len;
-
-		std::cout << "len: " << len << std::endl;
-		std::cout << "\"" << line->substr( start, len ) << "\"" << std::endl;
-
-		start += len;
+		start = end + 1;
+		end = line.find_first_of( "{}", start );
 	}
 
-	(void) mem;
-	(void) start;
-	(void) end;
-	(void) len;
-	return ;
+	if ( start < line.length() - 1)
+		it = mem.insert( ++it, line.substr( start ) );
+
+	return ( it );
 }
