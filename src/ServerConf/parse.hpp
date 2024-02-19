@@ -7,7 +7,6 @@
 
 #include "Log.hpp"
 #include "ServerConf.hpp"
-#include <vector>
 #include <deque>
 #include <string>
 
@@ -16,13 +15,11 @@
 #include <sstream>
 #include <sys/stat.h>
 
-int count_brackets ( std::deque< std::string > & );
+int count_brackets( std::deque< std::string > & );
 bool isRegularFile( const std::string & );
-int numServers( std::deque< std::string > & );
+int count_servers( std::deque< std::string > & );
 
 std::string & trim_f( std::string &, int ( *func )( int ) );
 void trim( std::string & );
 
 void add_elements( std::string &, std::deque< std::string > & );
-
-std::vector< std::deque<std::string> > splitServer( std::deque<std::string> );

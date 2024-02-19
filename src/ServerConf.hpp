@@ -37,5 +37,7 @@ class ServerConf
 		static void normalize ( std::deque< std::string > & );
 		static void split_elements ( std::deque< std::string > & );
 		static int pre_parse ( std::deque< std::string > & );
+		static int parse ( std::deque< std::string > & );
+		//static int post_parse ( std::deque< std::string > & );
 
 };

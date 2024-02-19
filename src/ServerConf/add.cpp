@@ -6,7 +6,6 @@
 #include "Log.hpp"
 #include "ServerConf.hpp"
 
-#include <vector>
 #include <deque>
 #include <string>
 #include "parse.hpp"
@@ -33,28 +32,15 @@ ServerConf::add ( std::ifstream & file )
 	
 	ServerConf::normalize( mem );
 
-	// Log what is stored in `mem'
-	LOG( "----" )
-	for ( std::deque< std::string >::iterator it = mem.begin();
-			it != mem.end(); ++it ) { LOG( *it ); }
-	LOG( "----" )
-	// ----
-
 	// Pre-parse `mem' is contents.
 	
 	if ( ServerConf::pre_parse( mem ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	// Split into `server {}' blocks.
-	// call to splitServers() which may be renamed split2blocks()
-	// or similar.
-	// ...
-
 	// Parse `mem' is contents.
-	// do for each server {} block extracted avobe
 
-	// Create a new instance `ServerConf'
-	// for each `server {}' block.
+	if ( ServerConf::parse( mem ) == EXIT_FAILURE )
+		return ( EXIT_FAILURE );
 
 	//ServerConf instance ( file );
 	//ServerConf::instances.insert( &instance );
