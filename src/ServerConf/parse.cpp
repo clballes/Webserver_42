@@ -60,26 +60,6 @@ ServerConf::parse ( std::deque< std::string > & content,
 		return ( EXIT_FAILURE );
 	}
 
-	// Print deque<deque<string>> contents.
-
-	LOG( "----" )
-	std::deque< std::deque< std::string > >::iterator it1;
-
-	it1 = server_blocks.begin();
-	while ( it1 != server_blocks.end() )
-	{
-		LOG( "__ start server" )
-		for ( std::deque< std::string >::iterator it2 = it1->begin();
-				it2 != it1->end(); ++it2 )
-		{
-			LOG( "== " << *it2 )
-		}
-		LOG( "" )
-		++it1;
-	}
-	LOG( "----" )
-	LOG( "end parse()" )
-
 	return ( EXIT_SUCCESS );
 }
 

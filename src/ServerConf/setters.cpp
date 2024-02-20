@@ -15,7 +15,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 	std::string directive;
 	std::string::size_type pos;
 
-	LOG( "call check_directives()" )
+	LOG( "call set_directives()" )
 
 	// There won't be "{" or "}" lines.
 	// See fill_block().

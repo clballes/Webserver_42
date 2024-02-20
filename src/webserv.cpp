@@ -18,6 +18,9 @@ webserv ( void )
 {
 	int kq;
 	//bool status = true;
+	
+	LOG( "" )
+	LOG( "call webserv()" )
 
 	// Configure SIGINT ( signal interrupt )
 	// so as to finish connections and end the program
@@ -57,7 +60,6 @@ webserv ( void )
 void
 graceful_stop ( int n )
 {
-	(void) n;
-	LOG ( "\rGracefully stoppping..." << std::endl );
+	LOG ( "\rGracefully stopping..." );
 	exit( n );
 }

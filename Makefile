@@ -12,7 +12,7 @@ BUILD_DIR		:=	build
 CC				:=	c++
 CPPFLAGS		:=	-MMD -I$(INC_DIR)
 CPPFLAGS		+=	-I$(SRC_DIR)/Server -I$(SRC_DIR)/ServerConf
-CPPFLAGS		+=	-g -fsanitize='address,undefined'
+#CPPFLAGS		+=	-g -fsanitize='address,undefined'
 #CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 SILENCE_LOGS	?=	false
@@ -30,6 +30,7 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/ServerConf/file2mem.cpp \
 					$(SRC_DIR)/ServerConf/normalize.cpp \
 					$(SRC_DIR)/ServerConf/split_elements.cpp \
+					$(SRC_DIR)/ServerConf/setters.cpp \
 					$(SRC_DIR)/ServerConf/parse.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
