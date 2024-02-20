@@ -9,5 +9,23 @@
 
 ServerConf::~ServerConf ( void )
 {
+	LOG( "ServerConf: destructor" )
+
+	return ;
+}
+
+void
+ServerConf::clear ( void )
+{
+	ServerConf::iterator it = ServerConf::instances.begin();
+
+	while ( it != ServerConf::instances.end() )
+	{
+		delete ( *it );
+		++it;
+	}
+
+	ServerConf::instances.clear();
+
 	return ;
 }

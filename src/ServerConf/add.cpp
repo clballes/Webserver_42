@@ -13,10 +13,16 @@
 int
 ServerConf::add ( std::ifstream & file )
 {
+	std::deque< std::deque< std::string > > server_blocks;
+	std::deque< std::deque< std::string > >::iterator block;
+	
+	LOG( "call add()" )
+	
 	// Check if file has been properly opened.
 
 	if ( file.good() == false )
 		return ( EXIT_FAILURE );
+	
 
 	// Store file into `mem'
 
@@ -38,12 +44,22 @@ ServerConf::add ( std::ifstream & file )
 		return ( EXIT_FAILURE );
 
 	// Parse `mem' is contents.
-
-	if ( ServerConf::parse( mem ) == EXIT_FAILURE )
+	
+	if ( ServerConf::parse( mem, server_blocks ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
+	
+	LOG( "blocks: " << server_blocks.size() )
+	
+	// Create a new instance `ServerConf'
+	// for each `server {}' block.
+	// WIP
 
-	//ServerConf instance ( file );
-	//ServerConf::instances.insert( &instance );
-
+	block = server_blocks.begin();
+	while ( block != server_blocks.end() )
+	{
+		ServerConf::instances.push_back( new ServerConf( *block ) );
+		++block;
+	}
+	
 	return ( EXIT_SUCCESS );
 }

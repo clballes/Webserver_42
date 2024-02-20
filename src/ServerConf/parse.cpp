@@ -14,13 +14,11 @@
 #include <sstream>
 #include <sys/stat.h>
 
-void split2blocks( std::deque< std::string > &,
-		std::deque< std::deque< std::string > > &,
-		const char * );
-
 int
 ServerConf::pre_parse ( std::deque< std::string > & content )
 {
+	LOG( "call pre_parse()" )
+	
 	if ( count_brackets( content ) == EXIT_FAILURE )
 	{
 		std::cerr << PROGRAM_NAME;
@@ -41,24 +39,20 @@ ServerConf::pre_parse ( std::deque< std::string > & content )
 }
 
 int
-ServerConf::parse ( std::deque< std::string > & content )
-{
-	// servers.. reallY?
-	// maybe rename it hihi
-	
-	std::deque< std::deque< std::string > > servers;
+ServerConf::parse ( std::deque< std::string > & content,
+	   std::deque< std::deque< std::string > > & server_blocks )
+{	
+	LOG( "call parse()" )
 	
 	// Split into `server {}' blocks.
-	// call to splitServers() which may be renamed split2blocks()
-	// or similar.
 	
-	//ServerConf::split2blocks( mem, &servers, "server" );
-	split2blocks( content, servers, "server" );
+	//ServerConf::split2blocks( content, server_blocks, "server" );
+	ServerConf::split2blocks( content, server_blocks, "server" );
 
 	// The following condition turns count_servers() useless
 	// consider removing it ( in pre_parse )
 
-	if ( servers.size() == 0 )
+	if ( server_blocks.size() == 0 )
 	{
 		std::cerr << PROGRAM_NAME;
 		std::cerr << ": syntax error: missing server directive";
@@ -66,9 +60,13 @@ ServerConf::parse ( std::deque< std::string > & content )
 		return ( EXIT_FAILURE );
 	}
 
+	// Print deque<deque<string>> contents.
+
 	LOG( "----" )
-	for ( std::deque< std::deque< std::string > >::iterator it1 = servers.begin();
-			it1 != servers.end(); ++it1 )
+	std::deque< std::deque< std::string > >::iterator it1;
+
+	it1 = server_blocks.begin();
+	while ( it1 != server_blocks.end() )
 	{
 		LOG( "__ start server" )
 		for ( std::deque< std::string >::iterator it2 = it1->begin();
@@ -77,13 +75,10 @@ ServerConf::parse ( std::deque< std::string > & content )
 			LOG( "== " << *it2 )
 		}
 		LOG( "" )
+		++it1;
 	}
 	LOG( "----" )
-
-	// Create a new instance `ServerConf'
-	// for each `server {}' block.
-	// WIP
-	// ...
+	LOG( "end parse()" )
 
 	return ( EXIT_SUCCESS );
 }
@@ -99,13 +94,15 @@ fill_block( std::deque< std::string >::iterator it,
 	std::deque< std::string > list;
 	std::string::size_type brackets = 0;
 
+	LOG( "call fill_block()" )
+
 	if ( *it == "{" )
 		++it;
 
 	while ( ! ( *it == "}" && brackets == 0 ) )
 	{
 		if ( *it == "{" || *it == "}" )
-			brackets += ( 0124 - it->at( 0 ) );
+			brackets += ( 124 - it->at( 0 ) );
 
 		list.push_back( *it );
 		++it;
@@ -120,12 +117,13 @@ fill_block( std::deque< std::string >::iterator it,
 // adapted from splitServers
 
 void
-split2blocks( std::deque< std::string > & content,
+ServerConf::split2blocks( std::deque< std::string > & content,
 		std::deque< std::deque< std::string > > & block_list,
 		const char * block_name )
 {
 	std::deque< std::string >::iterator it = content.begin();
 
+	LOG( "call split2blocks()" )
 	while ( it != content.end() )
 	{
 		if ( it->compare( block_name ) == 0 )
@@ -143,10 +141,12 @@ count_brackets ( std::deque< std::string > & content )
 	int brace = 0;
 	std::deque< std::string>::iterator it = content.begin();
 
+	LOG( "call count_brackets()" )
+
 	while ( it != content.end() && brace > 0)
 	{
 		if ( *it == "{" || *it == "}" )
-			brace += ( 0124 - it->at( 0x0 ) );
+			brace += ( 124 - it->at( 0x0 ) );
 		++it;
 	}
 	
@@ -157,6 +157,8 @@ bool
 isRegularFile( const std::string & filename )
 {
     struct stat file_info;
+
+	LOG( "call isRegularFile()" )
 
     if ( stat( filename.c_str(), &file_info ) != 0 )
         return ( false );
@@ -169,6 +171,8 @@ count_servers( std::deque< std::string > & content )
 {
     int count;
    
+	LOG( "call count_servers()" )
+
 	count = 0;
     for ( std::deque< std::string >::iterator it = content.begin();
 			it != content.end(); ++it )

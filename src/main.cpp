@@ -60,44 +60,34 @@ main ( int argc, char * const * argv )
 	// Once done, close file;
 
 	conf_file.close();
-	LOG( conf_filename << ": closed" )
+	LOG( conf_filename << ": closed OK" )
 
 	// --
 	// This goes to another function 
 
 	// Initialize n Server instances based on the configuration file.
+	// new `Server's in Server::servers will have to be FREEd.
 
-	ServerConf::iterator it = ServerConf::instances.begin();
+	for ( ServerConf::iterator it = ServerConf::instances.begin();
+			it != ServerConf::instances.end(); ++it )
+		Server::servers.push_back( new Server( *( *it ) ) );
 
-	while ( it != ServerConf::instances.end() )
-	{
-		Server::servers.push_back( new Server( *(*it) ) );
-		++it;
-	}
+	Server::servers.shrink_to_fit();
+	ServerConf::clear();
 
-	// Return extra memory to the system as <vector> is being used.
-
-	//Server::servers.shrink_to_fit();
-	//better to use reserve() previously
-	
 		// For the purpose of testing;
 		// initialize some servers manually.
 
-		//Server a( 8080 ); Server::servers.push_back( &a );
+		Server a( 8080 ); Server::servers.push_back( &a );
 		//Server b( 80 ); Server::servers.push_back( &b );
 		//Server c( USHRT_MAX ); Server::servers.push_back( &c );
 		//Server d( 22 ); Server::servers.push_back( &d );
 		//Server e( 80 ); Server::servers.push_back( &e );
 		//Server f( 00 ); Server::servers.push_back( &f );
-		
 		// --
 
-	// -- 
-
 	// Start listening / accepting connections
-	// ... kqueue
 	
-	//::webserv( Server::servers );
 	::webserv();
 
 	return ( EXIT_SUCCESS );

@@ -59,5 +59,5 @@ graceful_stop ( int n )
 {
 	(void) n;
 	LOG ( "\rGracefully stoppping..." << std::endl );
-	sleep(1);
+	exit( n );
 }
