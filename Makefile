@@ -23,7 +23,9 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/webserv.cpp \
 					$(SRC_DIR)/events.cpp \
 					$(SRC_DIR)/loop.cpp \
-					$(SRC_DIR)/Server/Server.cpp \
+					$(SRC_DIR)/Server/constructor.cpp \
+					$(SRC_DIR)/Server/destructor.cpp \
+					$(SRC_DIR)/Server/getters.cpp \
 					$(SRC_DIR)/ServerConf/constructor.cpp \
 					$(SRC_DIR)/ServerConf/destructor.cpp \
 					$(SRC_DIR)/ServerConf/add.cpp \

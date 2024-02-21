@@ -1,7 +1,7 @@
 /*                                                                            */
-/* Server.cpp                                                                 */
+/* constructor.cpp                                                            */
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
-/* Tue Feb 13 11:45:54 2024                                                   */
+/* Wed Feb 21 15:49:35 2024                                                   */
 
 #include "Server.hpp"
 
@@ -43,11 +43,11 @@ Server::create_socket ( void )
 		// set badbit
 		return ( EXIT_FAILURE );
 	}
-	
+
 	// ::setsockopt();
-	
+
 	// set goodbit
-	
+
 	return ( EXIT_SUCCESS );
 }
 
@@ -64,7 +64,7 @@ Server::bind_address ( void )
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}
-	
+
 	return ( EXIT_SUCCESS );
 }
 
@@ -93,24 +93,8 @@ Server::listen ( void )
 	(void) _client_address_len;
 	(void) _client_socket_fd;
 	(void) _client_address;
-	
+
 	return ( EXIT_SUCCESS );
-}
-
-Server::~Server ( void )
-{
-	if ( this->_socket_fd != 0 )
-		close (this->_socket_fd);
-
-	LOG( "call ~Server()" )
-
-	return ;
-}
-
-unsigned
-Server::socket ( void ) const
-{
-	return (this->_socket_fd);
 }
 
 std::ostream &
