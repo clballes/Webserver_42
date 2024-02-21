@@ -16,7 +16,6 @@ class Server
 {
 	public:
 
-		Server ( uint16_t );
 		Server ( const ServerConf & );
 		~Server ( void );
 
@@ -35,14 +34,17 @@ class Server
 
 	private:
 
-		int						_socket_fd; // _server_socket_fd
+		int create_socket ( void );
+		int bind_address ( void );
+		int listen ( void );
+
+		int						_socket_fd;
 		struct sockaddr_in		_server_address;
 
 		int						_client_socket_fd;
 		unsigned				_client_address_len;
 		struct sockaddr_in		_client_address;
 
-		// ::accept() can only do one client at a time ??
 };
 
 #endif /* !_SERVER_HPP_ */

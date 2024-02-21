@@ -48,7 +48,8 @@ ServerConf::add ( std::ifstream & file )
 	if ( ServerConf::parse( mem, server_blocks ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	
-	LOG( "blocks: " << server_blocks.size() )
+	LOG( "server_blocks: " << server_blocks.size() )
+	LOG( "" )
 	
 	// Create a new instance `ServerConf'
 	// for each `server {}' block.

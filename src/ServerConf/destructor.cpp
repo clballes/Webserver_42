@@ -9,7 +9,7 @@
 
 ServerConf::~ServerConf ( void )
 {
-	LOG( "ServerConf: destructor" )
+	LOG( "call ~ServerConf()" )
 
 	return ;
 }

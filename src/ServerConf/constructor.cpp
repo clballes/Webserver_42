@@ -22,14 +22,14 @@ ServerConf::_config_directives[] = {
 	{ "client_body", &ServerConf::set_client_body },
 	{ "cgi_param", &ServerConf::set_cgi_param },
 	{ "cgi_pass", &ServerConf::set_cgi_pass },
-	{ "allow_methods", &ServerConf::set_allow_methods },
+	{ "allow_methods", &ServerConf::set_allow_methods, },
 	{ "index", &ServerConf::set_index },
 	{ "autoindex", &ServerConf::set_autoindex },
-	{ 0x0, 0x0 } }; // 0x0 == NULL == nullptr
+	{ 0x0, 0x0 } };
 
 ServerConf::ServerConf ( void )
 {
-	LOG( "ServerConf: constructor" )
+	LOG( "call ServerConf( void )" )
 
 	return ;
 }
@@ -38,14 +38,14 @@ ServerConf::ServerConf ( const ServerConf & instance )
 {
 	*this = instance;
 	
-	LOG( "ServerConf: copy constructor" )
+	LOG( "call ServerConf( const ServerConf & )" )
 	
 	return ;
 }
 
 ServerConf::ServerConf ( const std::deque< std::string > & server_block )
 {
-	LOG( "ServerConf: constructor from deque" )
+	LOG( "call ServerConf( const std::deque< std::string > &" )
 	
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
 	{
@@ -60,9 +60,51 @@ ServerConf::operator = ( const ServerConf & instance )
 {
 	(void) instance;
 
-	LOG( "ServerConf: copy operator" )
+	LOG( "call operator=ServerConf" )
 
 	return (*this);
+}
+
+std::ostream &
+operator << ( std::ostream & out, const ServerConf & instance )
+{
+	std::vector< std::string >::const_iterator it;
+
+	out << "listen: " << ntohs( instance._address.sin_port );
+	out	<< " " << ntohl( instance._address.sin_addr.s_addr );
+	out << std::endl;
+
+	out << "server_name:";
+	for ( it = instance._server_name.begin();
+			it != instance._server_name.end(); ++it )
+		out << " " << *it;
+	out << std::endl;
+
+	out << "root: " << instance._root;
+	out << std::endl;
+
+	out << "allow_methods:";
+	for ( it = instance._allow_methods.begin();
+			it != instance._allow_methods.end(); ++it )
+		out << " " << *it;
+	out << std::endl;
+
+	out << "client_max_body_size: " << instance._client_max_body_size;
+	out << std::endl;
+
+	out << "cgi_pass: " << instance._cgi_pass;
+	out << std::endl;
+
+	out << "cgi_param: " << instance._cgi_param;
+	out << std::endl;
+
+	out << "index: " << instance._index;
+	out << std::endl;
+	
+	out << "autoindex: " << std::boolalpha << instance._autoindex;
+	out << std::endl;
+
+	return ( out );
 }
 
 /*

@@ -59,7 +59,7 @@ ServerConf::parse ( std::deque< std::string > & content,
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}
-
+	
 	return ( EXIT_SUCCESS );
 }
 

@@ -3,13 +3,14 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Tue Feb 20 11:07:07 2024                                                   */
 
+/* vim:set colorcolumn=80 :                                                   */
+
 #include "ServerConf.hpp"
 #include <sstream>
 
-// renamed from check_directives
-
 int
 ServerConf::set_directives ( const std::deque< std::string > & server_block )
+// Renamed from check_directives()
 {
 	std::deque< std::string >::const_iterator it = server_block.begin();
 	std::string directive;
@@ -33,8 +34,6 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 			pos = it->length();
 
 		directive = it->substr( 0 , pos );
-
-		LOG( "directive is: '" << directive << "'" )
 
 		// The following may go inside another routine.:
 		// Iterate over known configuration_directives.
@@ -100,17 +99,25 @@ port_digit ( std::string portStr )
 }
 
 int
-ServerConf::set_listen ( ServerConf & conf, const char * arg )
+ServerConf::set_listen ( ServerConf & conf, const char * arg )                 // @clballes
+																			   // aquesta funció potser
+																			   // s'hauria de restructurar.
+																			   // 1. Resoldre port ( si no, port = default )
+																			   // 2. Resoldre ip ( si no, ip = default )
+																			   // 3. Posar els valos a this->_address
+																			   //    en el format adient.
 {
 	std::string str( arg );
     std::istringstream iss( arg );
     std::string ip, portStr;
 
+	LOG( "call set_listen()" )
+
 	std::string::size_type pos = str.find( ':' );
 
 	if ( pos != std::string::npos )
     {
-        std::getline( iss, ip, ':' ); // tneim la ip
+        std::getline( iss, ip, ':' ); // tenim la ip
         std::getline( iss, portStr ); //tenim el port
     }
     else
@@ -118,37 +125,50 @@ ServerConf::set_listen ( ServerConf & conf, const char * arg )
         if ( str.length() >= 7 ) // vol dir q trobem una ip
         {
             ip = str;
-            conf._port = 80;
+            //conf._port = 80;
+			conf._address.sin_port = htons( 80 );
         }
         else
         {
             portStr = str; // vol dir q tenim el port
-			conf._host = INADDR_ANY;
+			//conf._host = INADDR_ANY;
+			conf._address.sin_addr.s_addr = htonl( INADDR_ANY );
         }
     }
     if ( ip == "localhost" )
     {
-        conf._host = INADDR_LOOPBACK;
+		//conf._host = INADDR_LOOPBACK;
+		conf._address.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
         if ( pos == std::string::npos )
-            conf._port = 80;
+		{
+            //conf._port = 80;
+			conf._address.sin_port = htons( 80 );
+		}
     }
     else if ( ( ! ip.empty() && !is_valid_ipv4( ip ) ) )
 	{
-        std::cerr << "IP address not ipv4" << std::endl;
+        //std::cerr << "IP address not ipv4" << std::endl;
         //_status = false;
     }
     else
-        conf._host = inet_addr( ip.c_str() );
+	{
+        //conf._host = inet_addr( ip.c_str() );
+		conf._address.sin_addr.s_addr = ::inet_addr( ip.c_str() );             // @clballes
+																			   // inet_addr() no està permesa.
+	}
 
-    if ( port_digit( portStr ) == 0 && conf._port != 80 )
+	if ( port_digit( portStr ) == 0 && ntohs( conf._address.sin_port ) != 80 )
+    //if ( port_digit( portStr ) == 0 && conf._port != 80 )
 	{
         std::cerr << "Error: Error syntax port, just numbers" << std::endl;
         //_status = false;
         return ( EXIT_FAILURE );
     }
-    else if ( conf._port != 80 )
+	else if ( ntohs( conf._address.sin_port ) != 80 )
+    //else if ( conf._port != 80 )
 	{
-        conf._port = std::stoi( portStr );
+        //conf._port = std::stoi( portStr );
+		conf._address.sin_port = htons( std::stoi( portStr ) );
     }
 
 	return ( EXIT_SUCCESS );
@@ -198,12 +218,14 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
     std::vector< std::string > words;
     std::string word;
 
+	LOG( "call set_server_name()" )
+
     while ( iss >> word )
 	{
         if ( parse_server_name( word ) != 1 )
         {
-            std::clog << " -------------- - -- KO SERVERNAME";
-			std::clog << std::endl;
+            //std::clog << " -------------- - -- KO SERVERNAME";
+			//std::clog << std::endl;
             // _status = false; mirar el default 0.0.0.0.					   // @clballes
             return ( EXIT_FAILURE );
         }
@@ -217,6 +239,8 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_error_page ( ServerConf & conf, const char * arg )
 {
+	LOG( "call set_error_page()" )
+
 	(void) conf;
 	(void) arg;
 
@@ -230,6 +254,8 @@ ServerConf::set_client_body ( ServerConf & conf, const char * arg )
 {
 	(void) conf;
 	(void) arg;
+
+	LOG( "call set_client_body()" )
 
     int alpha = 10;
 	std::string str( arg );
@@ -265,6 +291,8 @@ ServerConf::set_client_body ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_cgi_param ( ServerConf & conf, const char * arg )
 {
+	LOG( "call set_cgi_param()" )
+
 	(void) conf;
 	(void) arg;
 	
@@ -276,6 +304,8 @@ ServerConf::set_cgi_param ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_cgi_pass ( ServerConf & conf, const char * arg )
 {
+	LOG( "call set_cgi_pass()" )
+	
 	(void) conf;
 	(void) arg;
 
@@ -289,6 +319,8 @@ ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
 {
 	(void) conf;
 	(void) arg;
+
+	LOG( "call set_allow_methods()" )
 
 	std::istringstream iss( arg );
 	std::string word;
@@ -313,6 +345,8 @@ ServerConf::set_index ( ServerConf & conf, const char * arg )
 	(void) conf;
 	(void) arg;
 
+	LOG( "call set_index()" )
+
 	conf._index = arg;
 
 	return ( EXIT_SUCCESS );
@@ -323,6 +357,8 @@ ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
 {
 	(void) conf;
 	(void) arg;
+
+	LOG( "call set_autoindex()" )
 
 	conf._autoindex = arg;
 

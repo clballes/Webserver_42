@@ -34,6 +34,8 @@ class ServerConf
 		
 		static int add ( std::ifstream & );
 		static void clear ( void );
+		
+		friend std::ostream & operator << ( std::ostream&, const ServerConf & );
 
 	private:
 		
@@ -63,7 +65,8 @@ class ServerConf
 		static int set_root ( ServerConf &, const char * );
 		static int set_server_name ( ServerConf &, const char * );
 		static int set_error_page ( ServerConf &, const char * );
-		static int set_client_body ( ServerConf &, const char * ); // client_body_SIZE no?
+		static int set_client_body ( ServerConf &, const char * );
+		// client_body_SIZE no?
 		static int set_cgi_param ( ServerConf &, const char * );
 		static int set_cgi_pass ( ServerConf &, const char * );
 		static int set_allow_methods ( ServerConf &, const char * );
@@ -74,13 +77,18 @@ class ServerConf
 
 		// Need to be revised
 
-		uint16_t _port;
+		struct sockaddr_in _address;
+
+		in_port_t _port;
 		in_addr_t _host;
+		
 		std::vector<std::string> _server_name;
 		std::string _root;
-		std::vector<std::string> _allow_methods; //potser fer un short (0/0/0/1)
+		std::vector<std::string> _allow_methods;
+		// allow_methods -> potser fer un int bits:(0/0/0/1)
 		std::size_t _client_max_body_size;
-		std::string _index; // consider multiple indexes
+		std::string _index;
+		// consider multiple indexes <vector>
 		std::string _cgi_param;
 		std::string _cgi_pass;
 		bool _autoindex;
