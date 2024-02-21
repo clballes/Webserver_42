@@ -60,4 +60,19 @@
 # include <sys/stat.h>		/* stat */
 # include <dirent.h>		/* opendir, readdir, closedir */
 
+// This needs to be resorted and reordered properly
+// ...
+
+# include <sys/cdefs.h>
+# include <set>
+# include "Server.hpp"
+
+#define LOG(s) { std::clog << s << std::endl; }
+
+#include "Server.hpp"
+
+__BEGIN_DECLS extern "C"
+int webserv ( void );
+__END_DECLS
+
 #endif /* webserv.hpp */

@@ -1,41 +1,65 @@
 /*                                                                            */
-/* webserv.cpp                                                                */
-/* clballes <clballes@student.42barcelona.com>                                */
-/* Mon Jan  8 12:17:22 2024                                                   */
+/* test-kqueue.cpp                                                            */
+/* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
+/* Thu Jan 25 14:26:11 2024                                                   */
 
+#include "webserv.hpp"
 #include "Server.hpp"
-#include "ParsingServers.hpp"
-#include <iostream>
-#include <list>
+
+void graceful_stop ( int );
+void set_events ( int );
+void event_loop ( int );
+
+// The webserv() call starts multiple Server instances 
+// (...) using a kqueue.
 
 int
-main (int argc, const char **argv)
+webserv ( void )
 {
-	std::string		conf_file;
+	//bool status = true;
+	
+	LOG( "call webserv()" )
 
-	conf_file = DEFAULT_CONF;
-    if (argc > 2)
-    {
-		std::cout << argv[0] << " [configuration file]";
-		std::cout << std::endl;
-		return (EXIT_SUCCESS);
-    }
-	if (argv[1] != NULL)
-		conf_file.assign(argv[1]);
+	// Configure SIGINT ( signal interrupt )
+	// so as to finish connections and end the program
+	// gracefully.
+	
+	::signal( SIGINT, &graceful_stop );
 
-	// parsing servers posa tot en una llista
-	std::list<std::string>listConfig;
-	if(parsingServers(argv[1], listConfig) == EXIT_FAILURE){
-		return EXIT_FAILURE;
+	// Create a new kernel event queue.
+
+	Server::kq = ::kqueue();
+	if ( Server::kq == -1 )
+	{
+		std::cerr << PROGRAM_NAME;
+		std::cerr << ": " << ::strerror( errno ) << std::endl;
+		exit ( 0x1 ); // Caldra comprovar leaks ...
 	}
-		// AIXO PER FER ARRAY DE SERVERS
-		// std::vector<std::list<std::string> >arrayOfLists = splitServer(numServers(listConfig), listConfig);
-		// std::cout << arrayOfLists.size() << std::endl;
-		// std::vector<Server> serverVector(2); //array or dque han de ser punters
-		// // serverVector.reserve(2); 
-		// 	// std::cout << "a" << std::endl;
-		// for (size_t i = 0; i < 2; ++i) { //construy dos veces el copy y el construcotrrrr, entonces se me destruye dos veces tbien
-		// 	serverVector[i] = Server(); //Server(arrayOfLists[i]);
-		// }
-	return (EXIT_SUCCESS);
+	
+	LOG ( "kqueue properly initialized (fd=" << Server::kq << ")" );
+
+	// For each Server instance,
+	// register an event with the queue.
+
+	// WIP: maybe just set_init_events (sockets mainly)
+	// ; there will be more events to register later,
+	// during program execution and loop execution.
+
+	for ( Server::const_iterator it = Server::servers.begin();
+			it != Server::servers.end(); ++it )
+		(*it)->register_socket();
+
+	// Start listening for registered events
+	// ... kqueue
+
+	event_loop( Server::kq );
+
+	return ( EXIT_SUCCESS );
+}
+
+void
+graceful_stop ( int n )
+{
+	LOG ( "\rGracefully stopping..." );
+	exit( n );
 }

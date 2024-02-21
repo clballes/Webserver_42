@@ -10,13 +10,30 @@ INC_DIR			:=	$(SRC_DIR)
 BUILD_DIR		:=	build
 
 CC				:=	c++
-CPPFLAGS		:=	-MMD -iquotes$(INC_DIR)
+CPPFLAGS		:=	-MMD -I$(INC_DIR)
+CPPFLAGS		+=	-I$(SRC_DIR)/Server -I$(SRC_DIR)/ServerConf
 #CPPFLAGS		+=	-g -fsanitize='address,undefined'
+#CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
+SILENCE_LOGS	?=	false
 
-SRC_FILES		:=	$(SRC_DIR)/$(NAME).cpp \
-					$(SRC_DIR)/Server.cpp \
-					$(SRC_DIR)/ParsingServers.cpp
+SRC_FILES		:=	$(SRC_DIR)/main.cpp \
+					$(SRC_DIR)/init.cpp \
+					$(SRC_DIR)/getoptions.cpp \
+					$(SRC_DIR)/webserv.cpp \
+					$(SRC_DIR)/loop.cpp \
+					$(SRC_DIR)/Server/constructor.cpp \
+					$(SRC_DIR)/Server/destructor.cpp \
+					$(SRC_DIR)/Server/getters.cpp \
+					$(SRC_DIR)/Server/events.cpp \
+					$(SRC_DIR)/ServerConf/constructor.cpp \
+					$(SRC_DIR)/ServerConf/destructor.cpp \
+					$(SRC_DIR)/ServerConf/add.cpp \
+					$(SRC_DIR)/ServerConf/file2mem.cpp \
+					$(SRC_DIR)/ServerConf/normalize.cpp \
+					$(SRC_DIR)/ServerConf/split_elements.cpp \
+					$(SRC_DIR)/ServerConf/setters.cpp \
+					$(SRC_DIR)/ServerConf/parse.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
 
@@ -24,7 +41,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re debug
 
 #include $(DEP_FILES)
 
