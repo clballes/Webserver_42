@@ -13,10 +13,9 @@ void event_loop ( int );
 // The webserv() call starts multiple Server instances 
 // (...) using a kqueue.
 
-void
+int
 webserv ( void )
 {
-	int kq;
 	//bool status = true;
 	
 	LOG( "call webserv()" )
@@ -29,15 +28,15 @@ webserv ( void )
 
 	// Create a new kernel event queue.
 
-	kq = ::kqueue();
-	if ( kq == -1 )
+	Server::kq = ::kqueue();
+	if ( Server::kq == -1 )
 	{
 		std::cerr << PROGRAM_NAME;
 		std::cerr << ": " << ::strerror( errno ) << std::endl;
 		exit ( 0x1 ); // Caldra comprovar leaks ...
 	}
 	
-	LOG ( kq << ": kqueue properly initialized" << std::endl );
+	LOG ( "kqueue properly initialized (fd=" << Server::kq << ")" );
 
 	// For each Server instance,
 	// register an event with the queue.
@@ -46,14 +45,16 @@ webserv ( void )
 	// ; there will be more events to register later,
 	// during program execution and loop execution.
 
-	set_events( kq );
+	for ( Server::const_iterator it = Server::servers.begin();
+			it != Server::servers.end(); ++it )
+		(*it)->register_socket();
 
 	// Start listening for registered events
 	// ... kqueue
 
-	event_loop( kq );
+	event_loop( Server::kq );
 
-	return ;
+	return ( EXIT_SUCCESS );
 }
 
 void

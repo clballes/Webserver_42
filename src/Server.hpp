@@ -19,14 +19,16 @@ class Server
 		Server ( const ServerConf & );
 		~Server ( void );
 
-		unsigned socket ( void ) const;
+		bool good;
+		void register_socket ( void ) const;
 
-		//#ifdef DEBUG
-		//void setPort();
-		//void setAddr();
-		//#endif
+		// kqueue's file descriptor
 		
+		static int kq;
 		static std::vector< const Server * > servers;
+
+		static void clear ( void );
+		
 		typedef std::vector< const Server * >:: const_iterator const_iterator;
 		typedef std::vector< const Server * >:: iterator iterator;
 

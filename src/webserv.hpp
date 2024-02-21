@@ -72,7 +72,7 @@
 #include "Server.hpp"
 
 __BEGIN_DECLS extern "C"
-void webserv ( void );
+int webserv ( void );
 __END_DECLS
 
 #endif /* webserv.hpp */

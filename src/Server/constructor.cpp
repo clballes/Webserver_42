@@ -5,6 +5,9 @@
 
 #include "Server.hpp"
 
+int
+Server::kq = 0;
+
 // Initialize static `vector' of servers
 
 std::vector< const Server * >
@@ -86,15 +89,32 @@ Server::listen ( void )
 	// just listen
 	// put event on kqueue and accept when there's activity
 	//_client_address_len = sizeof( this->_client_address );
-	//_client_socket_fd = ::accept( this->_socket_fd, (struct sockaddr *) &this->_client_address, &this->_client_address_len );
+	//_client_socket_fd = ::accept( this->_socket_fd,
+	//		(struct sockaddr *) &this->_client_address,
+	//		&this->_client_address_len );
 
-	//::send( this->_client_socket_fd, "Hey there\n", ::strlen( "Hey there\n" ), 0 );
+	//::send( this->_client_socket_fd,
+	//		"Hey there\n", ::strlen( "Hey there\n" ), 0 );
 
 	(void) _client_address_len;
 	(void) _client_socket_fd;
 	(void) _client_address;
 
 	return ( EXIT_SUCCESS );
+}
+
+void
+Server::clear ( void )														   // @clballes
+																			   // Podem fer que en el destructor de cada instància
+																			   // `Server' comprovi si Server::servers.size() > 0
+																			   // i faci Server::clear(), encara que sigui reiterat.
+{
+	Server::iterator it = Server::servers.begin();
+
+	for ( ; it != Server::servers.end(); ++it )
+		delete *it;
+
+	return ;
 }
 
 std::ostream &
