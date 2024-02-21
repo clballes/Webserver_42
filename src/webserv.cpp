@@ -19,7 +19,6 @@ webserv ( void )
 	int kq;
 	//bool status = true;
 	
-	LOG( "" )
 	LOG( "call webserv()" )
 
 	// Configure SIGINT ( signal interrupt )

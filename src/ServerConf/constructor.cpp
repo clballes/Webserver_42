@@ -70,8 +70,10 @@ operator << ( std::ostream & out, const ServerConf & instance )
 {
 	std::vector< std::string >::const_iterator it;
 
-	out << "listen: " << ntohs( instance._address.sin_port );
-	out	<< " " << ntohl( instance._address.sin_addr.s_addr );
+	out << "listen: " << inet_ntoa( instance._address.sin_addr );              // @mpuig-ma
+																			   // Function not allowed
+	out << " " << ntohs( instance._address.sin_port );
+
 	out << std::endl;
 
 	out << "server_name:";
@@ -102,34 +104,7 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << std::endl;
 	
 	out << "autoindex: " << std::boolalpha << instance._autoindex;
-	out << std::endl;
+	//out << std::endl;
 
 	return ( out );
 }
-
-/*
-std::ostream &
-operator << ( std::ostream & out, const ConfigServer & server )
-{
-	out << "______________ PRINTING THE MAP ________________" << std::endl;
-	out << "server_name: ";
-
-	for (size_t i = 0; i < server._server_name.size(); i++) {
-		out << server._server_name[i];
-		if (i != server._server_name.size() - 1)
-			out << " ";
-	}
-
-    out << "Listen port:" << server._port << "  Listen host:" <<  server._host << std::endl;
-	out << "client_body_buffer_size: " << server._client_max_body_size << std::endl;
-	out << " root: " << server._root << std::endl;
-    out << "mapa size: "<< server._location.size() << std::endl;
-	for (std::map<std::string, ConfigServer>::const_iterator i = server._location.begin(); i != server._location.end(); i++) {
-        out << std::endl << "Location string: " << i->first << std::endl;
-		out << "dentro de location root: " << i->second.getRoot() << std::endl;
-		out << "dentro de location maxsize: " << i->second.getClient_max_body_size() << std::endl;
-	}
-
-	return ( out );
-}
-*/

@@ -13,6 +13,8 @@ Server::servers;
 Server::Server ( const ServerConf & instance )
 {
 	LOG( "call Server( const ServerConf & )" )
+	LOG( "> " << instance )
+
 	//set goodbit
 
 	std::memcpy( &this->_server_address, &instance._address,

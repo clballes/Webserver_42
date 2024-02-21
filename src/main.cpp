@@ -67,10 +67,7 @@ main ( int argc, char * const * argv )
 
 	for ( ServerConf::iterator it = ServerConf::instances.begin();
 			it != ServerConf::instances.end(); ++it )
-	{
-		// WIP std::clog << const_cast<const ServerConf &>(ref) << std::endl;
 		Server::servers.push_back( new Server( *( *it ) ) );
-	}
 
 	Server::servers.shrink_to_fit();
 	ServerConf::clear();

@@ -49,7 +49,6 @@ ServerConf::add ( std::ifstream & file )
 		return ( EXIT_FAILURE );
 	
 	LOG( "server_blocks: " << server_blocks.size() )
-	LOG( "" )
 	
 	// Create a new instance `ServerConf'
 	// for each `server {}' block.
