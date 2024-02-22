@@ -48,7 +48,7 @@ webserv ( void )
 
 	for ( Server::const_iterator it = Server::servers.begin();
 			it != Server::servers.end(); ++it )
-		( *it )->register_socket();
+		( *it )->register_read_socket();
 
 	// Start listening for registered events
 	// ... kqueue

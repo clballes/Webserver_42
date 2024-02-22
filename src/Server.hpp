@@ -20,7 +20,6 @@ class Server
 		~Server ( void );
 
 		bool good;
-		void register_socket ( void ) const;
 
 		// kqueue's file descriptor
 		
@@ -34,11 +33,14 @@ class Server
 
 		friend std::ostream & operator << ( std::ostream&, const Server & );
 
-	private:
+// COMMENTET FOR DEBUG ONLY
+//	private:
 
 		int create_socket ( void );
 		int bind_address ( void );
 		int listen ( void );
+		void register_read_socket ( void ) const;
+		int accept_connection ( struct kevent * );
 
 		int						_socket_fd;
 		struct sockaddr_in		_server_address;

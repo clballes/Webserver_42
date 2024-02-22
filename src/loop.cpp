@@ -12,6 +12,7 @@ event_loop ( int kq )
 {
 	int				n_events;
 	struct kevent	ev;
+	Server * serv;
 
 	n_events = 1;
 	status = true;
@@ -34,9 +35,18 @@ event_loop ( int kq )
 		if ( n_events == 0 )
 			continue ;
 
+		// if ev.ident is a file descriptor from one of the servers
+		// accept_connection and register read event for client incoming data.
+		//
+		// else if 
+		// read incoming data from client.
+
 		// Echo kevent ident which is the server's socket file descriptor.
 
-		std::cout << "id: " << ev.ident << std::endl;
+		serv = ( Server * ) ev.udata;
+		serv->accept_connection( &ev );
+
+		// consider EVFILT_SIGNAL
 	}
 
 	return ;

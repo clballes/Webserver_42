@@ -37,7 +37,8 @@ class ServerConf
 		
 		friend std::ostream & operator << ( std::ostream&, const ServerConf & );
 
-	private:
+// COMMENTED FOR DEBUG ONLY
+//	private:
 		
 		//  An empty ServerConf instance 
 		//  may be created for testing purposes.
@@ -59,6 +60,7 @@ class ServerConf
 		//static int post_parse ( std::deque< std::string > & );
 		
 		int set_directives ( const std::deque< std::string > & );
+		int set_directive ( std::string &, const char * );
 
 		static int set_listen ( ServerConf &, const char * );
 		static int set_root ( ServerConf &, const char * );

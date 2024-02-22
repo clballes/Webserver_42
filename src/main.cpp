@@ -51,16 +51,32 @@ main ( int argc, char * const * argv )
 	// Add `conf_file' is contents.
 	// Server_conf::add() also parses them. 
 	
-	if ( ServerConf::add( conf_file ) == EXIT_FAILURE )
-	{
-		conf_file.close();
-		return ( EXIT_FAILURE );
-	}
+		//if ( ServerConf::add( conf_file ) == EXIT_FAILURE )
+		//{
+		//	conf_file.close();
+		//	return ( EXIT_FAILURE );
+		//}
 	
 	// Once done, close file;
 
 	conf_file.close();
 	LOG( conf_filename << ": closed OK" )
+
+		// DEBUG
+		ServerConf * serv = new ServerConf();
+		serv->_address.sin_port = htons( 9000 );
+		serv->_address.sin_family = AF_INET;
+		serv->_address.sin_addr.s_addr = htonl( INADDR_ANY );
+		serv->_root = std::string( "/Users/mpuig-ma/Documents/www" );
+		serv->_allow_methods.push_back( std::string( "GET") );
+		serv->_client_max_body_size = 0;
+		serv->_index = std::string();
+		serv->_cgi_param = std::string( "params" );
+		serv->_cgi_pass = std::string( "pass" );
+		serv->_autoindex = true;
+
+		ServerConf::instances.push_back( serv );
+		// --
 
 	// Initialize n Server instances based on the configuration file.
 	// new `Server's in Server::servers will have to be FREEd.
