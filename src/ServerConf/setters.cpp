@@ -57,7 +57,8 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 
 		// Execute function to set whatever the directive found is.
 
-		ptr->set_func( *this, it->c_str() );
+		if ( ptr->set_func( *this, it->c_str() ) )
+			return ( EXIT_FAILURE );
 
 		++it;
 	}
@@ -332,8 +333,8 @@ ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
 			//_status = false;
 			return ( EXIT_FAILURE );
 		}
-		else
-			conf._allow_methods.push_back( word );
+		//else
+		//	conf._allow_methods.push_back( word );
 	}
 
 	return ( EXIT_SUCCESS );

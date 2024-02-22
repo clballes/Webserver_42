@@ -13,7 +13,7 @@ Server::kq = 0;
 std::vector< const Server * >
 Server::servers;
 
-Server::Server ( const ServerConf & instance )
+Server::Server ( const ServerConf & instance ): good( true )
 {
 	LOG( "call Server( const ServerConf & )" )
 	LOG( "> " << instance )
@@ -104,10 +104,7 @@ Server::listen ( void )
 }
 
 void
-Server::clear ( void )														   // @clballes
-																			   // Podem fer que en el destructor de cada instància
-																			   // `Server' comprovi si Server::servers.size() > 0
-																			   // i faci Server::clear(), encara que sigui reiterat.
+Server::clear ( void )
 {
 	Server::iterator it = Server::servers.begin();
 

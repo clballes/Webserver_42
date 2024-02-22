@@ -58,6 +58,8 @@ ServerConf::add ( std::ifstream & file )
 	while ( block != server_blocks.end() )
 	{
 		ServerConf::instances.push_back( new ServerConf( *block ) );
+		if ( ServerConf::instances.back()->good == false )
+			return ( EXIT_FAILURE );
 		++block;
 	}
 	

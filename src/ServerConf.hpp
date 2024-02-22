@@ -20,13 +20,13 @@ struct s_configuration_directives
 };
 
 typedef struct s_configuration_directives t_configuration_directives;
-
 class ServerConf
 {
 	public:
 
 		friend class Server;
 		
+		bool good;
 		static std::deque< const ServerConf * >instances;
 	
 		typedef std::deque< const ServerConf * >::iterator iterator;
@@ -43,7 +43,6 @@ class ServerConf
 		//  may be created for testing purposes.
 		
 		ServerConf ( void );
-		
 		ServerConf ( const ServerConf & );
 		ServerConf ( const std::deque< std::string > & );
 		ServerConf & operator = ( const ServerConf & );

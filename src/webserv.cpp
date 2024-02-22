@@ -13,11 +13,11 @@ void event_loop ( int );
 // The webserv() call starts multiple Server instances 
 // (...) using a kqueue.
 
+bool status;
+
 int
 webserv ( void )
 {
-	//bool status = true;
-	
 	LOG( "call webserv()" )
 
 	// Configure SIGINT ( signal interrupt )
@@ -25,6 +25,7 @@ webserv ( void )
 	// gracefully.
 	
 	::signal( SIGINT, &graceful_stop );
+	::signal( SIGQUIT, &graceful_stop );
 
 	// Create a new kernel event queue.
 
@@ -47,7 +48,7 @@ webserv ( void )
 
 	for ( Server::const_iterator it = Server::servers.begin();
 			it != Server::servers.end(); ++it )
-		(*it)->register_socket();
+		( *it )->register_socket();
 
 	// Start listening for registered events
 	// ... kqueue
@@ -60,6 +61,7 @@ webserv ( void )
 void
 graceful_stop ( int n )
 {
-	LOG ( "\rGracefully stopping..." );
-	exit( n );
+	LOG ( std::endl << "Gracefully stopping..." );
+	status = false;
+	(void )n;
 }

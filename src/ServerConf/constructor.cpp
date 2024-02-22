@@ -27,7 +27,7 @@ ServerConf::_config_directives[] = {
 	{ "autoindex", &ServerConf::set_autoindex },
 	{ 0x0, 0x0 } };
 
-ServerConf::ServerConf ( void )
+ServerConf::ServerConf ( void ): good( true )
 {
 	LOG( "call ServerConf( void )" )
 
@@ -45,11 +45,14 @@ ServerConf::ServerConf ( const ServerConf & instance )
 
 ServerConf::ServerConf ( const std::deque< std::string > & server_block )
 {
+	this->good = true;
+
 	LOG( "call ServerConf( const std::deque< std::string > &" )
 	
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
 	{
-		std::cerr << "ServerConf: error: check_directives" << std::endl;
+		std::cerr << "error: set_directives" << std::endl;
+		this->good = ! good;
 	}
 
 	return ;
@@ -59,6 +62,8 @@ ServerConf &
 ServerConf::operator = ( const ServerConf & instance )
 {
 	(void) instance;
+
+	this->good = instance.good;
 
 	LOG( "call operator=ServerConf" )
 

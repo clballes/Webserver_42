@@ -28,7 +28,7 @@ class Server
 		static std::vector< const Server * > servers;
 
 		static void clear ( void );
-		
+
 		typedef std::vector< const Server * >:: const_iterator const_iterator;
 		typedef std::vector< const Server * >:: iterator iterator;
 
@@ -48,5 +48,7 @@ class Server
 		struct sockaddr_in		_client_address;
 
 };
+
+extern bool status;
 
 #endif /* !_SERVER_HPP_ */
