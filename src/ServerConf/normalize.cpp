@@ -9,6 +9,7 @@
 #include "parse.hpp"
 
 void trim_comments( std::string & );
+void replace_sp( std::string & str, int ( *func )( int ) );
 
 void
 ServerConf::normalize ( std::deque< std::string > & mem )
@@ -21,6 +22,7 @@ ServerConf::normalize ( std::deque< std::string > & mem )
 	while ( it != mem.end() )
 	{
 		trim_comments( *it );
+		replace_sp( *it, &std::isspace );
 		trim_f( *it, &std::isspace );
 
 		if ( it->empty() == true )
@@ -95,4 +97,22 @@ trim_f( std::string & str, int ( *func )( int ) )
 		it = str.erase ( it );
 	
 	return ( str );
+}
+
+void
+replace_sp( std::string & str, int ( *func )( int ) )
+{
+	std::string::iterator it;
+
+	LOG( "call replace_sp" )
+
+	it = str.begin();
+	while ( it != str.end() )
+	{
+		if ( func( *it ) != 0 )
+			*it = ' ';
+		++it;
+	}
+	
+	return ;
 }
