@@ -60,7 +60,6 @@ ServerConf::add ( std::ifstream & file )
 		ServerConf::instances.push_back( new ServerConf( *block ) );
 		if ( ServerConf::instances.back()->good == false )
 		{
-			std::cout << "aaaaa exit de tot: " << std::endl;
 			return ( EXIT_FAILURE );
 		}
 		++block;

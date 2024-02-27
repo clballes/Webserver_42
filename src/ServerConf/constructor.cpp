@@ -45,21 +45,22 @@ ServerConf::ServerConf ( const ServerConf & instance )
 
 ServerConf::ServerConf ( const std::deque< std::string > & server_block )
 {
+	this->good = true;
+
 	LOG( "call ServerConf( const std::deque< std::string > &" )
-	
+
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
 	{
 		std::cerr << "ServerConf: error: check_directives" << std::endl;
 		this->good = ! good;
 	}
-
 	return ;
 }
 
 ServerConf &
 ServerConf::operator = ( const ServerConf & instance )
 {
-	(void) instance;
+	this->good = instance.good;
 
 	LOG( "call operator=ServerConf" )
 
@@ -73,7 +74,7 @@ operator << ( std::ostream & out, const ServerConf & instance )
 
 	out << "listen: " << inet_ntoa( instance._address.sin_addr );              // @mpuig-ma
 																			   // Function not allowed
-	out << " " << ntohs( instance._address.sin_port );
+	out << " port: " << ntohs( instance._address.sin_port );
 
 	out << std::endl;
 

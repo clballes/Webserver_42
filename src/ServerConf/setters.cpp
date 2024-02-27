@@ -13,48 +13,40 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 // Renamed from check_directives()
 {
 	std::deque< std::string >::const_iterator it = server_block.begin();
-	std::string directive;
-	std::string::size_type pos;
 
 	LOG( "call set_directives()" )
 
 	// There won't be "{" or "}" lines.
 	// See fill_block().
-
 	while ( it != server_block.end() )
 	{
-		pos = it->find( ' ' );
-
-		if ( pos == std::string::npos )
-			pos = it->length();
-
+		size_t posSpace = it->find(' ');
+		size_t posLen = it->length();
+		size_t pos = (posSpace != std::string::npos) ? posSpace : posLen;
 		std::string directive = (pos != std::string::npos) ? it->substr(0, pos) : *it;
 		std::string str = (pos != std::string::npos) ? it->substr(pos) : *it;
-
 		// The following may go inside another routine.:
 		// Iterate over known configuration_directives.
 		// If non is found, a NULL pointer will be returned.
 
 		t_configuration_directives * ptr = &ServerConf::_config_directives[0];
-		while ( ptr != NULL )
-		{
-			
+		while ( ptr->directive_name != NULL )
+		{	
 			if ( directive.compare( ptr->directive_name ) == 0 )
 				break ;
 			++ptr;
 		}
 
-		if ( ptr == NULL )
+		if ( ptr->directive_name == NULL )
 		{
 			std::cerr << PROGRAM_NAME;
 			std::cerr << ": error: invalid directive";
 			std::cerr << std::endl;
 			return ( EXIT_FAILURE );
 		}
-
 		// Execute function to set whatever the directive found is.
-
-		ptr->set_func( *this, str.c_str() );
+		if (ptr->set_func( *this,  str.c_str() ) == EXIT_FAILURE || ptr->set_func( *this, str.c_str() ) == '\0')
+			return (EXIT_FAILURE);
 
 		++it;
 	}
@@ -98,71 +90,42 @@ port_digit ( std::string portStr )
 int
 ServerConf::set_listen ( ServerConf & conf, const char * arg )
 {
-	std::string str( arg );
     std::istringstream iss( arg );
     std::string ip, portStr;
+	const char *port = arg;
 
 	LOG( "call set_listen()" )
 
-	std::string::size_type pos = str.find( ':' );
-
+    std::string::size_type pos = std::string(arg).find(':');
 	if ( pos != std::string::npos )
-    {
-        std::getline( iss, ip, ':' ); // tenim la ip
-        std::getline( iss, portStr ); //tenim el port
-    }
-    else
-    {
-        if ( str.length() >= 7 ) // vol dir q trobem una ip
-        {
-            ip = str;
-            //conf._port = 80;
-			conf._address.sin_port = htons( 80 );
-        }
-        else
-        {
-            portStr = str; // vol dir q tenim el port
-			//conf._host = INADDR_ANY;
-			conf._address.sin_addr.s_addr = htonl( INADDR_ANY );
-        }
-    }
-    if ( ip == "localhost" )
-    {
-		//conf._host = INADDR_LOOPBACK;
-		conf._address.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
-        if ( pos == std::string::npos )
-		{
-            //conf._port = 80;
-			conf._address.sin_port = htons( 80 );
-		}
-    }
-    else if ( ( ! ip.empty() && !is_valid_ipv4( ip ) ) )
 	{
-        //std::cerr << "IP address not ipv4" << std::endl;
-        //_status = false;
-    }
-    else
-	{
-        //conf._host = inet_addr( ip.c_str() );
-		conf._address.sin_addr.s_addr = ::inet_addr( ip.c_str() );             // @clballes
-																			   // inet_addr() no està permesa.
+		std::getline( iss, ip, ':' ); // tenim la ip
+		std::getline( iss, portStr ); //tenim el port
 	}
 
-	if ( port_digit( portStr ) == 0 && ntohs( conf._address.sin_port ) != 80 )
-    //if ( port_digit( portStr ) == 0 && conf._port != 80 )
-	{
-        std::cerr << "Error: Error syntax port, just numbers" << std::endl;
-        //_status = false;
-        return ( EXIT_FAILURE );
-    }
-	else if ( ntohs( conf._address.sin_port ) != 80 )
-    //else if ( conf._port != 80 )
-	{
-        //conf._port = std::stoi( portStr );
-		conf._address.sin_port = htons( std::stoi( portStr ) );
-    }
+	struct addrinfo hints, *result, *rp;
 
-	return ( EXIT_SUCCESS );
+    std::memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;    // Allow IPv4 or IPv6 AF_UNSPEC
+    hints.ai_socktype = SOCK_STREAM; // TCP socket
+	hints.ai_flags = AI_PASSIVE;      // Listen on all available interfaces if not ip given
+	int status = getaddrinfo(ip.empty() ? nullptr : ip.c_str(), portStr.empty() ? port : portStr.c_str(), &hints, &result);
+	if (status != 0) {
+		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
+		return (EXIT_FAILURE);
+	}
+    for (rp = result; rp != nullptr; rp = rp->ai_next) {
+        if (rp->ai_family == AF_INET) {
+            struct sockaddr_in *ipv4 = (struct sockaddr_in *)rp->ai_addr;
+            // Set the sockaddr_in structure
+            conf._address.sin_family = ipv4->sin_family;
+            conf._address.sin_port = ipv4->sin_port;
+            conf._address.sin_addr = ipv4->sin_addr;
+			break ;
+        }
+    }
+	freeaddrinfo(result); // Free the dynamically allocated memory
+	return (EXIT_SUCCESS);
 }
 
 int
@@ -176,13 +139,15 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 	return ( EXIT_SUCCESS );
 }
 
-// NO TROBO DOCUMETNACIO DAIXO ARA:
 // Server_name accoridng to nginx: alphanumeric characters, minus signs ("-"), and periods (".").
 // They must begin with an alphabetic character and end with an alphanumeric character.
 
 int
 ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 {
+	std::cout << "arg:"<< std::endl;
+
+	std::cout << "arg:"<< arg << std::endl;
     std::istringstream iss( arg );
     std::vector< std::string > words;
     std::string word;
@@ -192,23 +157,21 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
     while ( iss >> word )
 	{
 		std::string::size_type i;
-		if ( ! isalpha( word[0] ) )
-		{
-			std::cout << "entressss???"<< std::endl;
+		if ( ! isalpha( word[0] ) ){
 			return ( EXIT_FAILURE );
 		}
 		for ( i = 0; i < word.length(); i++ )
 		{
-			if ( ! isalnum( word[i] ) && ( word[i] != '-' && word[i] != '.' ) )
-			{
-				std::cout << "entressss 2???"<< std::endl;
+			if ( ! isalnum( word[i] ) && ( word[i] != '-' && word[i] != '.' ) ){
             	return ( EXIT_FAILURE );
 			}
 		}
         conf._server_name.push_back( word );
     }
-	if (!iss)
+	if (word.empty())
+		
 		// Empty server name ""
+
 		conf._server_name.push_back( "\"\"" );
 	return ( EXIT_SUCCESS );
 }
