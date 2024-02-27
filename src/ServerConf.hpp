@@ -20,6 +20,7 @@ struct s_configuration_directives
 };
 
 typedef struct s_configuration_directives t_configuration_directives;
+
 class ServerConf
 {
 	public:

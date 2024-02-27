@@ -12,7 +12,7 @@ BUILD_DIR		:=	build
 CC				:=	c++
 CPPFLAGS		:=	-MMD -I$(INC_DIR)
 CPPFLAGS		+=	-I$(SRC_DIR)/Server -I$(SRC_DIR)/ServerConf
-#CPPFLAGS		+=	-g -fsanitize='address,undefined'
+CPPFLAGS		+=	-g -fsanitize='address,undefined'
 #CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 SILENCE_LOGS	?=	false
@@ -24,8 +24,10 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/loop.cpp \
 					$(SRC_DIR)/Server/constructor.cpp \
 					$(SRC_DIR)/Server/destructor.cpp \
-					$(SRC_DIR)/Server/getters.cpp \
 					$(SRC_DIR)/Server/events.cpp \
+					$(SRC_DIR)/Client/constructor.cpp \
+					$(SRC_DIR)/Client/destructor.cpp \
+					$(SRC_DIR)/Client/events.cpp \
 					$(SRC_DIR)/ServerConf/constructor.cpp \
 					$(SRC_DIR)/ServerConf/destructor.cpp \
 					$(SRC_DIR)/ServerConf/add.cpp \

@@ -7,17 +7,20 @@
 #define _SERVER_HPP_
 
 #include "webserv.hpp"
+#include "IEvent.hpp"
 #include "ServerConf.hpp"
 #include <vector>
 
 class ServerConf;
 
-class Server
+class Server: public IEvent
 {
 	public:
 
 		Server ( const ServerConf & );
 		~Server ( void );
+
+		void dispatch ( void );
 
 		bool good;
 
@@ -39,8 +42,11 @@ class Server
 		int create_socket ( void );
 		int bind_address ( void );
 		int listen ( void );
+		
 		void register_read_socket ( void ) const;
-		int accept_connection ( struct kevent * );
+
+		int accept_connection ( void );
+		int receive_request ( int64_t );
 
 		int						_socket_fd;
 		struct sockaddr_in		_server_address;

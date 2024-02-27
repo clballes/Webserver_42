@@ -12,7 +12,7 @@ event_loop ( int kq )
 {
 	int				n_events;
 	struct kevent	ev;
-	Server * serv;
+	IEvent *        instance;
 
 	n_events = 1;
 	status = true;
@@ -21,7 +21,9 @@ event_loop ( int kq )
 	{
 		// kevent() call does not return until at least one event is received
 		// or when an associated timeout is exhausted.
+
 		n_events = ::kevent( kq, 0x0, 0, &ev, 1, 0 );
+		LOG( "n_events: " << n_events )
 
 		if ( status == false )
 			return ;
@@ -29,23 +31,19 @@ event_loop ( int kq )
 		if ( n_events == -1 )
 		{
 			std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
-			exit ( 0x5 );
+			return ; // ( EXIT_FAILURE );
 		}
 
 		if ( n_events == 0 )
 			continue ;
 
-		// if ev.ident is a file descriptor from one of the servers
-		// accept_connection and register read event for client incoming data.
-		//
-		// else if 
-		// read incoming data from client.
+		if ( ev.flags & EVFILT_READ )
+		{
+			instance = static_cast< IEvent * >( ev.udata );
+			instance->dispatch();
+		}
 
-		// Echo kevent ident which is the server's socket file descriptor.
-
-		serv = ( Server * ) ev.udata;
-		serv->accept_connection( &ev );
-
+		LOG( "<=" )
 		// consider EVFILT_SIGNAL
 	}
 

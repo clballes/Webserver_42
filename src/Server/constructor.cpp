@@ -15,6 +15,8 @@ Server::servers;
 
 Server::Server ( const ServerConf & instance ): good( true )
 {
+	struct kevent ev;
+
 	LOG( "call Server( const ServerConf & )" )
 	LOG( "> " << instance )
 
@@ -28,6 +30,15 @@ Server::Server ( const ServerConf & instance ): good( true )
 		   || Server::listen() == EXIT_FAILURE )
 		//set badbit
 
+	LOG( "register READ" )
+
+	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
+			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
+
+	if ( ::kevent( Server::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
+		std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
+
+	(void) ev;
 	return ;
 }
 
