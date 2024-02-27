@@ -44,49 +44,17 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 			std::cerr << std::endl;
 			return ( EXIT_FAILURE );
 		}
-		// Execute function to set whatever the directive found is.
-		if (ptr->set_func( *this,  str.c_str() ) == EXIT_FAILURE || ptr->set_func( *this, str.c_str() ) == '\0')
-			return (EXIT_FAILURE);
 
+		std::cout << "str:"<< str.c_str() << std::endl;
+		// Execute function to set whatever the directive found is.
+		if (ptr->set_func( *this,  str.c_str() ) == EXIT_FAILURE) //|| ptr->set_func( *this, str.c_str() ) == '\0' NO MENRECORDO EN QUIN CAS SINO NO EM DONAVA 
+			return (EXIT_FAILURE);
 		++it;
 	}
-
 	return ( EXIT_SUCCESS );
 }
 
-bool is_valid_ipv4( const std::string & ip )
-{
-    std::istringstream iss( ip);
-    int num;
-    char dot;
-
-    for ( int i = 0; i < 4; ++i )
-    {
-        if ( ! ( iss >> num )
-            || ( i < 3 && ! ( iss >> dot ) && dot != '.')
-			|| ( num < 0 || num > 255 ) )
-            return ( false );
-    }
-    return ( true );
-}
-
-int
-port_digit ( std::string portStr )
-{
-	std::string::size_type i;
-
-    for ( i = 0; i < portStr.length(); i++ )
-	{
-        if ( ! isdigit( portStr[i] ) )
-        {
-            std::cerr << "Error number port" << std::endl;
-            return ( 0 );
-        }
-    }
-
-    return ( 1 );
-}
-
+//valid port numbers 1 to 65535.
 int
 ServerConf::set_listen ( ServerConf & conf, const char * arg )
 {
@@ -101,6 +69,13 @@ ServerConf::set_listen ( ServerConf & conf, const char * arg )
 	{
 		std::getline( iss, ip, ':' ); // tenim la ip
 		std::getline( iss, portStr ); //tenim el port
+	}
+	else if (strlen(arg) > 5 )
+	{
+
+		std::cout << "a" << strlen(arg) << std::endl;
+		port = "80";
+		std::getline( iss, ip );
 	}
 
 	struct addrinfo hints, *result, *rp;
@@ -145,9 +120,6 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 {
-	std::cout << "arg:"<< std::endl;
-
-	std::cout << "arg:"<< arg << std::endl;
     std::istringstream iss( arg );
     std::vector< std::string > words;
     std::string word;
@@ -168,11 +140,11 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 		}
         conf._server_name.push_back( word );
     }
-	if (word.empty())
-		
+	if (word.empty()){
 		// Empty server name ""
 
 		conf._server_name.push_back( "\"\"" );
+	}		
 	return ( EXIT_SUCCESS );
 }
 

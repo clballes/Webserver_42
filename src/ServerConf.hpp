@@ -81,8 +81,8 @@ class ServerConf
 
 		struct sockaddr_in _address;
 
-		in_port_t _port;
-		in_addr_t _host;
+		// in_port_t _port;
+		// in_addr_t _host;
 		
 		std::vector<std::string> _server_name;
 		std::string _root;
