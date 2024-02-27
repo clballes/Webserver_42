@@ -17,7 +17,7 @@
 int
 ServerConf::pre_parse ( std::deque< std::string > & content )
 {
-	LOG( "call pre_parse()" )
+	// LOG( "call pre_parse()" )
 	
 	if ( count_brackets( content ) == EXIT_FAILURE )
 	{
@@ -42,7 +42,7 @@ int
 ServerConf::parse ( std::deque< std::string > & content,
 	   std::deque< std::deque< std::string > > & server_blocks )
 {	
-	LOG( "call parse()" )
+	// LOG( "call parse()" )
 	
 	// Split into `server {}' blocks.
 	
@@ -74,7 +74,7 @@ fill_block( std::deque< std::string >::iterator it,
 	std::deque< std::string > list;
 	std::string::size_type brackets = 0;
 
-	LOG( "call fill_block()" )
+	// LOG( "call fill_block()" )
 
 	if ( *it == "{" )
 		++it;
@@ -103,7 +103,7 @@ ServerConf::split2blocks( std::deque< std::string > & content,
 {
 	std::deque< std::string >::iterator it = content.begin();
 
-	LOG( "call split2blocks()" )
+	// LOG( "call split2blocks()" )
 	while ( it != content.end() )
 	{
 		if ( it->compare( block_name ) == 0 )
@@ -121,7 +121,7 @@ count_brackets ( std::deque< std::string > & content )
 	int brace = 0;
 	std::deque< std::string>::iterator it = content.begin();
 
-	LOG( "call count_brackets()" )
+	// LOG( "call count_brackets()" )
 
 	while ( it != content.end() && brace > 0)
 	{
@@ -138,7 +138,7 @@ isRegularFile( const std::string & filename )
 {
     struct stat file_info;
 
-	LOG( "call isRegularFile()" )
+	// LOG( "call isRegularFile()" )
 
     if ( stat( filename.c_str(), &file_info ) != 0 )
         return ( false );
@@ -151,7 +151,7 @@ count_servers( std::deque< std::string > & content )
 {
     int count;
    
-	LOG( "call count_servers()" )
+	// LOG( "call count_servers()" )
 
 	count = 0;
     for ( std::deque< std::string >::iterator it = content.begin();

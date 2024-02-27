@@ -16,7 +16,7 @@ ServerConf::add ( std::ifstream & file )
 	std::deque< std::deque< std::string > > server_blocks;
 	std::deque< std::deque< std::string > >::iterator block;
 	
-	LOG( "call add()" )
+	// LOG( "call add()" )
 	
 	// Check if file has been properly opened.
 
@@ -58,8 +58,12 @@ ServerConf::add ( std::ifstream & file )
 	while ( block != server_blocks.end() )
 	{
 		ServerConf::instances.push_back( new ServerConf( *block ) );
+		if ( ServerConf::instances.back()->good == false )
+		{
+			std::cout << "aaaaa exit de tot: " << std::endl;
+			return ( EXIT_FAILURE );
+		}
 		++block;
 	}
-	
 	return ( EXIT_SUCCESS );
 }

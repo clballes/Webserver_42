@@ -25,15 +25,11 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 	{
 		pos = it->find( ' ' );
 
-		// If pos == std::string::npos
-		// means the string does not
-		// container any `space';
-		// the full string is the directive then.
-
 		if ( pos == std::string::npos )
 			pos = it->length();
 
-		directive = it->substr( 0 , pos );
+		std::string directive = (pos != std::string::npos) ? it->substr(0, pos) : *it;
+		std::string str = (pos != std::string::npos) ? it->substr(pos) : *it;
 
 		// The following may go inside another routine.:
 		// Iterate over known configuration_directives.
@@ -42,6 +38,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 		t_configuration_directives * ptr = &ServerConf::_config_directives[0];
 		while ( ptr != NULL )
 		{
+			
 			if ( directive.compare( ptr->directive_name ) == 0 )
 				break ;
 			++ptr;
@@ -57,7 +54,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 
 		// Execute function to set whatever the directive found is.
 
-		ptr->set_func( *this, it->c_str() );
+		ptr->set_func( *this, str.c_str() );
 
 		++it;
 	}
@@ -99,13 +96,7 @@ port_digit ( std::string portStr )
 }
 
 int
-ServerConf::set_listen ( ServerConf & conf, const char * arg )                 // @clballes
-																			   // aquesta funció potser
-																			   // s'hauria de restructurar.
-																			   // 1. Resoldre port ( si no, port = default )
-																			   // 2. Resoldre ip ( si no, ip = default )
-																			   // 3. Posar els valos a this->_address
-																			   //    en el format adient.
+ServerConf::set_listen ( ServerConf & conf, const char * arg )
 {
 	std::string str( arg );
     std::istringstream iss( arg );
@@ -185,31 +176,9 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 	return ( EXIT_SUCCESS );
 }
 
-// alphanumeric characters, minus signs ("-"), and periods (".").
-// They must begin with an alphabetic character and end with an
-// alphanumeric character.
-
-int
-parse_server_name ( const std::string & str )				                   // @clballes
-																			   // Aquesta funció només
-																			   // es fa servir una vegada.
-																			   // Potser la podem incorporar
-																			   // directament a set_server_name.
-{
-	std::string::size_type i;
-
-    for ( i = 0; i < str.length(); i++ )
-    {
-        if ( str[0] == '\"' )
-            return ( 1 );
-        if ( ! isalpha( str[0] ) && i == 0 )
-            return ( 0 );
-        else if ( ! isalnum( str[i] ) && ( str[i] != '-' && str[i] != '.' ) )
-            return ( 0 );
-    }
-
-    return ( 1 );
-}
+// NO TROBO DOCUMETNACIO DAIXO ARA:
+// Server_name accoridng to nginx: alphanumeric characters, minus signs ("-"), and periods (".").
+// They must begin with an alphabetic character and end with an alphanumeric character.
 
 int
 ServerConf::set_server_name ( ServerConf & conf, const char * arg )
@@ -222,17 +191,25 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 
     while ( iss >> word )
 	{
-        if ( parse_server_name( word ) != 1 )
-        {
-            //std::clog << " -------------- - -- KO SERVERNAME";
-			//std::clog << std::endl;
-            // _status = false; mirar el default 0.0.0.0.					   // @clballes
-            return ( EXIT_FAILURE );
-        }
-        else
-            conf._server_name.push_back( word );
+		std::string::size_type i;
+		if ( ! isalpha( word[0] ) )
+		{
+			std::cout << "entressss???"<< std::endl;
+			return ( EXIT_FAILURE );
+		}
+		for ( i = 0; i < word.length(); i++ )
+		{
+			if ( ! isalnum( word[i] ) && ( word[i] != '-' && word[i] != '.' ) )
+			{
+				std::cout << "entressss 2???"<< std::endl;
+            	return ( EXIT_FAILURE );
+			}
+		}
+        conf._server_name.push_back( word );
     }
-
+	if (!iss)
+		// Empty server name ""
+		conf._server_name.push_back( "\"\"" );
 	return ( EXIT_SUCCESS );
 }
 
@@ -252,8 +229,6 @@ ServerConf::set_error_page ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_client_body ( ServerConf & conf, const char * arg )
 {
-	(void) conf;
-	(void) arg;
 
 	LOG( "call set_client_body()" )
 

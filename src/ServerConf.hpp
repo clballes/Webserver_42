@@ -36,6 +36,8 @@ class ServerConf
 		static void clear ( void );
 		
 		friend std::ostream & operator << ( std::ostream&, const ServerConf & );
+		bool good;
+
 
 	private:
 		

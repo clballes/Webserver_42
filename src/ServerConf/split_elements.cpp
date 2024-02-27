@@ -18,7 +18,7 @@ ServerConf::split_elements ( std::deque< std::string > & mem )
 {
 	std::deque< std::string >::iterator it = mem.begin();
 
-	LOG( "call split_elements()" )
+	// LOG( "call split_elements()" )
 
 	while ( it != mem.end() )
 	{
@@ -39,7 +39,7 @@ split_line ( std::deque< std::string >::iterator it,
 	std::string::size_type start = 0, end;
 	std::string line( *it );
 
-	LOG( "call split_line()" )
+	// LOG( "call split_line()" )
 
 	it = mem.erase( it ) - 1;
 
