@@ -15,8 +15,8 @@ Server::servers;
 
 Server::Server ( const ServerConf & instance ): good( true )
 {
-	LOG( "call Server( const ServerConf & )" )
-	LOG( "> " << instance )
+	LOG( "call Server::Server( const ServerConf & )" );
+	LOG( "> " << instance );
 
 	std::memcpy( &this->_address, &instance._address,
 			sizeof( instance._address ) );

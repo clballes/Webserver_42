@@ -16,7 +16,7 @@ ServerConf::add ( std::ifstream & file )
 	std::deque< std::deque< std::string > > server_blocks;
 	std::deque< std::deque< std::string > >::iterator block;
 	
-	LOG( "call add()" )
+	LOG( "call add()" );
 	
 	// Check if file has been properly opened.
 
@@ -48,7 +48,7 @@ ServerConf::add ( std::ifstream & file )
 	if ( ServerConf::parse( mem, server_blocks ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	
-	LOG( "server_blocks: " << server_blocks.size() )
+	LOG( "server_blocks: " << server_blocks.size() );
 	
 	// Create a new instance `ServerConf'
 	// for each `server {}' block.

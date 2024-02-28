@@ -7,5 +7,7 @@
 
 Client::~Client ( void )
 {
+	LOG( "call Client::~Client()" );
+
 	return ;
 }

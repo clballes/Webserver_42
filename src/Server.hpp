@@ -21,7 +21,7 @@ class Server: public IEvent
 		~Server ( void );
 
 		bool good;
-		void dispatch ( void );
+		void dispatch ( struct kevent & );
 		int start ( void );
 
 		static int kq;     // kqueue's file descriptor

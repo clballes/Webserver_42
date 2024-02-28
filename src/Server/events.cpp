@@ -7,18 +7,14 @@
 #include "Server.hpp"
 
 void
-Server::dispatch ( void )
+Server::dispatch ( struct kevent & ev )
 {
 	Client * c;
 
-	LOG( "Server: dispatch" )
+	LOG( "call Server::dispatch()" );
 
-	c = new Client();
-	if ( c->accept( this->_socket_fd ) == EXIT_FAILURE )
-	{
-		std::cerr << "ee: " << ::strerror( errno );
-		std::cerr << std::endl;
-	}
+	c = new Client( this->_socket_fd );
+	(void) ev;
 	
 	return ;
 }
@@ -29,7 +25,7 @@ Server::register_read_socket ( void ) const
 	struct kevent ev;
 	//static struct timespec ev_timeout;
 	
-	LOG( "call register_read_socket() (fd=" << this->_socket_fd << ")" )
+	LOG( "call Server::register_read() (fd=" << this->_socket_fd << ")" );
 
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
@@ -45,11 +41,11 @@ Server::receive_request ( int64_t data )
 {
 	char buffer[1024];
 
-	LOG( "call receive_request()" )
+	LOG( "call Server::receive_request()" );
 
 	std::memset( buffer, '\0', data );
 	ssize_t n = recv( this->_client_socket_fd, buffer, 1024, 0 );
-	LOG( "n: " << n )
+	LOG( "n: " << n );
 
 	write( STDOUT_FILENO, buffer, data );
 	// new Client()

@@ -29,7 +29,7 @@ ServerConf::_config_directives[] = {
 
 ServerConf::ServerConf ( void ): good( true )
 {
-	LOG( "call ServerConf( void )" )
+	LOG( "call ServerConf::ServerConf( void )" );
 
 	return ;
 }
@@ -38,7 +38,7 @@ ServerConf::ServerConf ( const ServerConf & instance )
 {
 	*this = instance;
 	
-	LOG( "call ServerConf( const ServerConf & )" )
+	LOG( "call ServerConf::ServerConf( const ServerConf & )" );
 	
 	return ;
 }
@@ -47,7 +47,7 @@ ServerConf::ServerConf ( const std::deque< std::string > & server_block )
 {
 	this->good = true;
 
-	LOG( "call ServerConf( const std::deque< std::string > &" )
+	LOG( "call ServerConf::ServerConf( const std::deque< std::string > &" );
 	
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
 	{
@@ -65,7 +65,7 @@ ServerConf::operator = ( const ServerConf & instance )
 
 	this->good = instance.good;
 
-	LOG( "call operator=ServerConf" )
+	LOG( "call ServerConf::operator=ServerConf" );
 
 	return (*this);
 }

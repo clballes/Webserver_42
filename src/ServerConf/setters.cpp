@@ -15,7 +15,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 	std::string directive;
 	std::string::size_type pos;
 
-	LOG( "call set_directives()" )
+	LOG( "call set_directives()" );
 
 	// There won't be "{" or "}" lines.
 	// See fill_block().
@@ -29,7 +29,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 			pos = it->length();
 
 		directive = it->substr( 0, pos );
-		LOG( " " << directive )
+		LOG( " " << directive );
 
 		if ( ServerConf::set_directive( directive,
 				   directive.c_str() + pos ) == EXIT_FAILURE )
@@ -46,8 +46,8 @@ ServerConf::set_directive ( std::string & directive, const char * arg )
 {
 	t_configuration_directives * ptr = &ServerConf::_config_directives[0];
 
-	LOG( " call set_directive()" )
-	LOG( " " << arg )
+	LOG( " call set_directive()" );
+	LOG( " " << arg );
 
 	if ( arg == NULL)
 		std::cout << "ARGG\n";

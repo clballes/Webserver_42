@@ -15,7 +15,7 @@ ServerConf::file2mem ( std::ifstream & file, std::deque< std::string > & mem )
 {
 	std::string line;
 	
-	LOG( "call file2mem()" )
+	LOG( "call file2mem()" );
 
 	while ( file.good() && ( file.rdstate() & std::ifstream::eofbit ) == 0 )
 	{

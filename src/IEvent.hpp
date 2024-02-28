@@ -6,11 +6,13 @@
 #ifndef _IEVENT_HPP_
 #define _IEVENT_HPP_
 
+#include "webserv.hpp"
+
 class IEvent
 {
 	public:
 	
-		virtual void dispatch ( void ) = 0;
+		virtual void dispatch ( struct kevent & ) = 0;
 		virtual ~IEvent ( void ) {};
 
 	private:

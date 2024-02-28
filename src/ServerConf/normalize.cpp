@@ -16,7 +16,7 @@ ServerConf::normalize ( std::deque< std::string > & mem )
 {
 	std::deque< std::string >::iterator it;
 
-	LOG( "call normalize()" )
+	LOG( "call normalize()" );
 	
 	it = mem.begin();
 	while ( it != mem.end() )
@@ -39,7 +39,7 @@ trim_comments( std::string & str )
 {
 	std::string::iterator it;
 
-	LOG( "call trim_comments()" )
+	LOG( "call trim_comments()" );
 
 	it = str.begin();
 	while ( it != str.end() && *it != '#' )
@@ -57,7 +57,7 @@ trim( std::string & input )
     std::string result;
     bool leadingSpacesOrTabs = true;
 
-	LOG( "call trim()" )
+	LOG( "call trim()" );
 
     for ( std::size_t i = 0; i < input.length(); ++i )
 	{
@@ -86,7 +86,7 @@ trim_f( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
 
-	LOG( "call trim_f" )
+	LOG( "call trim_f" );
 
 	it = str.end() - 1;
 	while ( it != str.begin() && func( *it ) )
@@ -104,7 +104,7 @@ replace_sp( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
 
-	LOG( "call replace_sp" )
+	LOG( "call replace_sp" );
 
 	it = str.begin();
 	while ( it != str.end() )

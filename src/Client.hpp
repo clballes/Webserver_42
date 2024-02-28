@@ -13,11 +13,17 @@ class Client: public IEvent
 {
 	public:
 
-		Client ( void );
+		Client ( int );
 		~Client ( void );
 
-		int accept ( int );
-		void dispatch ( void );
+		bool good;
+		void dispatch ( struct kevent & );
+
+		int register_recv ( void );
+		int register_send ( void );
+
+		int recv_request ( int64_t );
+		int send_request ( int64_t );
 
 	private:
 	

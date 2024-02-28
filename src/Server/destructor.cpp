@@ -10,7 +10,7 @@ Server::~Server ( void )
 	if ( this->_socket_fd != 0 )
 		close (this->_socket_fd);
 
-	LOG( "call ~Server()" )
+	LOG( "call Server::~Server()" );
 
 	return ;
 }

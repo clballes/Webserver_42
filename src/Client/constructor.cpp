@@ -5,13 +5,9 @@
 
 #include "Client.hpp"
 
-Client::Client ( int64_t fd )
+Client::Client ( int server_fd ): good( true )
 {
-	// register EV_READ ( for client )
-	
-	struct kevent ev;
-
-	LOG( "call Client::Client()" )
+	LOG( "call Client::Client()" );
 
 	this->_socket_fd = ::accept( server_fd,
 			(struct sockaddr *) &this->_address,
@@ -20,20 +16,11 @@ Client::Client ( int64_t fd )
 	if ( this->_socket_fd == -1 )
 	{
 		std::cerr << "client is not OK" << std::endl;
+		this->good = false;
+		return ;
 	}
 
-																	           // Use client event
-																			   // instead.
-																			   // register_read()	
-
-	/*
-	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
-			EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, (void * ) this );
-
-	if ( ::kevent( Server::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
-		std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
-	
-	*/
+	this->register_recv();
 
 	return ;
 }

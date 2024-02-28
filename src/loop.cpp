@@ -17,7 +17,7 @@ event_loop ( int kq )
 	n_events = 1;
 	status = true;
 
-	LOG( "call event_loop()" )
+	LOG( "call event_loop() (fd=" << kq << ")" );
 
 	while ( status == true )
 	{
@@ -25,7 +25,6 @@ event_loop ( int kq )
 		// or when an associated timeout is exhausted.
 
 		n_events = ::kevent( kq, 0x0, 0, &ev, 1, 0 );
-		LOG( "n_events: " << n_events )
 
 		if ( status == false )
 			return ;
@@ -35,6 +34,8 @@ event_loop ( int kq )
 			std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
 			return ; // ( EXIT_FAILURE );
 		}
+		
+		LOG( "ev (id=" << ev.ident << ")" );
 
 		if ( n_events == 0 )
 			continue ;
@@ -42,7 +43,7 @@ event_loop ( int kq )
 		if ( ev.flags & EVFILT_READ )
 		{
 			instance = static_cast< IEvent * >( ev.udata );
-			instance->dispatch();
+			instance->dispatch( ev );
 		}
 
 		// consider EVFILT_SIGNAL
