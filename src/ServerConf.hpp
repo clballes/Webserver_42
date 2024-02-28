@@ -77,21 +77,16 @@ class ServerConf
 
 		static t_configuration_directives _config_directives[];
 
-		// Need to be revised
-
-		struct sockaddr_in _address;
-
-		// in_port_t _port;
-		// in_addr_t _host;
-		
-		std::vector<std::string> _server_name;
-		std::string _root;
-		std::vector<std::string> _allow_methods;
+		struct sockaddr_in			_address;
+		std::vector<std::string>	_server_name;
+		std::string					_root;
+		std::vector<std::string>	_allow_methods;
+		std::vector< std::string>	_error_page;
 		// allow_methods -> potser fer un int bits:(0/0/0/1)
-		std::size_t _client_max_body_size;
-		std::string _index;
+		std::size_t					_client_max_body_size;
+		std::string					_index;
 		// consider multiple indexes <vector>
-		std::string _cgi_param;
-		std::string _cgi_pass;
-		bool _autoindex;
+		std::string 				_cgi_param;
+		std::string					_cgi_pass;
+		bool						_autoindex;
 };

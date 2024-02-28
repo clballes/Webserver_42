@@ -175,9 +175,7 @@ ServerConf::set_client_body ( ServerConf & conf, const char * arg )
     {
         if ( ! isdigit( str[i] )
 				&& str[i] != 'm' && str[i] != 'M'
-				&& str[i] != 'k' && str[i] != 'K' )
-            //_status = false;
-        
+				&& str[i] != 'k' && str[i] != 'K' )        
 		if ( isalpha( str[i] ) )
             alpha = 1;
     }
@@ -235,7 +233,6 @@ ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
 	{
 		if ( word != "GET" && word != "POST" )
 		{
-			//_status = false;
 			return ( EXIT_FAILURE );
 		}
 		else
@@ -259,7 +256,7 @@ ServerConf::set_index ( ServerConf & conf, const char * arg )
 }
 
 int
-ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
+ServerConf::set_autoindex ( ServerConf & conf, const char * arg ) //ferho
 {
 	(void) conf;
 	(void) arg;
