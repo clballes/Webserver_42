@@ -24,7 +24,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 		size_t posLen = it->length();
 		size_t pos = (posSpace != std::string::npos) ? posSpace : posLen;
 		std::string directive = (pos != std::string::npos) ? it->substr(0, pos) : *it;
-		std::string str = (pos != std::string::npos) ? it->substr(pos) : *it;
+		std::string str = (pos != std::string::npos) ? it->substr(pos + 1) : *it;
 		// The following may go inside another routine.:
 		// Iterate over known configuration_directives.
 		// If non is found, a NULL pointer will be returned.
@@ -44,8 +44,6 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 			std::cerr << std::endl;
 			return ( EXIT_FAILURE );
 		}
-
-		std::cout << "str:"<< str.c_str() << std::endl;
 		// Execute function to set whatever the directive found is.
 		if (ptr->set_func( *this,  str.c_str() ) == EXIT_FAILURE) //|| ptr->set_func( *this, str.c_str() ) == '\0' NO MENRECORDO EN QUIN CAS SINO NO EM DONAVA 
 			return (EXIT_FAILURE);
@@ -70,10 +68,8 @@ ServerConf::set_listen ( ServerConf & conf, const char * arg )
 		std::getline( iss, ip, ':' ); // tenim la ip
 		std::getline( iss, portStr ); //tenim el port
 	}
-	else if (strlen(arg) > 5 )
+	else if (strlen(arg) > 6 )
 	{
-
-		std::cout << "a" << strlen(arg) << std::endl;
 		port = "80";
 		std::getline( iss, ip );
 	}

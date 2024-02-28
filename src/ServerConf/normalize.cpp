@@ -10,6 +10,7 @@
 
 void trim_comments( std::string & );
 void replace_sp( std::string & str, int ( *func )( int ) );
+void del_multipl_sp( std::string & str, int ( *func )( int ) );
 
 void
 ServerConf::normalize ( std::deque< std::string > & mem )
@@ -24,7 +25,7 @@ ServerConf::normalize ( std::deque< std::string > & mem )
 		trim_comments( *it );
 		replace_sp( *it, &std::isspace );
 		trim_f( *it, &std::isspace );
-
+		del_multipl_sp( *it, &std::isspace );
 		if ( it->empty() == true )
 			it = mem.erase( it );
 		else
@@ -116,3 +117,40 @@ replace_sp( std::string & str, int ( *func )( int ) )
 	
 	return ;
 }
+
+void
+del_multipl_sp( std::string & str, int ( *func )( int ) )
+{
+	std::string::iterator it;
+
+	// LOG( "call multople_sp" )
+
+	it = str.begin();
+	while ( it != str.end() )
+	{
+		if (func(*it) != 0)
+        {
+			std::string::iterator nextIt = it + 1;
+
+            // Check if the next character is also a space
+            while (nextIt != str.end() && func(*nextIt) != 0)
+            {
+                str.erase(nextIt);
+                nextIt = it + 1;  // Update next iterator after erasing a space
+            }
+			if (nextIt != it + 1)
+            {
+                it = str.erase(it);
+            }
+			else{
+                ++it;
+            }
+        }
+        else{
+            ++it;
+        }
+	}
+	
+	return ;
+}
+
