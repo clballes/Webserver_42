@@ -25,6 +25,8 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/Server/constructor.cpp \
 					$(SRC_DIR)/Server/destructor.cpp \
 					$(SRC_DIR)/Server/events.cpp \
+					$(SRC_DIR)/Server/start.cpp \
+					$(SRC_DIR)/Server/clear.cpp \
 					$(SRC_DIR)/Client/constructor.cpp \
 					$(SRC_DIR)/Client/destructor.cpp \
 					$(SRC_DIR)/Client/events.cpp \

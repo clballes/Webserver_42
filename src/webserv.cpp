@@ -33,7 +33,8 @@ webserv ( void )
 	if ( Server::kq == -1 )
 	{
 		std::cerr << PROGRAM_NAME;
-		std::cerr << ": " << ::strerror( errno ) << std::endl;
+		std::cerr << ": kqueue: " << ::strerror( errno );
+		std::cerr << std::endl;
 		exit ( 0x1 ); // Caldra comprovar leaks ...
 	}
 	
@@ -46,9 +47,9 @@ webserv ( void )
 	// ; there will be more events to register later,
 	// during program execution and loop execution.
 
-	for ( Server::const_iterator it = Server::servers.begin();
+	for ( Server::iterator it = Server::servers.begin();
 			it != Server::servers.end(); ++it )
-		( *it )->register_read_socket();
+		( *it )->start();
 
 	// Start listening for registered events
 	// ... kqueue

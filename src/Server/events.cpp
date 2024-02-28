@@ -9,7 +9,16 @@
 void
 Server::dispatch ( void )
 {
+	Client * c;
+
 	LOG( "Server: dispatch" )
+
+	c = new Client();
+	if ( c->accept( this->_socket_fd ) == EXIT_FAILURE )
+	{
+		std::cerr << "ee: " << ::strerror( errno );
+		std::cerr << std::endl;
+	}
 	
 	return ;
 }
@@ -20,7 +29,7 @@ Server::register_read_socket ( void ) const
 	struct kevent ev;
 	//static struct timespec ev_timeout;
 	
-	LOG( "call register_read_socket() " << this->_socket_fd )
+	LOG( "call register_read_socket() (fd=" << this->_socket_fd << ")" )
 
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
@@ -45,20 +54,6 @@ Server::receive_request ( int64_t data )
 	write( STDOUT_FILENO, buffer, data );
 	// new Client()
 	// client->register_socket()
-
-	return ( EXIT_SUCCESS );
-}
-
-int
-Server::accept_connection ( void )
-{
-	Client * c;
-
-	LOG( "call accept_connection() " << this->_socket_fd )
-
-	c = new Client();
-	if ( c->accept( this->_socket_fd ) )
-		std::cerr << "ee: " << strerror ( errno ) << std::endl;
 
 	return ( EXIT_SUCCESS );
 }

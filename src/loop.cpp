@@ -17,6 +17,8 @@ event_loop ( int kq )
 	n_events = 1;
 	status = true;
 
+	LOG( "call event_loop()" )
+
 	while ( status == true )
 	{
 		// kevent() call does not return until at least one event is received
@@ -43,7 +45,6 @@ event_loop ( int kq )
 			instance->dispatch();
 		}
 
-		LOG( "<=" )
 		// consider EVFILT_SIGNAL
 	}
 

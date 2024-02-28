@@ -5,19 +5,18 @@
 
 #include "Client.hpp"
 
-int
-Client::accept ( int server_fd )
-{
-	this->_socket_fd = ::accept( server_fd,
-			(struct sockaddr *) &this->_address,
-			&this->_address_len );
-
-	return ( EXIT_SUCCESS );
-}
-
 void
 Client::dispatch ( void )
 {
 	LOG( "Client dispatch" )
+
+	return ;
+}
+
+void
+Client::register_read ( void ) const                						   // WIP
+{
+	LOG( "call Client::register_read()" )
+
 	return ;
 }

@@ -81,34 +81,34 @@ operator << ( std::ostream & out, const ServerConf & instance )
 
 	out << std::endl;
 
-	out << "server_name:";
+	out << "  server_name:";
 	for ( it = instance._server_name.begin();
 			it != instance._server_name.end(); ++it )
 		out << " " << *it;
 	out << std::endl;
 
-	out << "root: " << instance._root;
+	out << "  root: " << instance._root;
 	out << std::endl;
 
-	out << "allow_methods:";
+	out << "  allow_methods:";
 	for ( it = instance._allow_methods.begin();
 			it != instance._allow_methods.end(); ++it )
 		out << " " << *it;
 	out << std::endl;
 
-	out << "client_max_body_size: " << instance._client_max_body_size;
+	out << "  client_max_body_size: " << instance._client_max_body_size;
 	out << std::endl;
 
-	out << "cgi_pass: " << instance._cgi_pass;
+	out << "  cgi_pass: " << instance._cgi_pass;
 	out << std::endl;
 
-	out << "cgi_param: " << instance._cgi_param;
+	out << "  cgi_param: " << instance._cgi_param;
 	out << std::endl;
 
-	out << "index: " << instance._index;
+	out << "  index: " << instance._index;
 	out << std::endl;
 	
-	out << "autoindex: " << std::boolalpha << instance._autoindex;
+	out << "  autoindex: " << std::boolalpha << instance._autoindex;
 	//out << std::endl;
 
 	return ( out );
