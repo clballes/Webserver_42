@@ -18,7 +18,6 @@ bool status;
 int
 webserv ( void )
 {
-	LOG( "~ ~ ~ ~ ~" );
 	LOG( "call webserv()" );
 
 	// Configure SIGINT ( signal interrupt )
@@ -50,7 +49,10 @@ webserv ( void )
 
 	for ( Server::iterator it = Server::servers.begin();
 			it != Server::servers.end(); ++it )
-		( *it )->start();
+	{
+		if ( ( *it )->start() )
+			return ( EXIT_FAILURE );
+	}
 
 	// Start listening for registered events
 	// ... kqueue

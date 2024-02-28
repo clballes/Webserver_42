@@ -15,6 +15,8 @@ class IEvent
 		virtual void dispatch ( struct kevent & ) = 0;
 		virtual ~IEvent ( void ) {};
 
+		int kq;
+
 	private:
 
 };

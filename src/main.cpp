@@ -111,8 +111,8 @@ main ( int argc, char * const * argv )
 
 	if ( ::webserv() != EXIT_SUCCESS )
 	{
+		std::cerr << "Quitting ";
 		std::cerr << PROGRAM_NAME;
-		std::cerr << ": hmm ??";
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}

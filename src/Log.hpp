@@ -5,3 +5,6 @@
 
 #pragma once
 
+#include <iostream>
+
+#define LOG(s) { std::clog << s << std::endl; }

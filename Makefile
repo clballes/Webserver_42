@@ -22,14 +22,16 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/getoptions.cpp \
 					$(SRC_DIR)/webserv.cpp \
 					$(SRC_DIR)/loop.cpp \
+					$(SRC_DIR)/Client/constructor.cpp \
+					$(SRC_DIR)/Client/destructor.cpp \
+					$(SRC_DIR)/Client/events.cpp \
+					$(SRC_DIR)/HTTP/constructor.cpp \
+					$(SRC_DIR)/HTTP/destructor.cpp \
 					$(SRC_DIR)/Server/constructor.cpp \
 					$(SRC_DIR)/Server/destructor.cpp \
 					$(SRC_DIR)/Server/events.cpp \
 					$(SRC_DIR)/Server/start.cpp \
 					$(SRC_DIR)/Server/clear.cpp \
-					$(SRC_DIR)/Client/constructor.cpp \
-					$(SRC_DIR)/Client/destructor.cpp \
-					$(SRC_DIR)/Client/events.cpp \
 					$(SRC_DIR)/ServerConf/constructor.cpp \
 					$(SRC_DIR)/ServerConf/destructor.cpp \
 					$(SRC_DIR)/ServerConf/add.cpp \

@@ -5,7 +5,8 @@
 
 #include "Client.hpp"
 
-Client::Client ( int server_fd ): good( true )
+Client::Client ( int server_fd ): good( true ),
+	_socket_fd( 0 ), _buffer_recv( 0x0 ), _buffer_send( 0x0 )
 {
 	LOG( "call Client::Client()" );
 

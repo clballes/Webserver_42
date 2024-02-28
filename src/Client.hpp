@@ -22,14 +22,17 @@ class Client: public IEvent
 		int register_recv ( void );
 		int register_send ( void );
 
-		int recv_request ( int64_t );
-		int send_request ( int64_t );
+		int request_recv ( int64_t );
+		int request_send ( int64_t );
 
 	private:
 	
 		int						_socket_fd;
 		unsigned				_address_len;
 		struct sockaddr_in		_address;
+
+		char *                  _buffer_recv;
+		char *                  _buffer_send;
 
 };
 

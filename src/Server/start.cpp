@@ -19,8 +19,7 @@ Server::start ( void )
 	if ( this->_socket_fd == -1
 			|| fcntl( this->_socket_fd, F_SETFL, O_NONBLOCK ) == -1 )
 	{
-		std::cerr << PROGRAM_NAME;
-		std::cerr << ": socket: " << ::strerror( errno );
+		std::cerr << "socket: " << ::strerror( errno );
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}
@@ -35,8 +34,7 @@ Server::start ( void )
 	if ( ::bind( this->_socket_fd, (struct sockaddr *) &this->_address,
 				sizeof( this->_address ) ) == -1 )
 	{
-		std::cerr << PROGRAM_NAME;
-		std::cerr << ": bind: " << ::strerror( errno );
+		std::cerr << "bind: " << ::strerror( errno );
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}
@@ -48,8 +46,7 @@ Server::start ( void )
 
 	if ( ::listen( this->_socket_fd, 0x0 ) == -1 )
 	{
-		std::cerr << PROGRAM_NAME;
-		std::cerr << ": listen: " << ::strerror( errno );
+		std::cerr << "listen: " << ::strerror( errno );
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}

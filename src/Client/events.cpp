@@ -4,17 +4,17 @@
 /* Tue Feb 27 14:36:17 2024                                                   */
 
 #include "Client.hpp"
+#include "HTTP.hpp"
 
 void
 Client::dispatch ( struct kevent & ev )
 {
-	LOG( "call Client::dispatch()" );
+	LOG( "call Client::dispatch() (fd=" << ev.ident << ")" );
 
 	if ( ev.flags & EVFILT_READ )
-		this->recv_request( ev.data );
+		this->request_recv( ev.data );
 	else if ( ev.flags & EVFILT_WRITE )
-		this->send_request( ev.data );
-	(void) ev;
+		this->request_send( ev.data );
 
 	return ;
 }
@@ -24,7 +24,7 @@ Client::register_recv ( void )
 {
 	struct kevent ev;
 
-	LOG( "call Client::register_recv()" );
+	LOG( "call Client::register_recv() (fd=" << this->_socket_fd << ")" );
 
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, (void * ) this );
@@ -47,7 +47,7 @@ Client::register_send ( void )
 {
 	struct kevent ev;
 
-	LOG( "call Client::register_send()" );
+	LOG( "call Client::register_send() (fd=" << this->_socket_fd << ")" );
 
 	EV_SET( &ev, this->_socket_fd, EVFILT_WRITE,
 			EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, (void *) this );
@@ -64,25 +64,33 @@ Client::register_send ( void )
 }
 
 int
-Client::recv_request ( int64_t data )
+Client::request_recv ( int64_t data )
 {
+	ssize_t n;
 	char * buffer = new char [data];
 
-	LOG( "call Client::recv_request()" );
+	LOG( "call Client::request_recv() (fd=" << this->_socket_fd << ")" );
 
 	std::memset( buffer, '\0', data );
-	ssize_t n = recv( this->_socket_fd, buffer, data, 0 );
-	LOG ( "n: " << n );
+	n = recv( this->_socket_fd, buffer, data, 0 );
+	
+	if ( n == 0 )
+	{
+		LOG( "client closed connection (fd=" << this->_socket_fd << ")" );
+		delete this;
+		return ( EXIT_FAILURE );
+	}
 
-	write( STDOUT_FILENO, buffer, data );
+	HTTP * request = new HTTP( buffer, data );
+	(void) request;
 
 	return ( EXIT_SUCCESS );
 }
 
 int
-Client::send_request ( int64_t data )
+Client::request_send ( int64_t data )
 {
-	LOG( "call Client::send_request()" );
+	LOG( "call Client::request_send() (fd=" << this->_socket_fd << ")"  );
 	LOG( "data: " << data );
 
 	return ( EXIT_SUCCESS );

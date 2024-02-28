@@ -67,12 +67,12 @@
 # include <set>
 # include "Server.hpp"
 
-#define LOG(s) { std::clog << s << std::endl; }
-
 #include "Server.hpp"
 
 __BEGIN_DECLS extern "C"
 int webserv ( void );
 __END_DECLS
+
+#include "Log.hpp"
 
 #endif /* webserv.hpp */

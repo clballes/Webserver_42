@@ -17,6 +17,7 @@ event_loop ( int kq )
 	n_events = 1;
 	status = true;
 
+	LOG( "" );
 	LOG( "call event_loop() (fd=" << kq << ")" );
 
 	while ( status == true )
@@ -35,8 +36,6 @@ event_loop ( int kq )
 			return ; // ( EXIT_FAILURE );
 		}
 		
-		LOG( "ev (id=" << ev.ident << ")" );
-
 		if ( n_events == 0 )
 			continue ;
 

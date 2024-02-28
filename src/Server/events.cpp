@@ -11,7 +11,7 @@ Server::dispatch ( struct kevent & ev )
 {
 	Client * c;
 
-	LOG( "call Server::dispatch()" );
+	LOG( "call Server::dispatch() (fd=" << ev.ident << ")" );
 
 	c = new Client( this->_socket_fd );
 	(void) ev;
@@ -41,7 +41,7 @@ Server::receive_request ( int64_t data )
 {
 	char buffer[1024];
 
-	LOG( "call Server::receive_request()" );
+	LOG( "call Server::receive_request() (fd=" << this->_client_socket_fd << ")" );
 
 	std::memset( buffer, '\0', data );
 	ssize_t n = recv( this->_client_socket_fd, buffer, 1024, 0 );
