@@ -2,3 +2,4 @@
 - [x] Move Server::kq to IEvent::kq
 - [x] Each client has it's own HTTP instance
 - [ ] Clear unused / properly reorder included headers!
+- [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
