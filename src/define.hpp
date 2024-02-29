@@ -19,4 +19,9 @@
 
 # define DEFAULT_CONF		"conf/default.conf"
 
+#define METHOD_GET 8        //1000
+#define METHOD_POST 4       //0100
+#define METHOD_PUT 2        //0010
+#define METHOD_DELETE 1     //0001
+
 #endif /* define.hpp */

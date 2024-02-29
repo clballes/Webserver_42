@@ -108,7 +108,7 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 {
 	if (strcmp(arg, "\"\"") == 0)
 	{
-        std::cout << "root is: " << arg << std::endl;
+        std::cout << "root is: " << arg << std::endl; //use default o tirem el programa si no tenim root
 	}
 	conf._root = arg;
 
@@ -155,7 +155,7 @@ ServerConf::set_error_page ( ServerConf & conf, const char * arg )
 	LOG( "call set_error_page()" )
 
 	(void) conf;
-	(void) arg;
+	// (void) arg;
 
 	LOG( "error_page is: " << arg )
 
@@ -226,25 +226,24 @@ ServerConf::set_cgi_pass ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
 {
-	(void) conf;
-	(void) arg;
-
 	LOG( "call set_allow_methods()" )
 
-	std::istringstream iss( arg );
-	std::string word;
-
-	while ( iss >> word )
-	{
-		if ( word != "GET" && word != "POST" )
-		{
-			return ( EXIT_FAILURE );
-		}
-		else
-			conf._allow_methods.push_back( word );
-	}
-
-	return ( EXIT_SUCCESS );
+	std::istringstream iss(arg);
+    std::string word;
+    while (iss >> word) {
+        if (word == "GET") {
+            conf._allow_methods |= METHOD_GET;
+        } else if (word == "POST") {
+            conf._allow_methods |= METHOD_POST;
+        } else if (word == "PUT") {
+            conf._allow_methods |= METHOD_PUT;
+        } else if (word == "DELETE") {
+            conf._allow_methods |= METHOD_DELETE;
+        } else {
+            return EXIT_FAILURE;
+        }
+    }
+	return (EXIT_SUCCESS);
 }
 
 int
@@ -316,7 +315,7 @@ ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
 	else if (strcmp(arg, "on") == 0)
 	{
 		conf._autoindex = true;
-		displayAutoIndex(); //aixo no anira aqui, anira a la response, tipus html, es per fer probes mentres
+		// displayAutoIndex(); //aixo no anira aqui, anira a la response, tipus html, es per fer probes mentres
 		return (EXIT_SUCCESS);
 	}
 	else

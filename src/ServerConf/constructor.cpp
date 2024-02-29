@@ -27,7 +27,7 @@ ServerConf::_config_directives[] = {
 	{ "autoindex", &ServerConf::set_autoindex },
 	{ 0x0, 0x0 }};
 
-ServerConf::ServerConf ( void ): good( true )
+ServerConf::ServerConf ( void ): good( true ), _autoindex(false)
 {
 	LOG( "call ServerConf( void )" )
 
@@ -46,6 +46,7 @@ ServerConf::ServerConf ( const ServerConf & instance )
 ServerConf::ServerConf ( const std::deque< std::string > & server_block )
 {
 	this->good = true;
+	this->_autoindex = false;
 
 	LOG( "call ServerConf( const std::deque< std::string > &" )
 
@@ -87,11 +88,25 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << "root: " << instance._root;
 	out << std::endl;
 
-	out << "allow_methods:";
-	for ( it = instance._allow_methods.begin();
-			it != instance._allow_methods.end(); ++it )
-		out << " " << *it;
+	out << "Allowed methods: Bitwise representation: ";
+	for (int i = 6; i >= 0; --i) {
+		out << ((instance._allow_methods & (1 << i)) ? '1' : '0');
+	}
 	out << std::endl;
+    out << "Allowed methods: String representation: ";
+    if (instance._allow_methods & METHOD_GET) {
+        out << "GET ";
+    }
+    if (instance._allow_methods & METHOD_POST) {
+        out << "POST ";
+    }
+    if (instance._allow_methods & METHOD_PUT) {
+        out << "PUT ";
+    }
+    if (instance._allow_methods & METHOD_DELETE) {
+        out << "DELETE ";
+    }
+    out << std::endl;
 
 	out << "client_max_body_size: " << instance._client_max_body_size;
 	out << std::endl;
