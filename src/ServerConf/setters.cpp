@@ -20,11 +20,12 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 	// See fill_block().
 	while ( it != server_block.end() )
 	{
+		std::string str;
 		size_t posSpace = it->find(' ');
-		size_t posLen = it->length();
-		size_t pos = (posSpace != std::string::npos) ? posSpace : posLen;
-		std::string directive = (pos != std::string::npos) ? it->substr(0, pos) : *it;
-		std::string str = (pos != std::string::npos) ? it->substr(pos + 1) : *it;
+		size_t pos = (posSpace != std::string::npos) ? posSpace : it->length();
+
+		std::string directive = it->substr(0, pos);
+		str = (pos == it->length()) ? "\"\"" : it->substr(pos + 1);
 		// The following may go inside another routine.:
 		// Iterate over known configuration_directives.
 		// If non is found, a NULL pointer will be returned.
@@ -46,7 +47,10 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 		}
 		// Execute function to set whatever the directive found is.
 		if (ptr->set_func( *this,  str.c_str() ) == EXIT_FAILURE) //|| ptr->set_func( *this, str.c_str() ) == '\0' NO MENRECORDO EN QUIN CAS SINO NO EM DONAVA 
+		{
+			std::cerr << "Error: " << ptr->directive_name << ": ";
 			return (EXIT_FAILURE);
+		}
 		++it;
 	}
 	return ( EXIT_SUCCESS );
@@ -102,9 +106,10 @@ ServerConf::set_listen ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_root ( ServerConf & conf, const char * arg )
 {
-	(void) conf;
-	(void) arg;
-
+	if (strcmp(arg, "\"\"") == 0)
+	{
+        std::cout << "root is: " << arg << std::endl;
+	}
 	conf._root = arg;
 
 	return ( EXIT_SUCCESS );
@@ -116,6 +121,11 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 {
+	if (strcmp(arg, "\"\"") == 0)
+	{
+        conf._server_name.push_back( arg );
+		return (EXIT_SUCCESS);
+	}
     std::istringstream iss( arg );
     std::vector< std::string > words;
     std::string word;
@@ -136,11 +146,6 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 		}
         conf._server_name.push_back( word );
     }
-	if (word.empty()){
-		// Empty server name ""
-
-		conf._server_name.push_back( "\"\"" );
-	}		
 	return ( EXIT_SUCCESS );
 }
 
@@ -255,15 +260,65 @@ ServerConf::set_index ( ServerConf & conf, const char * arg )
 	return ( EXIT_SUCCESS );
 }
 
-int
-ServerConf::set_autoindex ( ServerConf & conf, const char * arg ) //ferho
+
+std::string  getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) {
+    std::stringstream   ss;
+    ss << "\t\t<p><a href=\"http://" + host + ":" <<\
+        port << dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
+    return ss.str();
+}
+// void displayAutoIndex(path directory, host, port) 
+void displayAutoIndex()
 {
-	(void) conf;
-	(void) arg;
+	const char* directory_path = "src/Server"; // Replace with your actual directory path
+	std::string dirName(directory_path);
+	DIR* directory = opendir(directory_path);
+	std::string page =\
+		"<!DOCTYPE html>\n\
+		<html>\n\
+		<head>\n\
+				<title>" + dirName + "</title>\n\
+		</head>\n\
+		<body>\n\
+		<h1>Index of</h1>\n\
+		<p>\n";
 
+	if(directory == NULL)
+	{
+		std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
+		return ;
+	}
+	if (dirName[0] != '/')
+		dirName = "/" + dirName;
+	if (directory)
+	{
+		  for (struct dirent *dirEntry = readdir(directory); dirEntry; dirEntry = readdir(directory)) {
+        page += getLink(std::string(dirEntry->d_name), dirName, "host", 80);
+    }
+	}
+	  page +="\
+		</p>\n\
+		</body>\n\
+		</html>\n";
+    closedir(directory);
+	std::cout << page << std::endl;
+    // return page;
+}
+
+int
+ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
+{
 	LOG( "call set_autoindex()" )
-
-	conf._autoindex = arg;
-
-	return ( EXIT_SUCCESS );
+	if (strcmp(arg, "off") == 0){
+		conf._autoindex = false;
+		return (EXIT_SUCCESS);
+	}
+	else if (strcmp(arg, "on") == 0)
+	{
+		conf._autoindex = true;
+		displayAutoIndex(); //aixo no anira aqui, anira a la response, tipus html, es per fer probes mentres
+		return (EXIT_SUCCESS);
+	}
+	else
+		return (EXIT_FAILURE);
 }

@@ -51,7 +51,7 @@ ServerConf::ServerConf ( const std::deque< std::string > & server_block )
 
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
 	{
-		std::cerr << "ServerConf: error: check_directives" << std::endl;
+		std::cerr << "ServerConf: check_directives" << std::endl;
 		this->good = ! good;
 	}
 	return ;
