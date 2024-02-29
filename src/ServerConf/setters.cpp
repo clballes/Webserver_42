@@ -270,7 +270,7 @@ ServerConf::set_index ( ServerConf & conf, const char * arg )
     std::vector< std::string > words;
     std::string word;
   	for (; iss >> word;) {
-        conf._index.push_back(word);
+        conf._index.push_back( word );
     }
 
 	return ( EXIT_SUCCESS );
