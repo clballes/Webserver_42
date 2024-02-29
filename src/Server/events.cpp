@@ -13,7 +13,7 @@ Server::dispatch ( struct kevent & ev )
 
 	LOG( "call Server::dispatch() (fd=" << ev.ident << ")" );
 
-	c = new Client( this->_socket_fd );
+	c = new Client( *this );
 	(void) ev;
 	
 	return ;
@@ -30,7 +30,7 @@ Server::register_read_socket ( void ) const
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
 
-	if ( ::kevent( Server::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
+	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
 		std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
 	
 	return ;

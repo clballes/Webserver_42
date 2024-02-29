@@ -6,14 +6,27 @@
 #ifndef _HTTP_HPP_
 #define _HTTP_HPP_
 
-class HTTP
+#include "IEvent.hpp"
+#include "Client.hpp"
+
+class Client;
+
+class HTTP: public IEvent
 {
 	public:
 
-		HTTP ( const char *, int64_t );
+		HTTP ( const Client & );
 		~HTTP ( void );
 
+		void dispatch ( struct kevent & );
+
 	private:
+
+		const Client & _client;
+
+		bool           _keep_alive;
+		std::string    _host;
+		std::string    _user_agent;
 
 };
 

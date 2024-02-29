@@ -6,8 +6,8 @@
 #ifndef _SERVER_HPP_
 #define _SERVER_HPP_
 
-#include "webserv.hpp"
 #include "IEvent.hpp"
+#include "webserv.hpp"
 #include "ServerConf.hpp"
 #include <vector>
 
@@ -31,6 +31,7 @@ class Server: public IEvent
 		typedef std::vector< Server * >:: const_iterator const_iterator;
 		typedef std::vector< Server * >:: iterator iterator;
 
+		friend class Client;
 		friend std::ostream & operator << ( std::ostream&, const Server & );
 
 // COMMENTET FOR DEBUG ONLY

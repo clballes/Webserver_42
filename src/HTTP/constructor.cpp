@@ -5,15 +5,15 @@
 
 #include "Log.hpp"
 #include "HTTP.hpp"
-
 #include <unistd.h>
 
-HTTP::HTTP ( const char * headers, int64_t data )
+HTTP::HTTP ( const Client & client_instance ): _client( client_instance )
 {
-	LOG( "call HTTP:HTTP( const char * )" );
-
-
-	write( STDOUT_FILENO, headers, data );
+	LOG( "call HTTP::HTTP( const Client & )" );
 	
+	write( STDOUT_FILENO,
+			this->_client._buffer_recv,
+			this->_client._data_recv );
+
 	return ;
 }

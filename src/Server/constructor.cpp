@@ -6,7 +6,7 @@
 #include "Server.hpp"
 
 int
-Server::kq = 0;
+IEvent::kq = 0;
 
 // Initialize static `vector' of servers
 

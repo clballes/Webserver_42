@@ -5,12 +5,15 @@
 
 #include "Client.hpp"
 
-Client::Client ( int server_fd ): good( true ),
-	_socket_fd( 0 ), _buffer_recv( 0x0 ), _buffer_send( 0x0 )
+Client::Client ( const Server & server_instance ): good( true ),
+	_socket_fd( 0 ),
+	_buffer_recv( 0x0 ),
+	_buffer_send( 0x0 ),
+	_server( server_instance )
 {
 	LOG( "call Client::Client()" );
 
-	this->_socket_fd = ::accept( server_fd,
+	this->_socket_fd = ::accept( _server._socket_fd,
 			(struct sockaddr *) &this->_address,
 			&this->_address_len );
 
@@ -20,6 +23,8 @@ Client::Client ( int server_fd ): good( true ),
 		this->good = false;
 		return ;
 	}
+
+	this->_http_request = new HTTP( *this );
 
 	this->register_recv();
 

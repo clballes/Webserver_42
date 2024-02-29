@@ -6,8 +6,6 @@
 #ifndef _IEVENT_HPP_
 #define _IEVENT_HPP_
 
-#include "webserv.hpp"
-
 class IEvent
 {
 	public:
@@ -15,7 +13,7 @@ class IEvent
 		virtual void dispatch ( struct kevent & ) = 0;
 		virtual ~IEvent ( void ) {};
 
-		int kq;
+		static int kq;
 
 	private:
 

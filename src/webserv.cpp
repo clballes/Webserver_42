@@ -3,6 +3,7 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Thu Jan 25 14:26:11 2024                                                   */
 
+#include "IEvent.hpp"
 #include "webserv.hpp"
 #include "Server.hpp"
 
@@ -29,8 +30,8 @@ webserv ( void )
 
 	// Create a new kernel event queue.
 
-	Server::kq = ::kqueue();
-	if ( Server::kq == -1 )
+	IEvent::kq = ::kqueue();
+	if ( IEvent::kq == -1 )
 	{
 		std::cerr << PROGRAM_NAME;
 		std::cerr << ": kqueue: " << ::strerror( errno );
@@ -38,7 +39,7 @@ webserv ( void )
 		exit ( 0x1 ); // Caldra comprovar leaks ...
 	}
 	
-	LOG ( "kqueue properly initialized (fd=" << Server::kq << ")" );
+	LOG ( "kqueue properly initialized (fd=" << IEvent::kq << ")" );
 
 	// For each Server instance,
 	// register an event with the queue.
@@ -57,7 +58,7 @@ webserv ( void )
 	// Start listening for registered events
 	// ... kqueue
 
-	event_loop( Server::kq );
+	event_loop( IEvent::kq );
 
 	return ( EXIT_SUCCESS );
 }

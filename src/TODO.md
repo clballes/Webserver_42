@@ -1,1 +1,3 @@
-- [ ] Deal with `keep-alive' clients
+- [x] Deal with `keep-alive' clients
+- [x] Move Server::kq to IEvent::kq
+- [x] Each client has it's own HTTP instance
