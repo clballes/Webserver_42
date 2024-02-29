@@ -27,7 +27,7 @@ ServerConf::_config_directives[] = {
 	{ "autoindex", &ServerConf::set_autoindex },
 	{ 0x0, 0x0 }};
 
-ServerConf::ServerConf ( void ): good( true ), _autoindex(false)
+ServerConf::ServerConf ( void ): good( true ), _allow_methods(0)
 {
 	LOG( "call ServerConf( void )" )
 
@@ -46,13 +46,13 @@ ServerConf::ServerConf ( const ServerConf & instance )
 ServerConf::ServerConf ( const std::deque< std::string > & server_block )
 {
 	this->good = true;
-	this->_autoindex = false;
+	this->_allow_methods = 0;
 
 	LOG( "call ServerConf( const std::deque< std::string > &" )
 
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
 	{
-		std::cerr << "ServerConf: check_directives" << std::endl;
+		std::cerr << "check_directives" << std::endl;
 		this->good = ! good;
 	}
 	return ;
@@ -117,11 +117,18 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << "cgi_param: " << instance._cgi_param;
 	out << std::endl;
 
-	out << "index: " << instance._index;
+	out << "_index:";
+	for ( it = instance._index.begin();
+			it != instance._index.end(); ++it )
+		out << " " << *it;
 	out << std::endl;
 	
-	out << "autoindex: " << std::boolalpha << instance._autoindex;
-	//out << std::endl;
+	if (instance._allow_methods & F_AUTOINDEX) {
+        out << "Autoindex: ON ";
+	}
+	else
+        out << "Autoindex: OFF ";
+
 
 	return ( out );
 }

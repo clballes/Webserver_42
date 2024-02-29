@@ -80,13 +80,10 @@ class ServerConf
 		struct sockaddr_in			_address;
 		std::vector<std::string>	_server_name;
 		std::string					_root;
-		int 						_allow_methods;
-		std::vector< std::string>	_error_page;
-		// allow_methods -> potser fer un int bits:(0/0/0/1)
+		unsigned int 				_allow_methods;
 		std::size_t					_client_max_body_size;
-		std::string					_index;
-		// consider multiple indexes <vector>
+		std::vector< std::string>	_index;
 		std::string 				_cgi_param;
 		std::string					_cgi_pass;
-		bool						_autoindex;
+		std::vector< std::string>	_error_page; //falta fer
 };
