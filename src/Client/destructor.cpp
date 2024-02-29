@@ -9,6 +9,9 @@ Client::~Client ( void )
 {
 	LOG( "call Client::~Client()" );
 
+	if ( this->_http_request != 0x0 )
+		delete this->_http_request;
+
 	if ( this->_buffer_recv != 0x0 )
 		delete [] this->_buffer_recv;
 

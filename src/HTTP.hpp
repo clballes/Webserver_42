@@ -8,6 +8,8 @@
 
 #include "IEvent.hpp"
 #include "Client.hpp"
+#include <string>
+#include <iostream>
 
 class Client;
 
@@ -19,6 +21,7 @@ class HTTP: public IEvent
 		~HTTP ( void );
 
 		void dispatch ( struct kevent & );
+		void perform ( void );
 
 	private:
 

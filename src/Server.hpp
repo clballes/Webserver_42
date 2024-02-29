@@ -32,7 +32,7 @@ class Server: public IEvent
 		typedef std::vector< Server * >:: iterator iterator;
 
 		friend class Client;
-		friend std::ostream & operator << ( std::ostream&, const Server & );
+		friend std::ostream & operator << ( std::ostream &, const Server & );
 
 // COMMENTET FOR DEBUG ONLY
 //	private:

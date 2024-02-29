@@ -10,6 +10,8 @@
 #include "HTTP.hpp"
 #include "webserv.hpp"
 
+class HTTP;
+
 class Client: public IEvent
 {
 	public:
