@@ -121,7 +121,5 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << std::endl;
 	
 	out << "autoindex: " << std::boolalpha << instance._autoindex;
-	//out << std::endl;
-
 	return ( out );
 }
