@@ -8,6 +8,18 @@
 #include "ServerConf.hpp"
 #include <sstream>
 
+
+int
+error_missingvalues(const char * arg)
+{
+	if (strcmp(arg, "\"\"") == 0)
+	{
+        std::cerr << "Missing directive value ";
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
 int
 ServerConf::set_directives ( const std::deque< std::string > & server_block )
 // Renamed from check_directives()
@@ -60,6 +72,8 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 int
 ServerConf::set_listen ( ServerConf & conf, const char * arg )
 {
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
     std::istringstream iss( arg );
     std::string ip, portStr;
 	const char *port = arg;
@@ -106,12 +120,9 @@ ServerConf::set_listen ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_root ( ServerConf & conf, const char * arg )
 {
-	if (strcmp(arg, "\"\"") == 0)
-	{
-        std::cout << "root is: " << arg << std::endl; //use default o tirem el programa si no tenim root
-	}
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	conf._root = arg;
-
 	return ( EXIT_SUCCESS );
 }
 
@@ -121,11 +132,8 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 {
-	if (strcmp(arg, "\"\"") == 0)
-	{
-        conf._server_name.push_back( arg );
-		return (EXIT_SUCCESS);
-	}
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
     std::istringstream iss( arg );
     std::vector< std::string > words;
     std::string word;
@@ -150,8 +158,10 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 }
 
 int
-ServerConf::set_error_page ( ServerConf & conf, const char * arg )
+ServerConf::set_error_page ( ServerConf & conf, const char * arg ) //falta fer
 {
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	LOG( "call set_error_page()" )
 
 	(void) conf;
@@ -165,6 +175,8 @@ ServerConf::set_error_page ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_client_body ( ServerConf & conf, const char * arg )
 {
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 
 	LOG( "call set_client_body()" )
 
@@ -200,11 +212,10 @@ ServerConf::set_client_body ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_cgi_param ( ServerConf & conf, const char * arg )
 {
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	LOG( "call set_cgi_param()" )
 
-	(void) conf;
-	(void) arg;
-	
 	conf._cgi_param = arg;
 
 	return ( EXIT_SUCCESS );
@@ -213,10 +224,9 @@ ServerConf::set_cgi_param ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_cgi_pass ( ServerConf & conf, const char * arg )
 {
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	LOG( "call set_cgi_pass()" )
-	
-	(void) conf;
-	(void) arg;
 
 	conf._cgi_pass = arg;
 
@@ -226,6 +236,8 @@ ServerConf::set_cgi_pass ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
 {
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	LOG( "call set_allow_methods()" )
 
 	std::istringstream iss(arg);
@@ -240,7 +252,7 @@ ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
         } else if (word == "DELETE") {
             conf._allow_methods |= METHOD_DELETE;
         } else {
-            return EXIT_FAILURE;
+            return (EXIT_FAILURE);
         }
     }
 	return (EXIT_SUCCESS);
@@ -249,24 +261,30 @@ ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
 int
 ServerConf::set_index ( ServerConf & conf, const char * arg )
 {
-	(void) conf;
-	(void) arg;
-
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	
 	LOG( "call set_index()" )
 
-	conf._index = arg;
+	std::istringstream iss( arg );
+    std::vector< std::string > words;
+    std::string word;
+  	for (; iss >> word;) {
+        conf._index.push_back( word );
+    }
 
 	return ( EXIT_SUCCESS );
 }
 
-
+// ESTO EN LA RESPONSE ESTARA
 std::string  getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) {
     std::stringstream   ss;
     ss << "\t\t<p><a href=\"http://" + host + ":" <<\
         port << dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
     return ss.str();
 }
-// void displayAutoIndex(path directory, host, port) 
+
+// void displayAutoIndex(path directory, host, port) EN LA RESPONSE
 void displayAutoIndex()
 {
 	const char* directory_path = "src/Server"; // Replace with your actual directory path
@@ -284,7 +302,7 @@ void displayAutoIndex()
 
 	if(directory == NULL)
 	{
-		std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
+		std::cerr << "Error opening directory: " << strerror(errno) << std::endl; // o que agafi default
 		return ;
 	}
 	if (dirName[0] != '/')
@@ -307,14 +325,15 @@ void displayAutoIndex()
 int
 ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
 {
+	if (error_missingvalues(arg) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	LOG( "call set_autoindex()" )
 	if (strcmp(arg, "off") == 0){
-		conf._autoindex = false;
 		return (EXIT_SUCCESS);
 	}
 	else if (strcmp(arg, "on") == 0)
 	{
-		conf._autoindex = true;
+		conf._allow_methods |= F_AUTOINDEX;
 		// displayAutoIndex(); //aixo no anira aqui, anira a la response, tipus html, es per fer probes mentres
 		return (EXIT_SUCCESS);
 	}
