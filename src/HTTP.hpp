@@ -12,6 +12,7 @@
 #include <iostream>
 
 #define BAD_REQUEST			400
+#define METHOD_NOT_ALLOWED	405
 #define URI_TOO_LONG		414
 #define NOT_IMPLEMENTED		501
 
