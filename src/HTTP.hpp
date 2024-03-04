@@ -70,8 +70,8 @@ class HTTP: public IEvent
 		std::string    _host;
 		std::string    _user_agent;
 
-		int start_line ( void );
 		void parse ( void );
+		int parse_start_line ( void );
 
 };
 

@@ -6,16 +6,23 @@
 #include "HTTP.hpp"
 #include "ft_string.h"
 
-void
+typedef struct s_start_line
+{
+	int method;
+
+} t_start_line;
+
+	void
 HTTP::parse ( void )
 {
 	LOG( "call HTTP::parse" );
 
 	// - [ ] Read until end of header
+	// WIP
 
 	// - [ ] Read start-line into struct
 
-	HTTP::start_line();
+	HTTP::parse_start_line();
 
 	// http_get( *this );
 
@@ -27,13 +34,8 @@ HTTP::parse ( void )
 // start-line = request-line / status-line
 // request-line = method SP request-target SP HTTP-version
 
-typedef struct s_start_line
-{
-	int method;
-} t_start_line;
-
 int
-HTTP::start_line ( void )
+HTTP::parse_start_line ( void )
 {
 	char * method;
 	int ( *func )( HTTP & );
