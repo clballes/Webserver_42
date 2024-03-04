@@ -16,7 +16,11 @@ ServerConf::add ( std::ifstream & file )
 	std::deque< std::deque< std::string > > server_blocks;
 	std::deque< std::deque< std::string > >::iterator block;
 	
+<<<<<<< HEAD
+	LOG( "call add()" );
+=======
 	// LOG( "call add()" )
+>>>>>>> merge_clara
 	
 	// Check if file has been properly opened.
 
@@ -59,7 +63,13 @@ ServerConf::add ( std::ifstream & file )
 	{
 		ServerConf::instances.push_back( new ServerConf( *block ) );
 		if ( ServerConf::instances.back()->good == false )
+<<<<<<< HEAD
 			return ( EXIT_FAILURE );
+=======
+		{
+			return ( EXIT_FAILURE );
+		}
+>>>>>>> merge_clara
 		++block;
 	}
 	return ( EXIT_SUCCESS );
