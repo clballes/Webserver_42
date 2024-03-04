@@ -91,13 +91,15 @@ char ** CgiHandler::init_env(const std::string& scriptPath, const std::string& f
 
 // this->_env["REDIRECT_STATUS"] = "200"; //Security needed to execute php-cgi
 // 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+
 // 	this->_env["SCRIPT_NAME"] = config.getPath();
 // 	this->_env["SCRIPT_FILENAME"] = config.getPath();
+
+// 	this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
+// 	this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation
 // 	this->_env["REQUEST_METHOD"] = request.getMethod();
 // 	this->_env["CONTENT_LENGTH"] = to_string(this->_body.length());
 // 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
-// 	this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
-// 	this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation
 // 	this->_env["QUERY_STRING"] = request.getQuery();
 // 	this->_env["REMOTEaddr"] = to_string(config.getHostPort().host);
 // 	this->_env["REMOTE_IDENT"] = headers["Authorization"];
