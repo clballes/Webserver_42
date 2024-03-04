@@ -107,8 +107,6 @@ ServerConf::split2blocks( std::deque< std::string > & content,
 		if ( it->compare( block_name ) == 0 )
 		{
 			it = fill_block( it + 1, block_list );
-			std::cout << "adffd" << std::endl;
-
 		}
 		else
 			++it;
