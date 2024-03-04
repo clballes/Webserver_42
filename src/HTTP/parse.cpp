@@ -4,6 +4,7 @@
 /* Mon Mar  4 15:42:42 2024                                                   */
 
 #include "HTTP.hpp"
+#include "ft_string.h"
 
 void
 HTTP::parse ( void )

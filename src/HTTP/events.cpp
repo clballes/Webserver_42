@@ -4,7 +4,6 @@
 /* Thu Feb 29 15:18:53 2024                                                   */
 
 #include "HTTP.hpp"
-#include "ft_string.h"
 
 void
 HTTP::dispatch ( struct kevent & ev )
