@@ -16,8 +16,8 @@ class CgiHandler
 		CgiHandler ( void );
 		~CgiHandler ( void );
 
-		void init_env();
-		void executeCGI(const std::string& scriptPath, const std::string& fullPath, const std::string& query);
+		char ** init_env(const std::string& scriptPath, const std::string& fullPath, const std::string& query);
+		void executeCGI(const std::string& scriptPath, char **env);
 
 	private:
         std::map<std::string, std::string> _env;
