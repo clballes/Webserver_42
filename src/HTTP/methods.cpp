@@ -10,15 +10,7 @@ HTTP::http_get ( HTTP & http )
 // Reads start-line into struct s_request;
 {
 	LOG( "call HTTP::http_get()" );
-
 	(void) http;
-
-	int i = 0;
-	while ( i < HTTP::n_methods )
-	{
-		LOG( HTTP::methods[i].method );
-		++i;
-	}
 
 	return ( EXIT_SUCCESS );
 }

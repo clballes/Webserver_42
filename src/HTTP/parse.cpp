@@ -6,13 +6,15 @@
 #include "HTTP.hpp"
 #include "ft_string.h"
 
+#define SP 32
+
 typedef struct s_start_line
 {
 	int method;
 
 } t_start_line;
 
-	void
+void
 HTTP::parse ( void )
 {
 	LOG( "call HTTP::parse" );
@@ -22,7 +24,8 @@ HTTP::parse ( void )
 
 	// - [ ] Read start-line into struct
 
-	HTTP::parse_start_line();
+	if ( HTTP::parse_start_line() == EXIT_FAILURE )
+		LOG( "error HTTP::parse_start_line()" );
 
 	// http_get( *this );
 
@@ -37,6 +40,9 @@ HTTP::parse ( void )
 int
 HTTP::parse_start_line ( void )
 {
+	int i;
+	int count;
+	char * buf;
 	char * method;
 	int ( *func )( HTTP & );
 
@@ -45,25 +51,58 @@ HTTP::parse_start_line ( void )
 	this->_request_line.method = 0x0;
 	func = 0x0;
 
-	for ( int i = 0; i < HTTP::n_methods; ++i )
+	// Find out method
+	// This will go inside another routine
+	// parse_start_line_method() ?
+
+	count = 0;
+	buf = this->_client._buffer_recv;
+
+	while ( count < this->_client._data_recv && buf[count] != SP )
+		++count;
+
+	method = ft_substr( this->_client._buffer_recv, 0, count - 1 );
+
+	if ( count > HTTP::n_longest_method )
 	{
-		method = (char *) HTTP::methods[i].method;
-
-		// Case might be were _buffer_recv
-		// has not enough bytes ... ?
-
-		if ( ft_strncmp( method, this->_client._buffer_recv,
-					ft_strlen( method ) ) == 0 )
-		{
-			func = HTTP::methods[i].method_func;
-			break ;
-		}
+		LOG( NOT_IMPLEMENTED );
+		return ( EXIT_FAILURE );
 	}
 
-	if ( func == 0x0 )
-		LOG( NOT_IMPLEMENTED );
+	for ( i = 0; i < HTTP::n_methods; ++i )
+	{
+		if ( ft_strcmp( method, HTTP::methods[i].method ) == 0 )
+			break ;
+	}
 
-	//this->_request_line.method = ;
+	if ( method != NULL )
+		free( method );
+
+	if ( i == HTTP::n_methods )
+	{
+		LOG( NOT_IMPLEMENTED );
+		return ( EXIT_FAILURE );
+	}
+	else
+		this->_request_line.method = HTTP::methods[i].code;
+
+	LOG( "count: " << count );
+	LOG( "data - 1: " << this->_client._data_recv - 1 );
+
+	if ( count < this->_client._data_recv - 1 )
+	{
+		LOG( "error: not enough bytes..." );
+		return ( EXIT_FAILURE );
+	}
+
+	buf = this->_client._buffer_recv + count;
+
+	count = 0;
+	//while ( count < this->_client._data_recv && buf[count] != SP )
+	//	++count;
+
+	//write( STDOUT_FILENO, buf, 5 );
+
 	//this->_request_line.request_target = ;
 	//this->_request_line.http_version = ;
 

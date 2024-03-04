@@ -29,6 +29,7 @@ typedef struct s_http_method
 {
 	const char * method;
 	int ( *method_func )( HTTP & );
+	int code;
 
 } t_http_method;
 
@@ -48,6 +49,7 @@ class HTTP: public IEvent
 		~HTTP ( void );
 
 		static int            n_methods;
+		static int            n_longest_method;
 		static t_http_method  methods[];
 
 		static int http_get ( HTTP & );
