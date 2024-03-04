@@ -85,6 +85,7 @@ Client::request_recv ( int64_t data )
 	//this->register_send();
 	this->_buffer_send = strdup( "HEYHEYHEYMFFF\n" );
 	this->_data_send = strlen( this->_buffer_send );
+
 	this->_http_request->perform();
 	// register HTTP.method
 	// once ready should register Client::request_send
