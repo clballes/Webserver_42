@@ -3,6 +3,7 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Thu Jan 25 14:26:11 2024                                                   */
 
+#include "IEvent.hpp"
 #include "webserv.hpp"
 #include "Server.hpp"
 
@@ -13,30 +14,32 @@ void event_loop ( int );
 // The webserv() call starts multiple Server instances 
 // (...) using a kqueue.
 
+bool status;
+
 int
 webserv ( void )
 {
-	//bool status = true;
-	
-	LOG( "call webserv()" )
+	LOG( "call webserv()" );
 
 	// Configure SIGINT ( signal interrupt )
 	// so as to finish connections and end the program
 	// gracefully.
 	
 	::signal( SIGINT, &graceful_stop );
+	::signal( SIGQUIT, &graceful_stop );
 
 	// Create a new kernel event queue.
 
-	Server::kq = ::kqueue();
-	if ( Server::kq == -1 )
+	IEvent::kq = ::kqueue();
+	if ( IEvent::kq == -1 )
 	{
 		std::cerr << PROGRAM_NAME;
-		std::cerr << ": " << ::strerror( errno ) << std::endl;
+		std::cerr << ": kqueue: " << ::strerror( errno );
+		std::cerr << std::endl;
 		exit ( 0x1 ); // Caldra comprovar leaks ...
 	}
 	
-	LOG ( "kqueue properly initialized (fd=" << Server::kq << ")" );
+	LOG ( "kqueue properly initialized (fd=" << IEvent::kq << ")" );
 
 	// For each Server instance,
 	// register an event with the queue.
@@ -45,14 +48,17 @@ webserv ( void )
 	// ; there will be more events to register later,
 	// during program execution and loop execution.
 
-	for ( Server::const_iterator it = Server::servers.begin();
+	for ( Server::iterator it = Server::servers.begin();
 			it != Server::servers.end(); ++it )
-		(*it)->register_socket();
+	{
+		if ( ( *it )->start() )
+			return ( EXIT_FAILURE );
+	}
 
 	// Start listening for registered events
 	// ... kqueue
 
-	event_loop( Server::kq );
+	event_loop( IEvent::kq );
 
 	return ( EXIT_SUCCESS );
 }
@@ -60,6 +66,9 @@ webserv ( void )
 void
 graceful_stop ( int n )
 {
-	LOG ( "\rGracefully stopping..." );
-	exit( n );
+	LOG( "" );
+	LOG( "Stopping " << PROGRAM_NAME << " gracefully (s=" << n << ")" );
+	status = false;
+
+	return ;
 }

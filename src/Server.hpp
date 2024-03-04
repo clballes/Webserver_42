@@ -6,13 +6,14 @@
 #ifndef _SERVER_HPP_
 #define _SERVER_HPP_
 
+#include "IEvent.hpp"
 #include "webserv.hpp"
 #include "ServerConf.hpp"
 #include <vector>
 
 class ServerConf;
 
-class Server
+class Server: public IEvent
 {
 	public:
 
@@ -20,33 +21,33 @@ class Server
 		~Server ( void );
 
 		bool good;
-		void register_socket ( void ) const;
+		void dispatch ( struct kevent & );
+		int start ( void );
 
-		// kqueue's file descriptor
-		
-		static int kq;
-		static std::vector< const Server * > servers;
-
+		static int kq;     // kqueue's file descriptor
+		static std::vector< Server * > servers;
 		static void clear ( void );
-		
-		typedef std::vector< const Server * >:: const_iterator const_iterator;
-		typedef std::vector< const Server * >:: iterator iterator;
 
-		friend std::ostream & operator << ( std::ostream&, const Server & );
+		typedef std::vector< Server * >:: const_iterator const_iterator;
+		typedef std::vector< Server * >:: iterator iterator;
 
-	private:
+		friend class Client;
+		friend std::ostream & operator << ( std::ostream &, const Server & );
 
-		int create_socket ( void );
-		int bind_address ( void );
-		int listen ( void );
+// COMMENTET FOR DEBUG ONLY
+//	private:
+
+		void register_read_socket ( void ) const;
+		int receive_request ( int64_t );
 
 		int						_socket_fd;
-		struct sockaddr_in		_server_address;
-
-		int						_client_socket_fd;
-		unsigned				_client_address_len;
-		struct sockaddr_in		_client_address;
+		unsigned				_address_len;
+		struct sockaddr_in		_address;
+		
+		int _client_socket_fd;
 
 };
+
+extern bool status;
 
 #endif /* !_SERVER_HPP_ */

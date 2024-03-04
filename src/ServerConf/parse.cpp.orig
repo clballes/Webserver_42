@@ -17,7 +17,11 @@
 int
 ServerConf::pre_parse ( std::deque< std::string > & content )
 {
+<<<<<<< HEAD
+	LOG( "call pre_parse()" );
+=======
 	// LOG( "call pre_parse()" )
+>>>>>>> merge_clara
 	
 	if ( count_brackets( content ) == EXIT_FAILURE )
 	{
@@ -42,7 +46,11 @@ int
 ServerConf::parse ( std::deque< std::string > & content,
 	   std::deque< std::deque< std::string > > & server_blocks )
 {	
+<<<<<<< HEAD
+	LOG( "call parse()" );
+=======
 	// LOG( "call parse()" )
+>>>>>>> merge_clara
 	
 	// Split into `server {}' blocks.
 	
@@ -74,7 +82,11 @@ fill_block( std::deque< std::string >::iterator it,
 	std::deque< std::string > list;
 	std::string::size_type brackets = 0;
 
+<<<<<<< HEAD
+	LOG( "call fill_block()" );
+=======
 	// LOG( "call fill_block()" )
+>>>>>>> merge_clara
 
 	if ( *it == "{" )
 		++it;
@@ -103,7 +115,11 @@ ServerConf::split2blocks( std::deque< std::string > & content,
 {
 	std::deque< std::string >::iterator it = content.begin();
 
+<<<<<<< HEAD
+	LOG( "call split2blocks()" );
+=======
 	// LOG( "call split2blocks()" )
+>>>>>>> merge_clara
 	while ( it != content.end() )
 	{
 		if ( it->compare( block_name ) == 0 )
@@ -121,7 +137,11 @@ count_brackets ( std::deque< std::string > & content )
 	int brace = 0;
 	std::deque< std::string>::iterator it = content.begin();
 
+<<<<<<< HEAD
+	LOG( "call count_brackets()" );
+=======
 	// LOG( "call count_brackets()" )
+>>>>>>> merge_clara
 
 	while ( it != content.end() && brace > 0)
 	{
@@ -138,7 +158,11 @@ isRegularFile( const std::string & filename )
 {
     struct stat file_info;
 
+<<<<<<< HEAD
+	LOG( "call isRegularFile()" );
+=======
 	// LOG( "call isRegularFile()" )
+>>>>>>> merge_clara
 
     if ( stat( filename.c_str(), &file_info ) != 0 )
         return ( false );
@@ -151,7 +175,11 @@ count_servers( std::deque< std::string > & content )
 {
     int count;
    
+<<<<<<< HEAD
+	LOG( "call count_servers()" );
+=======
 	// LOG( "call count_servers()" )
+>>>>>>> merge_clara
 
 	count = 0;
     for ( std::deque< std::string >::iterator it = content.begin();

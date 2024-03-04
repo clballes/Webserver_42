@@ -46,7 +46,7 @@ main ( int argc, char * const * argv )
 		std::cerr << ": " << ::strerror( errno ) << std::endl;
 		return ( EXIT_FAILURE );
 	}
-	LOG( conf_filename << ": open OK" )
+	LOG( conf_filename << ": open OK" );
 
 	// Add `conf_file' is contents.
 	// Server_conf::add() also parses them. 
@@ -60,7 +60,7 @@ main ( int argc, char * const * argv )
 	// Once done, close file;
 
 	conf_file.close();
-	LOG( conf_filename << ": closed OK" )
+	LOG( conf_filename << ": closed OK" );
 
 	// Initialize n Server instances based on the configuration file.
 	// new `Server's in Server::servers will have to be FREEd.
@@ -84,8 +84,8 @@ main ( int argc, char * const * argv )
 
 	if ( ::webserv() != EXIT_SUCCESS )
 	{
+		std::cerr << "Quitting ";
 		std::cerr << PROGRAM_NAME;
-		std::cerr << ": hmm ??";
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}

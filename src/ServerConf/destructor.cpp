@@ -9,7 +9,7 @@
 
 ServerConf::~ServerConf ( void )
 {
-	LOG( "call ~ServerConf()" )
+	LOG( "call ServerConf::~ServerConf()" );
 
 	return ;
 }

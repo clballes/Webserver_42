@@ -10,9 +10,9 @@ INC_DIR			:=	$(SRC_DIR)
 BUILD_DIR		:=	build
 
 CC				:=	c++
-CPPFLAGS		:=	-MMD -I$(INC_DIR)
-CPPFLAGS		+=	-I$(SRC_DIR)/Server -I$(SRC_DIR)/ServerConf
-#CPPFLAGS		+=	-g -fsanitize='address,undefined'
+CPPFLAGS		:=	-MMD
+CPPFLAGS		+=	-I$(INC_DIR) -I$(SRC_DIR)/ServerConf
+CPPFLAGS		+=	-g -fsanitize='address,undefined'
 #CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 SILENCE_LOGS	?=	false
@@ -22,10 +22,6 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/getoptions.cpp \
 					$(SRC_DIR)/webserv.cpp \
 					$(SRC_DIR)/loop.cpp \
-					$(SRC_DIR)/Server/constructor.cpp \
-					$(SRC_DIR)/Server/destructor.cpp \
-					$(SRC_DIR)/Server/getters.cpp \
-					$(SRC_DIR)/Server/events.cpp \
 					$(SRC_DIR)/ServerConf/constructor.cpp \
 					$(SRC_DIR)/ServerConf/destructor.cpp \
 					$(SRC_DIR)/ServerConf/add.cpp \
@@ -33,22 +29,33 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/ServerConf/normalize.cpp \
 					$(SRC_DIR)/ServerConf/split_elements.cpp \
 					$(SRC_DIR)/ServerConf/setters.cpp \
-					$(SRC_DIR)/ServerConf/parse.cpp
+					$(SRC_DIR)/ServerConf/parse.cpp \
+					$(SRC_DIR)/Server/constructor.cpp \
+					$(SRC_DIR)/Server/destructor.cpp \
+					$(SRC_DIR)/Server/events.cpp \
+					$(SRC_DIR)/Server/start.cpp \
+					$(SRC_DIR)/Server/clear.cpp \
+					$(SRC_DIR)/Client/constructor.cpp \
+					$(SRC_DIR)/Client/destructor.cpp \
+					$(SRC_DIR)/Client/events.cpp \
+					$(SRC_DIR)/HTTP/constructor.cpp \
+					$(SRC_DIR)/HTTP/destructor.cpp \
+					$(SRC_DIR)/HTTP/events.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
+
+.PHONY: all clean fclean re debug
+
+all: $(NAME)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: all clean fclean re debug
-
-#include $(DEP_FILES)
-
-all: $(NAME)
-
 $(NAME): $(OBJ_FILES)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(OBJ_FILES) -o $(basename $@)
+
+-include $(DEP_FILES)
 
 clean:
 	rm -rf $(BUILD_DIR)

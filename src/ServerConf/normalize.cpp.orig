@@ -17,7 +17,11 @@ ServerConf::normalize ( std::deque< std::string > & mem )
 {
 	std::deque< std::string >::iterator it;
 
+<<<<<<< HEAD
+	LOG( "call normalize()" );
+=======
 	// LOG( "call normalize()" )
+>>>>>>> merge_clara
 	
 	it = mem.begin();
 	while ( it != mem.end() )
@@ -40,7 +44,11 @@ trim_comments( std::string & str )
 {
 	std::string::iterator it;
 
+<<<<<<< HEAD
+	LOG( "call trim_comments()" );
+=======
 	// LOG( "call trim_comments()" )
+>>>>>>> merge_clara
 
 	it = str.begin();
 	while ( it != str.end() && *it != '#' )
@@ -58,7 +66,11 @@ trim( std::string & input )
     std::string result;
     bool leadingSpacesOrTabs = true;
 
+<<<<<<< HEAD
+	LOG( "call trim()" );
+=======
 	// LOG( "call trim()" )
+>>>>>>> merge_clara
 
     for ( std::size_t i = 0; i < input.length(); ++i )
 	{
@@ -87,7 +99,11 @@ trim_f( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
 
+<<<<<<< HEAD
+	LOG( "call trim_f" );
+=======
 	// LOG( "call trim_f" )
+>>>>>>> merge_clara
 
 	it = str.end() - 1;
 	while ( it != str.begin() && func( *it ) )
@@ -105,7 +121,11 @@ replace_sp( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
 
+<<<<<<< HEAD
+	LOG( "call replace_sp" );
+=======
 	// LOG( "call replace_sp" )
+>>>>>>> merge_clara
 
 	it = str.begin();
 	while ( it != str.end() )

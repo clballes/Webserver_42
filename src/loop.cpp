@@ -5,33 +5,47 @@
 
 #include "webserv.hpp"
 
+extern bool status;
+
 void
 event_loop ( int kq )
 {
 	int				n_events;
-	bool			status = true;
 	struct kevent	ev;
+	IEvent *        instance;
 
 	n_events = 1;
+	status = true;
+
+	LOG( "" );
+	LOG( "call event_loop() (fd=" << kq << ")" );
 
 	while ( status == true )
 	{
 		// kevent() call does not return until at least one event is received
 		// or when an associated timeout is exhausted.
+
 		n_events = ::kevent( kq, 0x0, 0, &ev, 1, 0 );
+
+		if ( status == false )
+			return ;
 
 		if ( n_events == -1 )
 		{
 			std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
-			exit ( 0x5 );
+			return ; // ( EXIT_FAILURE );
 		}
-
+		
 		if ( n_events == 0 )
 			continue ;
 
-		// Echo kevent ident which is the server's socket file descriptor.
+		if ( ev.flags & EVFILT_READ )
+		{
+			instance = static_cast< IEvent * >( ev.udata );
+			instance->dispatch( ev );
+		}
 
-		std::cout << "id: " << ev.ident << std::endl;
+		// consider EVFILT_SIGNAL
 	}
 
 	return ;

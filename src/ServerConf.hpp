@@ -9,6 +9,7 @@
 #include <fstream>
 #include <deque>
 #include <vector>
+#include <map>
 
 class Server;
 class ServerConf;
@@ -27,6 +28,7 @@ class ServerConf
 
 		friend class Server;
 		
+		bool good;
 		static std::deque< const ServerConf * >instances;
 	
 		typedef std::deque< const ServerConf * >::iterator iterator;
@@ -37,13 +39,14 @@ class ServerConf
 		
 		friend std::ostream & operator << ( std::ostream&, const ServerConf & );
 
-	private:
+
+// COMMENTED FOR DEBUG ONLY
+//	private:
 		
 		//  An empty ServerConf instance 
 		//  may be created for testing purposes.
 		
 		ServerConf ( void );
-		
 		ServerConf ( const ServerConf & );
 		ServerConf ( const std::deque< std::string > & );
 		ServerConf & operator = ( const ServerConf & );
@@ -60,6 +63,7 @@ class ServerConf
 		//static int post_parse ( std::deque< std::string > & );
 		
 		int set_directives ( const std::deque< std::string > & );
+		int set_directive ( std::string &, const char * );
 
 		static int set_listen ( ServerConf &, const char * );
 		static int set_root ( ServerConf &, const char * );
@@ -75,21 +79,14 @@ class ServerConf
 
 		static t_configuration_directives _config_directives[];
 
-		// Need to be revised
-
-		struct sockaddr_in _address;
-
-		in_port_t _port;
-		in_addr_t _host;
+		struct sockaddr_in			_address;
+		std::vector< std::string>	_server_name;
+		std::string					_root;
+		unsigned int 				_allow_methods;
+		std::size_t					_client_max_body_size;
+		std::vector< std::string>	_index;
+		std::string 				_cgi_param; //nse si guardar en un vector
+		std::string					_cgi_pass; 
+		std::map<int, std::string>	_error_page; //falta fer
 		
-		std::vector<std::string> _server_name;
-		std::string _root;
-		std::vector<std::string> _allow_methods;
-		// allow_methods -> potser fer un int bits:(0/0/0/1)
-		std::size_t _client_max_body_size;
-		std::string _index;
-		// consider multiple indexes <vector>
-		std::string _cgi_param;
-		std::string _cgi_pass;
-		bool _autoindex;
 };
