@@ -84,8 +84,8 @@ class ServerConf
 		unsigned int 				_allow_methods;
 		std::size_t					_client_max_body_size;
 		std::vector< std::string>	_index;
-		std::string 				_cgi_param;
-		std::string					_cgi_pass;
+		std::string 				_cgi_param; //nse si guardar en un vector
+		std::string					_cgi_pass; 
 		std::map<int, std::string>	_error_page; //falta fer
 		
 };

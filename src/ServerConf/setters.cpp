@@ -158,7 +158,7 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 }
 
 int
-ServerConf::set_error_page ( ServerConf & conf, const char * arg ) //falta fer
+ServerConf::set_error_page ( ServerConf & conf, const char * arg )
 {
 	if (error_missingvalues(arg) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
