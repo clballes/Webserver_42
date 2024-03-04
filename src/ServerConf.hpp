@@ -9,6 +9,7 @@
 #include <fstream>
 #include <deque>
 #include <vector>
+#include <map>
 
 class Server;
 class ServerConf;
@@ -78,12 +79,13 @@ class ServerConf
 		static t_configuration_directives _config_directives[];
 
 		struct sockaddr_in			_address;
-		std::vector<std::string>	_server_name;
+		std::vector< std::string>	_server_name;
 		std::string					_root;
 		unsigned int 				_allow_methods;
 		std::size_t					_client_max_body_size;
 		std::vector< std::string>	_index;
 		std::string 				_cgi_param;
 		std::string					_cgi_pass;
-		std::vector< std::string>	_error_page; //falta fer
+		std::map<int, std::string>	_error_page; //falta fer
+		
 };

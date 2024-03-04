@@ -18,6 +18,7 @@
 # endif /* WEBSERV_OK */
 
 # define DEFAULT_CONF		"conf/default.conf"
+# define DEFAULT_ERR    	"conf/default_err.conf"
 
 #define F_AUTOINDEX     0x00010000 
 #define  METHOD_GET     0x00001000

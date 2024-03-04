@@ -164,11 +164,32 @@ ServerConf::set_error_page ( ServerConf & conf, const char * arg ) //falta fer
 		return (EXIT_FAILURE);
 	LOG( "call set_error_page()" )
 
-	(void) conf;
-	// (void) arg;
+  	std::string argStr(arg);
+  	std::string uri;
+	int number;
 
-	LOG( "error_page is: " << arg )
-
+    for (size_t i = 0; i <= argStr.length(); i++) {
+		if (isdigit(arg[i]))
+		{
+			if (arg[i + 1] == 32)
+			{
+				std::string numberStr = argStr.substr(0, i + 1);
+				number = std::atoi(numberStr.c_str());
+				i++;
+				if (arg[i + 1] == '/'){
+					uri = argStr.substr(i + 1, argStr.length());
+					conf._error_page[number] = uri;
+					return EXIT_SUCCESS;
+				}
+				else{
+					return EXIT_FAILURE;
+				}
+			}
+		}
+		else{
+			return EXIT_FAILURE;
+		}
+    }
 	return ( EXIT_SUCCESS );
 }
 
