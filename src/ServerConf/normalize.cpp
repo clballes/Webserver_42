@@ -22,9 +22,9 @@ ServerConf::normalize ( std::deque< std::string > & mem )
 	it = mem.begin();
 	while ( it != mem.end() )
 	{
-		trim_comments( *it );
 		replace_sp( *it, &std::isspace );
 		trim_f( *it, &std::isspace );
+		trim_comments( *it );
 		del_multipl_sp( *it, &std::isspace );
 		if ( it->empty() == true )
 			it = mem.erase( it );
@@ -48,6 +48,8 @@ trim_comments( std::string & str )
 
 	if ( it != str.end() )
 		str.erase( it, str.end() );
+
+
 
 	return ;
 }

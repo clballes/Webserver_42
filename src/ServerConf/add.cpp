@@ -29,7 +29,7 @@ ServerConf::add ( std::ifstream & file )
 	std::deque< std::string > mem;
 	if ( ServerConf::file2mem( file, mem ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-	
+
 	// Split lines by `{}' and directives.
 	ServerConf::split_elements( mem );
 	
@@ -37,17 +37,18 @@ ServerConf::add ( std::ifstream & file )
 	// Removes comments, trims `isspace()' characters
 	
 	ServerConf::normalize( mem );
-
+	
 	// Pre-parse `mem' is contents.
 	
 	if ( ServerConf::pre_parse( mem ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
+
 	// Parse `mem' is contents.
 	
 	if ( ServerConf::parse( mem, server_blocks ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-	
+
 	LOG( "server_blocks: " << server_blocks.size() );
 	
 	// Create a new instance `ServerConf'

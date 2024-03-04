@@ -42,7 +42,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 		// If non is found, a NULL pointer will be returned.
 
 		t_configuration_directives * ptr = &ServerConf::_config_directives[0];
-		while ( ptr->directive_name != NULL )
+		while ( ptr->directive_name != NULL)
 		{	
 			if ( directive.compare( ptr->directive_name ) == 0 )
 				break ;
@@ -52,7 +52,7 @@ ServerConf::set_directives ( const std::deque< std::string > & server_block )
 		if ( ptr->directive_name == NULL )
 		{
 			std::cerr << PROGRAM_NAME;
-			std::cerr << ": error: invalid directive";
+			std::cerr << ": error: invalid directive ";
 			std::cerr << std::endl;
 			return ( EXIT_FAILURE );
 		}
@@ -289,6 +289,7 @@ ServerConf::set_index ( ServerConf & conf, const char * arg )
 	std::istringstream iss( arg );
     std::vector< std::string > words;
     std::string word;
+	conf._index.clear();
   	for (; iss >> word;) {
         conf._index.push_back( word );
     }
