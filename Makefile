@@ -9,12 +9,17 @@ SRC_DIR			:=	src
 INC_DIR			:=	$(SRC_DIR)
 BUILD_DIR		:=	build
 
+LIBFT			:=	$(SRC_DIR)/libft/libft.a
+
 CC				:=	c++
 CPPFLAGS		:=	-MMD
 CPPFLAGS		+=	-I$(INC_DIR) -I$(SRC_DIR)/ServerConf
+CPPFLAGS		+=	-I$(dir $(LIBFT))/include
 CPPFLAGS		+=	-g -fsanitize='address,undefined'
 #CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
+CXXFLAGS		+=	-Wno-unused-command-line-argument
+LDFLAGS			:=	-L$(dir $(LIBFT)) -lft
 SILENCE_LOGS	?=	false
 
 SRC_FILES		:=	$(SRC_DIR)/main.cpp \
@@ -50,10 +55,10 @@ all: $(NAME)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
-	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ_FILES)
-	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(OBJ_FILES) -o $(basename $@)
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $(OBJ_FILES) -o $(basename $@)
 
 -include $(DEP_FILES)
 
