@@ -18,7 +18,7 @@ int
 ServerConf::pre_parse ( std::deque< std::string > & content )
 {
 	// LOG( "call pre_parse()" )
-	
+
 	if ( count_brackets( content ) == EXIT_FAILURE )
 	{
 		std::cerr << PROGRAM_NAME;
@@ -30,11 +30,10 @@ ServerConf::pre_parse ( std::deque< std::string > & content )
 	if ( count_servers( content ) < 1 )
 	{
 		std::cerr << PROGRAM_NAME;
-		std::cerr << ": syntax error: missing server directive";
+		std::cerr << ": syntax error: missing server directive en el count";
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}
-
 	return ( EXIT_SUCCESS );
 }
 
@@ -51,7 +50,6 @@ ServerConf::parse ( std::deque< std::string > & content,
 
 	// The following condition turns count_servers() useless
 	// consider removing it ( in pre_parse )
-
 	if ( server_blocks.size() == 0 )
 	{
 		std::cerr << PROGRAM_NAME;
@@ -107,7 +105,11 @@ ServerConf::split2blocks( std::deque< std::string > & content,
 	while ( it != content.end() )
 	{
 		if ( it->compare( block_name ) == 0 )
+		{
 			it = fill_block( it + 1, block_list );
+			std::cout << "adffd" << std::endl;
+
+		}
 		else
 			++it;
 	}
@@ -121,9 +123,9 @@ count_brackets ( std::deque< std::string > & content )
 	int brace = 0;
 	std::deque< std::string>::iterator it = content.begin();
 
-	// LOG( "call count_brackets()" )
+	LOG( "call count_brackets()" )
 
-	while ( it != content.end() && brace > 0)
+	while ( it != content.end())
 	{
 		if ( *it == "{" || *it == "}" )
 			brace += ( 124 - it->at( 0x0 ) );
@@ -151,7 +153,7 @@ count_servers( std::deque< std::string > & content )
 {
     int count;
    
-	// LOG( "call count_servers()" )
+	LOG( "call count_servers()" )
 
 	count = 0;
     for ( std::deque< std::string >::iterator it = content.begin();

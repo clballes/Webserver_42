@@ -22,8 +22,15 @@ ServerConf::split_elements ( std::deque< std::string > & mem )
 
 	while ( it != mem.end() )
 	{
+		size_t pos = it->find_first_of( "{}", 0 );
 		if ( it->find_first_of( "{}", 0 ) != std::string::npos )
+		{
+			size_t pos2 = it->find("#");
+			if (it->find("#") != std::string::npos && pos > pos2){
+				break;
+			}
 			it = split_line( it, mem );
+		}
 		++it;
 	}
 

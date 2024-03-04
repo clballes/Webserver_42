@@ -27,10 +27,17 @@ ServerConf::_config_directives[] = {
 	{ "autoindex", &ServerConf::set_autoindex },
 	{ 0x0, 0x0 }};
 
-ServerConf::ServerConf ( void ): good( true ), _allow_methods(0)
+ServerConf::ServerConf ( void ): good( true ), _root("html"), _allow_methods(0), _client_max_body_size(0), _index(1, "index.html")
 {
 	LOG( "call ServerConf::ServerConf( void )" );
-
+	this->_error_page[400] = "src/err_pages/400.html";
+	this->_error_page[403] = "src/err_pages/403.html";
+	this->_error_page[404] = "src/err_pages/404html";
+	this->_error_page[405] = "src/err_pages/405.html";
+	this->_error_page[410] = "src/err_pages/410.html";
+	this->_error_page[413] = "src/err_pages/413.html";
+	this->_error_page[500] = "src/err_pages/500.html";
+	this->_address.sin_port = 80;
 	return ;
 }
 
@@ -44,9 +51,18 @@ ServerConf::ServerConf ( const ServerConf & instance )
 }
 
 ServerConf::ServerConf ( const std::deque< std::string > & server_block ):
-	good( true ), _allow_methods(0)
+	good( true ), _root("html"), _allow_methods(0), _client_max_body_size(0), _index(1, "index.html")
 {
 	LOG( "call ServerConf( const std::deque< std::string > &" )
+
+	this->_error_page[400] = "src/err_pages/400.html";
+	this->_error_page[403] = "src/err_pages/403.html";
+	this->_error_page[404] = "src/err_pages/404html";
+	this->_error_page[405] = "src/err_pages/405.html";
+	this->_error_page[410] = "src/err_pages/410.html";
+	this->_error_page[413] = "src/err_pages/413.html";
+	this->_error_page[500] = "src/err_pages/500.html";
+	this->_address.sin_port = 80;
 
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
 	{
@@ -128,6 +144,12 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	else
         out << "Autoindex: OFF ";
 
-
+	
+    out << "Error Pages:";
+	std::map<int, std::string>::const_iterator it2 = instance._error_page.begin();
+	while (it2 != instance._error_page.end()) {
+		out << "Int: " << it2->first << ", Value String: " << it2->second << std::endl;
+		++it2;
+	}
 	return ( out );
 }

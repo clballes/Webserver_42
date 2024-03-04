@@ -39,9 +39,7 @@ class ServerConf
 		
 		friend std::ostream & operator << ( std::ostream&, const ServerConf & );
 
-
-// COMMENTED FOR DEBUG ONLY
-//	private:
+	private:
 		
 		//  An empty ServerConf instance 
 		//  may be created for testing purposes.
@@ -60,17 +58,14 @@ class ServerConf
 		static int pre_parse ( std::deque< std::string > & );
 		static int parse ( std::deque< std::string > &,
 				std::deque< std::deque< std::string > > & );
-		//static int post_parse ( std::deque< std::string > & );
 		
 		int set_directives ( const std::deque< std::string > & );
-		int set_directive ( std::string &, const char * );
 
 		static int set_listen ( ServerConf &, const char * );
 		static int set_root ( ServerConf &, const char * );
 		static int set_server_name ( ServerConf &, const char * );
 		static int set_error_page ( ServerConf &, const char * );
 		static int set_client_body ( ServerConf &, const char * );
-		// client_body_SIZE no?
 		static int set_cgi_param ( ServerConf &, const char * );
 		static int set_cgi_pass ( ServerConf &, const char * );
 		static int set_allow_methods ( ServerConf &, const char * );
