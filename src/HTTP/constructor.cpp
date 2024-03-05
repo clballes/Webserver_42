@@ -6,28 +6,47 @@
 #include "Log.hpp"
 #include "HTTP.hpp"
 #include <unistd.h>
+#include <ft_string.h>
 
-HTTP::HTTP ( const Client & client_instance ): _client( client_instance )
+t_http_method
+HTTP::methods[] = {
+	{ "GET", &HTTP::http_get, HTTP_GET },
+	{ "HEAD", &HTTP::http_head, HTTP_HEAD },
+	{ "POST", &HTTP::http_post, HTTP_POST },
+	{ "PUT", &HTTP::http_put, HTTP_PUT },
+	{ "DELETE", &HTTP::http_delete, HTTP_DELETE },
+	{ 0, 0, 0 }
+};
+
+int
+HTTP::n_methods = ( sizeof( HTTP::methods ) /
+		sizeof( *HTTP::methods ) ) - 1;
+
+static int
+get_method_longest_len ( t_http_method * ptr )
+{
+	size_t n;
+
+	n = 0;
+	while ( ptr->method != NULL )
+	{
+		if ( ft_strlen( ptr->method ) > n )
+			n = ft_strlen( ptr->method );
+		++ptr;
+	}
+
+	return ( n );
+}
+
+int
+HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
+
+HTTP::HTTP ( Client & client_instance ): _client( client_instance )
 {
 	LOG( "call HTTP::HTTP( const Client & )" );
 	
 	(void) _host;
 	(void) _user_agent;
-
-	return ;
-}
-
-void
-HTTP::perform ( void )
-{
-	write( STDOUT_FILENO,
-			this->_client._buffer_recv,
-			this->_client._data_recv );
-
-	::send( this->_client._socket_fd,
-			this->_client._buffer_send,
-			this->_client._data_send,
-			0x0 );
 
 	return ;
 }

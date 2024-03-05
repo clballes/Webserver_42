@@ -69,10 +69,10 @@ Client::request_recv ( int64_t data )
 	
 	LOG( "call Client::request_recv() (fd=" << this->_socket_fd << ")" );
 	
-	this->_buffer_recv = new char [data];
+	this->_buffer_recv = new char [data + 1];
+	this->_buffer_recv[data] = '\0';
 	this->_data_recv = data;
 
-	std::memset( this->_buffer_recv, '\0', data );
 	n = recv( this->_socket_fd, this->_buffer_recv, data, 0 );
 	
 	if ( n == 0 )
@@ -83,8 +83,6 @@ Client::request_recv ( int64_t data )
 	}
 
 	//this->register_send();
-	this->_buffer_send = strdup( "HEYHEYHEYMFFF\n" );
-	this->_data_send = strlen( this->_buffer_send );
 	this->_http_request->perform();
 	// register HTTP.method
 	// once ready should register Client::request_send

@@ -14,10 +14,13 @@ Server::dispatch ( struct kevent & ev )
 	LOG( "call Server::dispatch() (fd=" << ev.ident << ")" );
 
 	c = new Client( *this );
-	(void) ev;
-	
+
+	(void) ev;	
+
 	return ;
 }
+
+// not being used ... ?
 
 void
 Server::register_read_socket ( void ) const
@@ -36,9 +39,13 @@ Server::register_read_socket ( void ) const
 	return ;
 }
 
+// not being used ... ?
+
 int
 Server::receive_request ( int64_t data )
 {
+	( void ) data;
+	/*
 	char buffer[1024];
 
 	LOG( "call Server::receive_request() (fd=" << this->_client_socket_fd << ")" );
@@ -48,8 +55,6 @@ Server::receive_request ( int64_t data )
 	LOG( "n: " << n );
 
 	write( STDOUT_FILENO, buffer, data );
-	// new Client()
-	// client->register_socket()
-
+	*/
 	return ( EXIT_SUCCESS );
 }

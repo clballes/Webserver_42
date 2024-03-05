@@ -5,13 +5,15 @@
 
 #include "Client.hpp"
 
-Client::Client ( const Server & server_instance ): good( true ),
+Client::Client ( Server & server_instance ): good( true ),
 	_socket_fd( 0 ),
 	_buffer_recv( 0x0 ),
 	_buffer_send( 0x0 ),
 	_server( server_instance )
 {
 	LOG( "call Client::Client()" );
+
+	server_instance._clients.push_back( const_cast< Client * >( this ) );
 
 	this->_socket_fd = ::accept( _server._socket_fd,
 			(struct sockaddr *) &this->_address,

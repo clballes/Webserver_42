@@ -70,5 +70,11 @@ graceful_stop ( int n )
 	LOG( "Stopping " << PROGRAM_NAME << " gracefully (s=" << n << ")" );
 	status = false;
 
+	for ( Server::iterator it = Server::servers.begin();
+		it != Server::servers.end(); ++it )
+		( *it )->stop();
+
+	close( IEvent::kq );
+
 	return ;
 }

@@ -14,13 +14,12 @@
 class Server;
 class ServerConf;
 
-struct s_configuration_directives
+typedef struct s_configuration_directives
 {
 	const char *directive_name;
 	int ( *set_func )( ServerConf &, const char * );
-};
 
-typedef struct s_configuration_directives t_configuration_directives;
+} t_configuration_directives;
 
 class ServerConf
 {

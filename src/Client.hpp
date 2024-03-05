@@ -8,15 +8,17 @@
 
 #include "IEvent.hpp"
 #include "HTTP.hpp"
+#include "Server.hpp"
 #include "webserv.hpp"
 
 class HTTP;
+class Server;
 
 class Client: public IEvent
 {
 	public:
 
-		Client ( const Server & );
+		Client ( Server & );
 		~Client ( void );
 
 		bool good;
@@ -42,7 +44,7 @@ class Client: public IEvent
 		char *                  _buffer_send;
 
 		HTTP *                  _http_request;
-		const Server &          _server;
+		Server &                _server;
 
 };
 

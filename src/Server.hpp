@@ -9,9 +9,11 @@
 #include "IEvent.hpp"
 #include "webserv.hpp"
 #include "ServerConf.hpp"
+#include "Client.hpp"
 #include <vector>
 
 class ServerConf;
+class Client;
 
 class Server: public IEvent
 {
@@ -23,6 +25,7 @@ class Server: public IEvent
 		bool good;
 		void dispatch ( struct kevent & );
 		int start ( void );
+		void stop ( void );
 
 		static int kq;     // kqueue's file descriptor
 		static std::vector< Server * > servers;
@@ -34,8 +37,7 @@ class Server: public IEvent
 		friend class Client;
 		friend std::ostream & operator << ( std::ostream &, const Server & );
 
-// COMMENTET FOR DEBUG ONLY
-//	private:
+	private:
 
 		void register_read_socket ( void ) const;
 		int receive_request ( int64_t );
@@ -44,7 +46,7 @@ class Server: public IEvent
 		unsigned				_address_len;
 		struct sockaddr_in		_address;
 		
-		int _client_socket_fd;
+		std::vector< Client * > _clients;
 
 };
 

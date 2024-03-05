@@ -17,7 +17,7 @@ Server::start ( void )
 	this->_socket_fd = ::socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
 
 	if ( this->_socket_fd == -1
-			|| fcntl( this->_socket_fd, F_SETFL, O_NONBLOCK ) == -1 )
+			|| fcntl( this->_socket_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1 )
 	{
 		std::cerr << "socket: " << ::strerror( errno );
 		std::cerr << std::endl;
