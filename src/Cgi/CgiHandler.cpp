@@ -17,7 +17,7 @@ CgiHandler::CgiHandler()
 
     // std::string scriptPath = "/Users/clballes/Desktop/web42/src/Cgi/ubuntu_cgi_tester";
     std::string scriptPath = "/Users/clballes/Desktop/web42/src/Cgi/cgi_tester"; // fastcgi_pass instructs nginx to execute a CGI script (PHP in your case) using the FastCGI protocol.
-    std::string fullPath = "/path/to/your/script.php"; //normalment es per donar extra info, en el notre cas sera el mateix q el script
+    std::string fullPath =  "/Users/clballes/Desktop/web42/src/Cgi/cgi_tester"; //normalment es per donar extra info, en el notre cas sera el mateix q el script
     std::string query = "param1=value1&param2=value2"; //cgi_parak
     // Execute the CGI script
     char **env = init_env(scriptPath, fullPath, query);
@@ -80,8 +80,8 @@ char ** CgiHandler::init_env(const std::string& scriptPath, const std::string& f
     env[0] = strdup("REQUEST_METHOD=GET");
     env[1] = strdup(("QUERY_STRING=" + query).c_str());
     env[2] = strdup(("SCRIPT_FILENAME=" + scriptPath).c_str());
-    env[2] = strdup(("SCRIPT_NAME=" + scriptPath).c_str());
-    env[3] = strdup(("PATH_INFO=" + fullPath).c_str());
+    // env[2] = strdup(("SCRIPT_NAME=" + scriptPath).c_str());
+    // env[3] = strdup(("PATH_INFO=" + fullPath).c_str());
     env[4] = strdup(("SERVER_PROTOCOL=" + add).c_str());
     // env[4] = strdup(("GATEWAY_INTERFACE=" + add2).c_str());
     env[5] = nullptr;
