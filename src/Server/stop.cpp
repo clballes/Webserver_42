@@ -8,6 +8,13 @@
 void
 Server::stop ( void )
 {
+	for ( std::vector< Client * >::iterator iterator = this->_clients.begin();
+			iterator != this->_clients.end(); ++iterator )
+	{
+		if ( *iterator != NULL )
+			delete *iterator;
+	}
+
 	delete ( this );
 
 	return ;
