@@ -66,7 +66,7 @@ class HTTP: public IEvent
 		const Client & _client;
 
 		t_request      _request_line;
-		int	 		   _response_code;
+		int	 		   _status_code;
 
 		bool           _keep_alive;
 		std::string    _host;
@@ -74,6 +74,8 @@ class HTTP: public IEvent
 
 		void parse ( void );
 		int parse_start_line ( void );
+
+		int parse_method ( char * buf );
 
 };
 

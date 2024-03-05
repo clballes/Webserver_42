@@ -40,71 +40,76 @@ HTTP::parse ( void )
 int
 HTTP::parse_start_line ( void )
 {
-	int i;
 	int count;
 	char * buf;
-	char * method;
-	int ( *func )( HTTP & );
-
-	LOG( "call start_line()" );
-
-	this->_request_line.method = 0x0;
-	func = 0x0;
-
-	// Find out method
-	// This will go inside another routine
-	// parse_start_line_method() ?
 
 	count = 0;
 	buf = this->_client._buffer_recv;
+	
+	LOG( "call parse_start_line()" );
+	LOG( "data_recv: " << this->_client._data_recv );
+
+	// Find out method
+	
+	if ( HTTP::parse_method( buf ) == EXIT_FAILURE )
+		return ( this->_status_code );
+
+	LOG( "looking for method" );
 
 	while ( count < this->_client._data_recv && buf[count] != SP )
 		++count;
+	--count;
+	
+	return ( EXIT_SUCCESS );
+}
 
-	method = ft_substr( this->_client._buffer_recv, 0, count - 1 );
+int
+HTTP::parse_method ( char * buf )
+{
+	int count, iterator;
 
-	if ( count > HTTP::n_longest_method )
+	LOG( "call HTTP::parse_method()" );
+
+	count = 0;
+	LOG( " count: " << count );
+
+	while ( count < HTTP::n_longest_method
+			&& count < this->_client._data_recv
+			&& buf[count] != SP )
+		++count;
+	
+	LOG( " count: " << count );
+
+	if ( count == HTTP::n_longest_method )
 	{
-		LOG( NOT_IMPLEMENTED );
+		LOG( " 501 Not implemented" );
 		return ( EXIT_FAILURE );
 	}
-
-	for ( i = 0; i < HTTP::n_methods; ++i )
+	else if ( count == this->_client._data_recv )
 	{
-		if ( ft_strcmp( method, HTTP::methods[i].method ) == 0 )
-			break ;
-	}
-
-	if ( method != NULL )
-		free( method );
-
-	if ( i == HTTP::n_methods )
-	{
-		LOG( NOT_IMPLEMENTED );
+		LOG( " 400 Bad request" );
 		return ( EXIT_FAILURE );
 	}
 	else
-		this->_request_line.method = HTTP::methods[i].code;
+		--count;
+	
+	LOG( " count: " << count );
 
-	LOG( "count: " << count );
-	LOG( "data - 1: " << this->_client._data_recv - 1 );
-
-	if ( count < this->_client._data_recv - 1 )
+	for ( iterator = 0; iterator < HTTP::n_methods; ++iterator )
 	{
-		LOG( "error: not enough bytes..." );
+		if ( ft_strncmp( buf, this->_client._buffer_recv, count ) == 0 )
+			break ;
+	}
+
+	if ( iterator == HTTP::n_methods )
+	{
+		LOG( " 501 Not implemented" );
 		return ( EXIT_FAILURE );
 	}
 
-	buf = this->_client._buffer_recv + count;
+	LOG( " OK: " << HTTP::methods[iterator].method );
 
-	count = 0;
-	//while ( count < this->_client._data_recv && buf[count] != SP )
-	//	++count;
-
-	//write( STDOUT_FILENO, buf, 5 );
-
-	//this->_request_line.request_target = ;
-	//this->_request_line.http_version = ;
+	this->_request_line.method = HTTP::methods[iterator].code;
 
 	return ( EXIT_SUCCESS );
 }
