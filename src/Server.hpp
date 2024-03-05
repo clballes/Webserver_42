@@ -23,6 +23,7 @@ class Server: public IEvent
 		bool good;
 		void dispatch ( struct kevent & );
 		int start ( void );
+		void stop ( void );
 
 		static int kq;     // kqueue's file descriptor
 		static std::vector< Server * > servers;
