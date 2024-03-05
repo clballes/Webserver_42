@@ -41,7 +41,7 @@ get_method_longest_len ( t_http_method * ptr )
 int
 HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
 
-HTTP::HTTP ( const Client & client_instance ): _client( client_instance )
+HTTP::HTTP ( Client & client_instance ): _client( client_instance )
 {
 	LOG( "call HTTP::HTTP( const Client & )" );
 	

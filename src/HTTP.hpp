@@ -22,6 +22,8 @@
 #define HTTP_PUT			0x00000004
 #define HTTP_DELETE			0x00000005
 
+#define HTTP_11				0x11
+
 class Client;
 class HTTP;
 
@@ -45,7 +47,7 @@ class HTTP: public IEvent
 {
 	public:
 
-		HTTP ( const Client & );
+		HTTP ( Client & );
 		~HTTP ( void );
 
 		static int            n_methods;
@@ -63,7 +65,7 @@ class HTTP: public IEvent
 
 	private:
 
-		const Client & _client;
+		Client &       _client;
 
 		t_request      _request_line;
 		int	 		   _status_code;
@@ -72,10 +74,11 @@ class HTTP: public IEvent
 		std::string    _host;
 		std::string    _user_agent;
 
-		void parse ( void );
+		int parse ( void );
 		int parse_start_line ( void );
-		int parse_method ( char * );
-		int parse_request_target ( char * );
+		int parse_method ( char *, int64_t * );
+		int parse_request_target ( char *, int64_t * );
+		int parse_http_version ( char *, int64_t * );
 
 };
 
