@@ -54,7 +54,7 @@ DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
 
 .PHONY: all clean fclean re debug
 
-all: $(NAME)
+all: $(LIBFT) $(NAME)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
@@ -63,6 +63,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(NAME): $(OBJ_FILES)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $(OBJ_FILES) -o $(basename $@)
 
+$(LIBFT):
+	make -C $(dir $(LIBFT))
+
 -include $(DEP_FILES)
 
 clean:
@@ -70,6 +73,7 @@ clean:
 
 fclean: clean
 	rm -f $(NAME)
+	make fclean -C $(dir $(LIBFT))
 
 re: fclean
 	$(MAKE)
