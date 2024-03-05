@@ -33,7 +33,7 @@ event_loop ( int kq )
 		if ( n_events == -1 )
 		{
 			std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
-			return ; // ( EXIT_FAILURE );
+			break ; // ( EXIT_FAILURE );
 		}
 		
 		if ( n_events == 0 )
@@ -47,6 +47,9 @@ event_loop ( int kq )
 
 		// consider EVFILT_SIGNAL
 	}
+
+	LOG( "close kq (fd=" << IEvent::kq << ")" );
+	close ( IEvent::kq );
 
 	return ;
 }

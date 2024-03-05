@@ -74,5 +74,7 @@ graceful_stop ( int n )
 		it != Server::servers.end(); ++it )
 		( *it )->stop();
 
+	close( IEvent::kq );
+
 	return ;
 }
