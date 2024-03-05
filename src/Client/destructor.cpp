@@ -7,6 +7,8 @@
 
 Client::~Client ( void )
 {
+	std::vector< Client * >::iterator it;
+
 	LOG( "call Client::~Client()" );
 
 	if ( this->_http_request != 0x0 )
@@ -23,6 +25,16 @@ Client::~Client ( void )
 
 	if ( this->_socket_fd != 0 )
 		close ( this->_socket_fd );
+
+	for ( it = this->_server._clients.begin();
+			it != this->_server._clients.end(); ++it )
+	{
+		if ( *it == this )
+		{
+			it = this->_server._clients.erase( it );
+			break ;
+		}
+	}
 
 	return ;
 }

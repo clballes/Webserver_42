@@ -49,16 +49,19 @@ HTTP::parse_start_line ( void )
 	LOG( "call parse_start_line()" );
 	LOG( "data_recv: " << this->_client._data_recv );
 
-	// Find out method
-	
-	if ( HTTP::parse_method( buf ) == EXIT_FAILURE )
+	// Implement this in a for loop fashion
+
+	count = HTTP::parse_method( buf );
+	if ( count == -1 )
 		return ( this->_status_code );
+	buf += count;
 
-	LOG( "looking for method" );
+	count = HTTP::parse_request_target( buf );
+	if ( count == -1 )
+		return ( this->_status_code );
+	buf += count;
 
-	while ( count < this->_client._data_recv && buf[count] != SP )
-		++count;
-	--count;
+	LOG( "Seems OK to me" );
 	
 	return ( EXIT_SUCCESS );
 }
@@ -83,12 +86,12 @@ HTTP::parse_method ( char * buf )
 	if ( count == HTTP::n_longest_method )
 	{
 		LOG( " 501 Not implemented" );
-		return ( EXIT_FAILURE );
+		return ( -1 );
 	}
 	else if ( count == this->_client._data_recv )
 	{
 		LOG( " 400 Bad request" );
-		return ( EXIT_FAILURE );
+		return ( -1 );
 	}
 	else
 		--count;
@@ -104,12 +107,22 @@ HTTP::parse_method ( char * buf )
 	if ( iterator == HTTP::n_methods )
 	{
 		LOG( " 501 Not implemented" );
-		return ( EXIT_FAILURE );
+		return ( -1 );
 	}
 
 	LOG( " OK: " << HTTP::methods[iterator].method );
 
 	this->_request_line.method = HTTP::methods[iterator].code;
 
-	return ( EXIT_SUCCESS );
+	return ( count );
+}
+
+int
+HTTP::parse_request_target ( char * buf )
+{
+	int count;
+
+	count = 0;
+	(void) buf;
+	return ( count );
 }

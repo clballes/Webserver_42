@@ -14,7 +14,6 @@ Server::dispatch ( struct kevent & ev )
 	LOG( "call Server::dispatch() (fd=" << ev.ident << ")" );
 
 	c = new Client( *this );
-	this->_clients.push_back( c );
 
 	(void) ev;	
 

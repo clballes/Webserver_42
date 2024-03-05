@@ -74,8 +74,8 @@ class HTTP: public IEvent
 
 		void parse ( void );
 		int parse_start_line ( void );
-
-		int parse_method ( char * buf );
+		int parse_method ( char * );
+		int parse_request_target ( char * );
 
 };
 
