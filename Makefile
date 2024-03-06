@@ -18,7 +18,6 @@ CPPFLAGS		+=	-I$(dir $(LIBFT))/include
 CPPFLAGS		+=	-g -fsanitize='address,undefined'
 #CPPFLAGS		+=	-D SILENCE_LOGS
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
-CXXFLAGS		+=	-Wno-unused-command-line-argument
 LDFLAGS			:=	-L$(dir $(LIBFT)) -lft
 SILENCE_LOGS	?=	false
 
@@ -58,7 +57,7 @@ all: $(LIBFT) $(NAME)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
-	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ_FILES)
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $(OBJ_FILES) -o $(basename $@)
