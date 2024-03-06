@@ -25,9 +25,14 @@ ServerConf::_config_directives[] = {
 	{ "allow_methods", &ServerConf::set_allow_methods, },
 	{ "index", &ServerConf::set_index },
 	{ "autoindex", &ServerConf::set_autoindex },
-	{ 0x0, 0x0 }};
+	{ 0x0, 0x0 } };
 
-ServerConf::ServerConf ( void ): good( true ), _root("html"), _allow_methods(0), _client_max_body_size(0), _index(1, "index.html")
+ServerConf::ServerConf ( void ):
+	good( true ),
+	_root("html"),
+	_allow_methods(0),
+	_client_max_body_size(0),
+	_index(1, "index.html")
 {
 	LOG( "call ServerConf::ServerConf( void )" );
 	this->_error_page[400] = "src/err_pages/400.html";
@@ -51,7 +56,11 @@ ServerConf::ServerConf ( const ServerConf & instance )
 }
 
 ServerConf::ServerConf ( const std::deque< std::string > & server_block ):
-	good( true ), _root("html"), _allow_methods(0), _client_max_body_size(0), _index(1, "index.html")
+	good( true ),
+	_root("html"),
+	_allow_methods(0), 
+	_client_max_body_size(0),
+	_index(1, "index.html")
 {
 	LOG( "call ServerConf( const std::deque< std::string > &" )
 
@@ -80,7 +89,7 @@ ServerConf::operator = ( const ServerConf & instance )
 
 	LOG( "call ServerConf::operator=ServerConf" );
 
-	return (*this);
+	return ( *this );
 }
 
 std::ostream &
@@ -89,9 +98,7 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	std::vector< std::string >::const_iterator it;
 
 	out << "listen: " << inet_ntoa( instance._address.sin_addr );              // @mpuig-ma
-																			   // Function not allowed
 	out << " port: " << ntohs( instance._address.sin_port );
-
 	out << std::endl;
 
 	out << "server_name:";
@@ -103,24 +110,22 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << "root: " << instance._root;
 	out << std::endl;
 
+	/*
 	out << "Allowed methods: Bitwise representation: ";
-	for (int i = 6; i >= 0; --i) {
-		out << ((instance._allow_methods & (1 << i)) ? '1' : '0');
-	}
+	for ( int i = 6; i >= 0; --i )
+		out << ( (instance._allow_methods & ( 1 << i ) ) ? '1' : '0' );
 	out << std::endl;
-    out << "Allowed methods: String representation: ";
-    if (instance._allow_methods & METHOD_GET) {
-        out << "GET ";
-    }
-    if (instance._allow_methods & METHOD_POST) {
-        out << "POST ";
-    }
-    if (instance._allow_methods & METHOD_PUT) {
-        out << "PUT ";
-    }
-    if (instance._allow_methods & METHOD_DELETE) {
-        out << "DELETE ";
-    }
+	*/
+
+    out << "allowed_methods:";
+    if ( instance._allow_methods & METHOD_GET )
+        out << " GET";
+    if ( instance._allow_methods & METHOD_POST )
+        out << " POST";
+    if ( instance._allow_methods & METHOD_PUT )
+        out << " PUT";
+    if ( instance._allow_methods & METHOD_DELETE )
+        out << " DELETE";
     out << std::endl;
 
 	out << "client_max_body_size: " << instance._client_max_body_size;
@@ -132,24 +137,24 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << "cgi_param: " << instance._cgi_param;
 	out << std::endl;
 
-	out << "_index:";
+	if ( instance._allow_methods & F_AUTOINDEX )
+        out << "autoindex: on" << std::endl;
+	
+	out << "index:";
 	for ( it = instance._index.begin();
 			it != instance._index.end(); ++it )
 		out << " " << *it;
-	out << std::endl;
-	
-	if (instance._allow_methods & F_AUTOINDEX) {
-        out << "Autoindex: ON ";
-	}
-	else
-        out << "Autoindex: OFF ";
 
-	
+	/*
     out << "Error Pages:";
 	std::map<int, std::string>::const_iterator it2 = instance._error_page.begin();
-	while (it2 != instance._error_page.end()) {
-		out << "Int: " << it2->first << ", Value String: " << it2->second << std::endl;
+	while ( it2 != instance._error_page.end() )
+	{
+		out << "Int: " << it2->first << ", Value String: " << it2->second;
+		out << std::endl;
 		++it2;
 	}
+	*/
+
 	return ( out );
 }

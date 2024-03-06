@@ -89,8 +89,6 @@ HTTP::parse_start_line ( void )
 		this->_status_code = BAD_REQUEST;
 	}
 
-	LOG( "OK" );
-
 	return ( EXIT_SUCCESS );
 }
 

@@ -17,7 +17,6 @@ event_loop ( int kq )
 	n_events = 1;
 	status = true;
 
-	LOG( "" );
 	LOG( "call event_loop() (fd=" << kq << ")" );
 
 	while ( status == true )

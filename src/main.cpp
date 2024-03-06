@@ -60,6 +60,7 @@ main ( int argc, char * const * argv )
 	// Once done, close file;
 
 	conf_file.close();
+	
 	LOG( conf_filename << ": closed OK" );
 
 	// Initialize n Server instances based on the configuration file.

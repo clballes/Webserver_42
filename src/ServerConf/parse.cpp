@@ -121,7 +121,7 @@ count_brackets ( std::deque< std::string > & content )
 	int brace = 0;
 	std::deque< std::string>::iterator it = content.begin();
 
-	LOG( "call count_brackets()" )
+	// LOG( "call count_brackets()" )
 
 	while ( it != content.end())
 	{
@@ -151,7 +151,7 @@ count_servers( std::deque< std::string > & content )
 {
     int count;
    
-	LOG( "call count_servers()" )
+	// LOG( "call count_servers()" )
 
 	count = 0;
     for ( std::deque< std::string >::iterator it = content.begin();
