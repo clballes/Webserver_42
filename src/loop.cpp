@@ -20,7 +20,7 @@ event_loop ( int kq )
 	LOG( "call event_loop() (fd=" << kq << ")" );
 
 	while ( status == true )
-	{
+	{	
 		// kevent() call does not return until at least one event is received
 		// or when an associated timeout is exhausted.
 
@@ -38,6 +38,8 @@ event_loop ( int kq )
 		if ( n_events == 0 )
 			continue ;
 
+		LOG( "(ev=" << ev.ident << ")" );
+		
 		if ( ev.flags & EVFILT_READ )
 		{
 			instance = static_cast< IEvent * >( ev.udata );
