@@ -74,12 +74,13 @@ Client::request_recv ( int64_t data )
 	this->_data_recv = data;
 
 	n = recv( this->_socket_fd, this->_buffer_recv, data, 0 );
-
-	std::cout << std::endl << this->_buffer_recv;
 	
+	LOG( "(recv)" );
+	LOG_BUFFER( this->_buffer_recv );
+
 	if ( n == 0 )
 	{
-		LOG( "client closed connectin (fd=" << this->_socket_fd << ")" );
+		LOG( "client closed connection (fd=" << this->_socket_fd << ")" );
 		delete this;
 		return ( EXIT_FAILURE );
 	}
