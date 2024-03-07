@@ -39,7 +39,7 @@ webserv ( void )
 		exit ( 0x1 ); // Caldra comprovar leaks ...
 	}
 	
-	LOG ( "kqueue properly initialized (fd=" << IEvent::kq << ")" );
+	LOG ( " kqueue properly initialized (fd=" << IEvent::kq << ")" );
 
 	// For each Server instance,
 	// register an event with the queue.

@@ -97,17 +97,17 @@ operator << ( std::ostream & out, const ServerConf & instance )
 {
 	std::vector< std::string >::const_iterator it;
 
-	out << "listen: " << inet_ntoa( instance._address.sin_addr );              // @mpuig-ma
+	out << " listen: " << inet_ntoa( instance._address.sin_addr );              // @mpuig-ma
 	out << " port: " << ntohs( instance._address.sin_port );
 	out << std::endl;
 
-	out << "server_name:";
+	out << " server_name:";
 	for ( it = instance._server_name.begin();
 			it != instance._server_name.end(); ++it )
 		out << " " << *it;
 	out << std::endl;
 
-	out << "root: " << instance._root;
+	out << " root: " << instance._root;
 	out << std::endl;
 
 	/*
@@ -117,7 +117,7 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << std::endl;
 	*/
 
-    out << "allowed_methods:";
+    out << " allowed_methods:";
     if ( instance._allow_methods & METHOD_GET )
         out << " GET";
     if ( instance._allow_methods & METHOD_POST )
@@ -128,19 +128,19 @@ operator << ( std::ostream & out, const ServerConf & instance )
         out << " DELETE";
     out << std::endl;
 
-	out << "client_max_body_size: " << instance._client_max_body_size;
+	out << " client_max_body_size: " << instance._client_max_body_size;
 	out << std::endl;
 
-	out << "cgi_pass: " << instance._cgi_pass;
+	out << " cgi_pass: " << instance._cgi_pass;
 	out << std::endl;
 
-	out << "cgi_param: " << instance._cgi_param;
+	out << " cgi_param: " << instance._cgi_param;
 	out << std::endl;
 
 	if ( instance._allow_methods & F_AUTOINDEX )
-        out << "autoindex: on" << std::endl;
+        out << " autoindex: on" << std::endl;
 	
-	out << "index:";
+	out << " index:";
 	for ( it = instance._index.begin();
 			it != instance._index.end(); ++it )
 		out << " " << *it;
