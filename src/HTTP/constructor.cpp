@@ -18,9 +18,24 @@ HTTP::methods[] = {
 	{ 0, 0, 0 }
 };
 
+static int get_method_longest_len ( t_http_method * );
+
 int
 HTTP::n_methods = ( sizeof( HTTP::methods ) /
 		sizeof( *HTTP::methods ) ) - 1;
+
+int
+HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
+
+HTTP::HTTP ( Client & client_instance ): _client( client_instance )
+{
+	LOG( "call HTTP::HTTP( const Client & )" );
+	
+	(void) _host;
+	(void) _user_agent;
+
+	return ;
+}
 
 static int
 get_method_longest_len ( t_http_method * ptr )
@@ -36,17 +51,4 @@ get_method_longest_len ( t_http_method * ptr )
 	}
 
 	return ( n );
-}
-
-int
-HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
-
-HTTP::HTTP ( Client & client_instance ): _client( client_instance )
-{
-	LOG( "call HTTP::HTTP( const Client & )" );
-	
-	(void) _host;
-	(void) _user_agent;
-
-	return ;
 }
