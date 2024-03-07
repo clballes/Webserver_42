@@ -21,6 +21,9 @@ HTTP::perform ( void )
 {
 	LOG( "call HTTP::perform" );
 
+	LOG( "(recv)" );
+	LOG_BUFFER( this->_client._buffer_recv );
+	
 	if ( this->parse () == EXIT_FAILURE )
 	{
 		LOG( "parse not OK" );

@@ -73,10 +73,7 @@ Client::request_recv ( int64_t data )
 	this->_buffer_recv[data] = '\0';
 	this->_data_recv = data;
 
-	n = recv( this->_socket_fd, this->_buffer_recv, data, 0 );
-	
-	LOG( "(recv)" );
-	LOG_BUFFER( this->_buffer_recv );
+	n = recv( this->_socket_fd, this->_buffer_recv, data, 0 );	
 
 	if ( n == 0 )
 	{
@@ -84,7 +81,7 @@ Client::request_recv ( int64_t data )
 		delete this;
 		return ( EXIT_FAILURE );
 	}
-
+	
 	//this->register_send();
 	this->_http_request->perform();
 	// register HTTP.method
