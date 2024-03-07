@@ -30,12 +30,7 @@ HTTP::perform ( void )
 		LOG( "status code: " << this->_status_code );
 	}
 	
-	this->_buffer_send.assign( "HTTP/1.1 400 \n\r\n" );
-
-	::send( this->_client._socket_fd,
-			this->_buffer_send.c_str(),
-			this->_buffer_send.length(),
-			0x0 );
+	this->_client._buffer_send.assign( "HTTP/1.1 400 \n\r\n" );
 
 	return ;
 }

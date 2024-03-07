@@ -17,8 +17,10 @@ Client::~Client ( void )
 	if ( this->_buffer_recv != 0x0 )
 		delete [] this->_buffer_recv;
 
+	/*
 	if ( this->_buffer_send != 0x0 )
 		delete [] this->_buffer_send;
+	*/
 
 	// Registered kevents to this->_socked_fd
 	// are automatically deleted on close()

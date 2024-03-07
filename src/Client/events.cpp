@@ -84,6 +84,7 @@ Client::request_recv ( int64_t data )
 	
 	//this->register_send();
 	this->_http_request->perform();
+	this->request_send(0);
 	// register HTTP.method
 	// once ready should register Client::request_send
 	// which in turn should send() _buffer_send
@@ -97,7 +98,13 @@ Client::request_send ( int64_t data )
 	LOG( "call Client::request_send() (fd=" << this->_socket_fd << ")"  );
 	LOG( "data: " << data );
 
-	this->_http_request->perform();
+	LOG( "(send)" );
+	LOG_BUFFER( (char *) this->_buffer_send.c_str() );
+
+	::send( this->_socket_fd,
+			this->_buffer_send.c_str(),
+			this->_buffer_send.length(),
+			0x0 );
 
 	return ( EXIT_SUCCESS );
 }

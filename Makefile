@@ -46,6 +46,8 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/HTTP/constructor.cpp \
 					$(SRC_DIR)/HTTP/destructor.cpp \
 					$(SRC_DIR)/HTTP/parse.cpp \
+					$(SRC_DIR)/HTTP/parse_start_line.cpp \
+					$(SRC_DIR)/HTTP/parse_field_lines.cpp \
 					$(SRC_DIR)/HTTP/methods.cpp \
 					$(SRC_DIR)/HTTP/events.cpp
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)

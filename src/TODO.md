@@ -4,3 +4,4 @@
 - [ ] Clear unused / properly reorder included headers!
 - [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
 - [ ] Find out why binded addresses keep binded for some seconds after cntrl+D
+- [ ] Tests: request headers

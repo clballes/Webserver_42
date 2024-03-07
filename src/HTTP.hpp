@@ -74,14 +74,14 @@ class HTTP: public IEvent
 		std::string    _host;
 		std::string    _user_agent;
 
-		std::string    _buffer_send;
-
 		int parse ( void );
+
 		int parse_start_line ( void );
 		int parse_method ( char *, int64_t * );
 		int parse_request_target ( char *, int64_t * );
 		int parse_http_version ( char *, int64_t * );
 
+		int parse_field_lines ( void );
 };
 
 #endif /* !_HTTP_HPP_ */

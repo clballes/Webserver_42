@@ -7,8 +7,7 @@
 
 Client::Client ( Server & server_instance ): good( true ),
 	_socket_fd( 0 ),
-	_buffer_recv( 0x0 ),
-	_buffer_send( 0x0 ),
+	_buffer_recv( 0x0 ), //_buffer_send( 0x0 ),
 	_server( server_instance )
 {
 	LOG( "call Client::Client()" );

@@ -41,7 +41,7 @@ class Client: public IEvent
 		int64_t					_data_recv;
 		int64_t					_data_send;
 		char *                  _buffer_recv;
-		char *                  _buffer_send;
+		std::string   			_buffer_send;
 
 		HTTP *                  _http_request;
 		Server &                _server;
