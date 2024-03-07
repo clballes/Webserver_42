@@ -10,9 +10,6 @@ HTTP::http_get ( HTTP & http )
 // Reads start-line into struct s_request;
 {
 	LOG( "call HTTP::http_get()" );
-
-	http._client._buffer_send = strdup( "<html>HEY</html>\r\n" );
-	http._client._data_send = strlen( http._client._buffer_send );
 	(void) http;
 
 	return ( EXIT_SUCCESS );
