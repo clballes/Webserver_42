@@ -27,16 +27,11 @@ HTTP::perform ( void )
 		LOG( "status code: " << this->_status_code );
 	}
 	
-	this->_client._buffer_send = strdup( "HTTP/1.1 400 \n\r\n" );
-	this->_client._data_send = strlen( this->_client._buffer_send );
-
-	write( STDOUT_FILENO,
-			this->_client._buffer_recv,
-			this->_client._data_recv );
+	this->_buffer_send.assign( "HTTP/1.1 400 \n\r\n" );
 
 	::send( this->_client._socket_fd,
-			this->_client._buffer_send,
-			this->_client._data_send,
+			this->_buffer_send.c_str(),
+			this->_buffer_send.length(),
 			0x0 );
 
 	return ;
