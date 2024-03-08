@@ -17,7 +17,7 @@ CPPFLAGS		+=	-I$(INC_DIR) -I$(SRC_DIR)/ServerConf
 CPPFLAGS		+=	-I$(dir $(LIBFT))/include
 CPPFLAGS		+=	-g -fsanitize='address,undefined'
 #CPPFLAGS		+=	-D SILENCE_LOGS
-CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
+CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98 -DREUSE_SOCKET
 LDFLAGS			:=	-L$(dir $(LIBFT)) -lft
 SILENCE_LOGS	?=	false
 

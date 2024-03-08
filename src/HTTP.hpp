@@ -8,6 +8,7 @@
 
 #include <string>
 #include <iostream>
+#include "Log.hpp"
 #include "HTTP_status_codes.hpp"
 
 #define HTTP_GET				0x00000001
@@ -61,9 +62,13 @@ class HTTP
 
 	protected:
 
-		t_request      _request_line;
-		int	 		   _status_code;
-		bool           _keep_alive;
+		int64_t					_data_recv;
+		std::string			    _buffer_recv;
+		std::string   			_buffer_send;
+		
+		t_request            	_request_line;
+		int                   	_status_code;
+		bool                  	_keep_alive;
 
 		int parse ( void );
 		int parse_start_line ( void );

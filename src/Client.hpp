@@ -35,10 +35,6 @@ class Client: public IEvent, public HTTP
 		unsigned				_address_len;
 		struct sockaddr_in		_address;
 
-		int64_t					_data_recv;
-		std::string			    _buffer_recv;
-		std::string   			_buffer_send;
-
 		Server &                _server;
 
 };
