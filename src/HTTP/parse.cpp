@@ -4,6 +4,7 @@
 /* Mon Mar  4 15:42:42 2024                                                   */
 
 #include "HTTP.hpp"
+#include "Log.hpp"
 
 int
 HTTP::parse ( void )
@@ -19,8 +20,8 @@ HTTP::parse ( void )
 	if ( HTTP::parse_start_line() == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	else
-		this->_client._buffer_recv.erase( 0,
-				this->_client._buffer_recv.find_first_of( "\n" )  + 1 );
+		this->_buffer_recv.erase( 0,
+				this->_buffer_recv.find_first_of( "\n" )  + 1 );
 
 	if ( HTTP::parse_field_lines() == EXIT_FAILURE )
 		return ( EXIT_FAILURE );

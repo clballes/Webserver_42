@@ -10,12 +10,10 @@
 #include "HTTP.hpp"
 #include "Server.hpp"
 #include "webserv.hpp"
-#include <sstream>
 
-class HTTP;
 class Server;
 
-class Client: public IEvent
+class Client: public IEvent, public HTTP
 {
 	public:
 
@@ -31,8 +29,6 @@ class Client: public IEvent
 		int request_recv ( int64_t );
 		int request_send ( void );
 
-		friend class HTTP;
-
 	private:
 	
 		int						_socket_fd;
@@ -43,7 +39,6 @@ class Client: public IEvent
 		std::string			    _buffer_recv;
 		std::string   			_buffer_send;
 
-		HTTP *                  _http_request;
 		Server &                _server;
 
 };

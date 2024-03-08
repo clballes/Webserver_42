@@ -25,8 +25,6 @@ Client::Client ( Server & server_instance ):
 		return ;
 	}
 
-	this->_http_request = new HTTP( *this );
-
 	this->register_recv();
 
 	return ;

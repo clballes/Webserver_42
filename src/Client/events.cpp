@@ -82,7 +82,7 @@ Client::request_recv ( int64_t data )
 	}
 	
 	//this->register_send();
-	this->_http_request->perform();
+	this->perform();
 	this->request_send();
 	// register HTTP.method
 	// once ready should register Client::request_send

@@ -27,13 +27,10 @@ HTTP::n_methods = ( sizeof( HTTP::methods ) /
 int
 HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
 
-HTTP::HTTP ( Client & client_instance ): _client( client_instance )
+HTTP::HTTP ( void )
 {
 	LOG( "call HTTP::HTTP( const Client & )" );
 	
-	(void) _host;
-	(void) _user_agent;
-
 	return ;
 }
 

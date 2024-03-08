@@ -15,7 +15,7 @@ int
 HTTP::parse_start_line ( void )
 {
 	int64_t count = 0;
-	char *  buf = (char *) this->_client._buffer_recv.c_str();
+	char *  buf = (char *) this->_buffer_recv.c_str();
 
 	LOG( "call parse_start_line()" );
 
@@ -24,7 +24,7 @@ HTTP::parse_start_line ( void )
 	if ( HTTP::parse_method( buf, &count ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	if ( count == this->_client._data_recv || buf[count] != SP )
+	if ( count == this->_data_recv || buf[count] != SP )
 	{
 		LOG( " 404 Bad request" );
 		this->_status_code = BAD_REQUEST;
@@ -36,7 +36,7 @@ HTTP::parse_start_line ( void )
 	if ( HTTP::parse_request_target( buf, &count ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	if ( count == this->_client._data_recv || buf[count] != SP )
+	if ( count == this->_data_recv || buf[count] != SP )
 	{
 		LOG( " 404 Bad request" );
 		this->_status_code = BAD_REQUEST;
@@ -50,8 +50,8 @@ HTTP::parse_start_line ( void )
 
 	// Check CRLF at end
 
-	if ( ( count != this->_client._data_recv && buf[count++] != CR )
-			|| ( count != this->_client._data_recv && buf[count] != LF ) )
+	if ( ( count != this->_data_recv && buf[count++] != CR )
+			|| ( count != this->_data_recv && buf[count] != LF ) )
 	{
 		LOG( " 404 Bad request" );
 		this->_status_code = BAD_REQUEST;
@@ -69,11 +69,11 @@ HTTP::parse_method ( char * buf, int64_t * pos )
 	LOG( "call HTTP::parse_method()" );
 
 	while ( count < HTTP::n_longest_method
-			&& count < this->_client._data_recv
+			&& count < this->_data_recv
 			&& buf[count] != SP )
 		++count;
 
-	if ( count == this->_client._data_recv )
+	if ( count == this->_data_recv )
 	{
 		LOG( " 400 Bad request" );
 		this->_status_code = BAD_REQUEST;
@@ -89,7 +89,7 @@ HTTP::parse_method ( char * buf, int64_t * pos )
 	for ( iterator = 0; iterator < HTTP::n_methods; ++iterator )
 	{
 		if ( ft_strncmp( buf,
-					this->_client._buffer_recv.c_str(), count - 1) == 0 )
+					this->_buffer_recv.c_str(), count - 1) == 0 )
 			break ;
 	}
 
@@ -116,8 +116,7 @@ HTTP::parse_request_target ( char * buf, int64_t * pos )
 
 	LOG( "call HTTP::parse_request_target()" );
 
-	while ( count < this->_client._data_recv
-			&& buf[count] != SP )
+	while ( count < this->_data_recv && buf[count] != SP )
 	{
 		++count;
 	}
@@ -135,7 +134,7 @@ HTTP::parse_http_version ( char * buf, int64_t * pos )
 
 	LOG( "call HTTP::parse_http_version()" );
 
-	while ( count < this->_client._data_recv
+	while ( count < this->_data_recv
 			&& buf[count] != SP && buf[count] != CR )
 	{
 		++count;
