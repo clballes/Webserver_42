@@ -8,7 +8,12 @@
 int
 Server::start ( void )
 {
+	struct linger sl;
+
 	LOG( "call Server::start()" );
+
+	sl.l_onoff = 1;
+	sl.l_linger = 0;
 
 	//LOG( "call socket()" );
 
@@ -17,7 +22,9 @@ Server::start ( void )
 	this->_socket_fd = ::socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
 
 	if ( this->_socket_fd == -1
-			|| fcntl( this->_socket_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1 )
+			|| fcntl( this->_socket_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1
+			|| setsockopt( this->_socket_fd, SOL_SOCKET, SO_LINGER,
+				&sl, sizeof( sl  ) ) == -1 )
 	{
 		std::cerr << "socket: " << ::strerror( errno );
 		std::cerr << std::endl;

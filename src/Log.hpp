@@ -11,7 +11,8 @@
 
 #define LOG_BUFFER(str) \
 { \
-	char *jakala = str; \
+	char *jakala = (char *) str; \
+	std::clog << "\""; \
 	while ( jakala != 0 && *jakala != 0 ) \
 	{ \
 		if ( std::isprint( *jakala ) ) { std::clog << *jakala; } \
@@ -20,5 +21,5 @@
 		else if ( *jakala == 015 ) { std::clog << "\\r"; } \
 		++jakala; \
 	} \
-	std::clog << std::endl; \
+	std::clog << "\"" << std::endl; \
 }

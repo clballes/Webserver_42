@@ -21,16 +21,22 @@ HTTP::perform ( void )
 {
 	LOG( "call HTTP::perform" );
 
-	LOG( "(recv)" );
-	LOG_BUFFER( this->_client._buffer_recv );
+	std::clog << "recv ";
+	LOG_BUFFER( this->_client._buffer_recv.c_str() );
+
+	// Basic composition of status_line ( response ).
+
+	this->_client._buffer_send = ( "HTTP/1.1 xxx OK\r\n" );
+	this->_client._buffer_send.append( "content-type: text/html; charset=UTF-8\r\n" );
+	this->_client._buffer_send.append( "content-length: 25\r\n" );
+	this->_client._buffer_send.append( "\r\n" );
+	this->_client._buffer_send.append( "<html><h1>hey</h1></html>" );
 	
 	if ( this->parse () == EXIT_FAILURE )
-	{
-		LOG( "parse not OK" );
-		LOG( "status code: " << this->_status_code );
-	}
-	
-	this->_client._buffer_send.assign( "HTTP/1.1 400 \n\r\n" );
+		LOG( " KO" );
+
+	this->_status_code = 200;
+	this->_client._buffer_send.replace( 9, 3, ft_itoa( this->_status_code ) );
 
 	return ;
 }

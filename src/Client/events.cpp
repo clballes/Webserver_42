@@ -15,7 +15,7 @@ Client::dispatch ( struct kevent & ev )
 	if ( ev.flags & EVFILT_READ )
 		this->request_recv( ev.data );
 	else if ( ev.flags & EVFILT_WRITE )
-		this->request_send( ev.data );
+		this->request_send();
 
 	return ;
 }
@@ -68,12 +68,11 @@ Client::request_recv ( int64_t data )
 	ssize_t n;
 	
 	LOG( "call Client::request_recv() (fd=" << this->_socket_fd << ")" );
-	
-	this->_buffer_recv = new char [data + 1];
-	this->_buffer_recv[data] = '\0';
-	this->_data_recv = data;
 
-	n = recv( this->_socket_fd, this->_buffer_recv, data, 0 );	
+	this->_data_recv = data;
+	this->_buffer_recv.resize( data + 1 );
+
+	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 
 	if ( n == 0 )
 	{
@@ -84,7 +83,7 @@ Client::request_recv ( int64_t data )
 	
 	//this->register_send();
 	this->_http_request->perform();
-	this->request_send(0);
+	this->request_send();
 	// register HTTP.method
 	// once ready should register Client::request_send
 	// which in turn should send() _buffer_send
@@ -93,12 +92,11 @@ Client::request_recv ( int64_t data )
 }
 
 int
-Client::request_send ( int64_t data )
+Client::request_send ( void )
 {
 	LOG( "call Client::request_send() (fd=" << this->_socket_fd << ")"  );
-	LOG( "data: " << data );
 
-	LOG( "(send)" );
+	std::clog << "send ";
 	LOG_BUFFER( (char *) this->_buffer_send.c_str() );
 
 	::send( this->_socket_fd,

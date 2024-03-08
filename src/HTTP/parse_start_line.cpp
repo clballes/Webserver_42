@@ -6,10 +6,6 @@
 #include "HTTP.hpp"
 #include "ft_string.h"
 
-#define LF 012
-#define CR 015
-#define SP 040
-
 // From RFT9112:
 //
 // start-line = request-line / status-line
@@ -19,10 +15,9 @@ int
 HTTP::parse_start_line ( void )
 {
 	int64_t count = 0;
-	char *  buf = this->_client._buffer_recv;
+	char *  buf = (char *) this->_client._buffer_recv.c_str();
 
 	LOG( "call parse_start_line()" );
-	LOG( "data_recv: " << this->_client._data_recv );
 
 	// Implement this in a for loop fashion
 
@@ -93,7 +88,8 @@ HTTP::parse_method ( char * buf, int64_t * pos )
 
 	for ( iterator = 0; iterator < HTTP::n_methods; ++iterator )
 	{
-		if ( ft_strncmp( buf, this->_client._buffer_recv, count - 1) == 0 )
+		if ( ft_strncmp( buf,
+					this->_client._buffer_recv.c_str(), count - 1) == 0 )
 			break ;
 	}
 
@@ -106,7 +102,6 @@ HTTP::parse_method ( char * buf, int64_t * pos )
 
 
 	this->_request_line.method = HTTP::methods[iterator].code;
-	LOG( " OK: " << this->_request_line.method );
 	*pos = count;
 
 	http_get( *this );
@@ -128,9 +123,6 @@ HTTP::parse_request_target ( char * buf, int64_t * pos )
 	}
 
 	this->_request_line.request_target = buf + *pos;
-	write( STDOUT_FILENO, " OK: ", 5 );
-	write( STDOUT_FILENO, this->_request_line.request_target, count - *pos );
-	write( STDOUT_FILENO, "\n", 1 );
 	*pos = count;
 
 	return ( EXIT_SUCCESS );
@@ -158,9 +150,6 @@ HTTP::parse_http_version ( char * buf, int64_t * pos )
 	else
 		this->_request_line.http_version = HTTP_11;
 
-	write( STDOUT_FILENO, " OK: ", 5 );
-	write( STDOUT_FILENO, buf + *pos, count - *pos );
-	write( STDOUT_FILENO, "\n", 1 );
 	*pos = count;
 
 	return ( EXIT_SUCCESS );

@@ -10,6 +10,7 @@
 #include "HTTP.hpp"
 #include "Server.hpp"
 #include "webserv.hpp"
+#include <sstream>
 
 class HTTP;
 class Server;
@@ -28,7 +29,7 @@ class Client: public IEvent
 		int register_send ( void );
 
 		int request_recv ( int64_t );
-		int request_send ( int64_t );
+		int request_send ( void );
 
 		friend class HTTP;
 
@@ -39,8 +40,7 @@ class Client: public IEvent
 		struct sockaddr_in		_address;
 
 		int64_t					_data_recv;
-		int64_t					_data_send;
-		char *                  _buffer_recv;
+		std::string			    _buffer_recv;
 		std::string   			_buffer_send;
 
 		HTTP *                  _http_request;

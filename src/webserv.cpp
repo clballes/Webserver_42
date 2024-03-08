@@ -52,7 +52,10 @@ webserv ( void )
 			it != Server::servers.end(); ++it )
 	{
 		if ( ( *it )->start() )
+		{
+			// WIP: retry once after ~30 seconds.
 			return ( EXIT_FAILURE );
+		}
 	}
 
 	// Start listening for registered events

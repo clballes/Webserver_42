@@ -14,8 +14,8 @@ Client::~Client ( void )
 	if ( this->_http_request != 0x0 )
 		delete this->_http_request;
 
-	if ( this->_buffer_recv != 0x0 )
-		delete [] this->_buffer_recv;
+	//if ( this->_buffer_recv != 0x0 )
+	//	delete [] this->_buffer_recv;
 
 	/*
 	if ( this->_buffer_send != 0x0 )
@@ -33,6 +33,13 @@ Client::~Client ( void )
 	{
 		if ( *it == this )
 		{
+			// WIP !!
+			this->_buffer_send.assign( "HTTP/1.1 200 OK\r\nconnection: close\r\n" );
+			::send( this->_socket_fd,
+					this->_buffer_send.c_str(),
+					this->_buffer_send.length(),
+					0 );
+
 			it = this->_server._clients.erase( it );
 			break ;
 		}

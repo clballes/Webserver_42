@@ -24,6 +24,10 @@
 
 #define HTTP_11				0x11
 
+#define LF 012
+#define CR 015
+#define SP 040
+
 class Client;
 class HTTP;
 
