@@ -1,7 +1,9 @@
+- [ ] parse headers
+- [ ] std::map for headers
+- [ ] Tests: request headers
+- [ ] Clear unused / properly reorder included headers!
+- [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
 - [x] Deal with `keep-alive' clients
 - [x] Move Server::kq to IEvent::kq
 - [x] Each client has it's own HTTP instance
-- [ ] Clear unused / properly reorder included headers!
-- [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
-- [ ] Find out why binded addresses keep binded for some seconds after cntrl+D
-- [ ] Tests: request headers
+- [x] Find out why binded addresses keep binded for some seconds after cntrl+D

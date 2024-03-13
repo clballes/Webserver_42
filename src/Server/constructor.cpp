@@ -21,6 +21,15 @@ Server::Server ( const ServerConf & instance ): good( true )
 	std::memcpy( &this->_address, &instance._address,
 			sizeof( instance._address ) );
 
+	_server_name = instance._server_name;
+	_root = instance._root;
+	_allow_methods = instance._allow_methods;
+	_client_max_body_size = instance._client_max_body_size;
+	_index = instance._index;
+	_cgi_param = instance._cgi_param;
+	_cgi_pass = instance._cgi_pass;
+	_error_page = instance._error_page;
+
 	return ;
 }
 

@@ -23,12 +23,14 @@ Client::~Client ( void )
 		if ( *it == this )
 		{
 			// WIP !!
+			/*
 			LOG("dddddddestructorr");
 			this->_buffer_send.assign( "HTTP/1.1 200 OK\r\nconnection: close\r\n" );
 			::send( this->_socket_fd,
 					this->_buffer_send.c_str(),
 					this->_buffer_send.length(),
 					0 );
+			*/
 
 			it = this->_server._clients.erase( it );
 			break ;

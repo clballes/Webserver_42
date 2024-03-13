@@ -48,6 +48,16 @@ class Server: public IEvent
 		
 		std::vector< Client * > _clients;
 
+
+		std::vector< std::string>	_server_name;
+		std::string					_root;
+		unsigned int 				_allow_methods;
+		std::size_t					_client_max_body_size;
+		std::vector< std::string>	_index;
+		std::string 				_cgi_param; //nse si guardar en un vector
+		std::string					_cgi_pass; 
+		std::map<int, std::string>	_error_page; //falta fer
+
 };
 
 extern bool status;

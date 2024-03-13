@@ -11,6 +11,8 @@
 #include "Log.hpp"
 #include "HTTP_status_codes.hpp"
 
+#include <map>
+
 #define HTTP_GET				0x00000001
 #define HTTP_HEAD				0x00000002
 #define HTTP_POST				0x00000003
@@ -24,6 +26,7 @@
 #define SP 040
 
 class HTTP;
+class Client;
 
 typedef struct s_http_method
 {
@@ -41,11 +44,13 @@ typedef struct s_request
 
 } t_request;
 
+typedef std::map< std::string, std::string > t_headers;
+
 class HTTP
 {
 	public:
 
-		HTTP ( void );
+		HTTP ( Client & );
 		~HTTP ( void );
 
 		static int            n_methods;
@@ -62,6 +67,9 @@ class HTTP
 
 	protected:
 
+		Client &                _client;
+		t_headers               _headers;
+
 		int64_t					_data_recv;
 		std::string			    _buffer_recv;
 		std::string   			_buffer_send;
@@ -76,6 +84,10 @@ class HTTP
 		int parse_request_target ( char *, int64_t * );
 		int parse_http_version ( char *, int64_t * );
 		int parse_field_lines ( void );
+
+		void compose_response ( void );
 };
+
+#include "Client.hpp"
 
 #endif /* !_HTTP_HPP_ */
