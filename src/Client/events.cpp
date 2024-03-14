@@ -69,7 +69,6 @@ Client::request_recv ( int64_t data )
 	
 	LOG( "call Client::request_recv() (fd=" << this->_socket_fd << ")" );
 
-	this->_data_recv = data;
 	this->_buffer_recv.resize( data + 1 );
 
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );

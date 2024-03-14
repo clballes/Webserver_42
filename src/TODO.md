@@ -1,8 +1,10 @@
-- [ ] parse headers
-- [ ] std::map for headers
+- [ ] allow_methods -> flags (Server)
+- [ ] http Server & from Client
 - [ ] Tests: request headers
 - [ ] Clear unused / properly reorder included headers!
 - [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
+- [x] parse headers
+- [x] std::map for headers
 - [x] Deal with `keep-alive' clients
 - [x] Move Server::kq to IEvent::kq
 - [x] Each client has it's own HTTP instance

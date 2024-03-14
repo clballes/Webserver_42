@@ -5,151 +5,137 @@
 
 #include "HTTP.hpp"
 #include "ft_string.h"
+#include "parse.hpp"
 
 // From RFT9112:
 //
 // start-line = request-line / status-line
 // request-line = method SP request-target SP HTTP-version
 
+static int parse_method ( t_request &, std::string & );
+static int parse_target ( t_request &, std::string & );
+static int parse_http_version ( t_request &, std::string & );
+
 int
-HTTP::parse_start_line ( void )
+HTTP::parse_start_line( std::string & line )
 {
-	int64_t count = 0;
-	char *  buf = (char *) this->_buffer_recv.c_str();
+	LOG( "call HTTP::parse_start_line()" );
+	LOG_BUFFER( line.c_str() );
 
-	LOG( "call parse_start_line()" );
-
-	// Implement this in a for loop fashion
-
-	if ( HTTP::parse_method( buf, &count ) == EXIT_FAILURE )
+	this->_status_code = parse_method( this->_request, line );
+	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
-
-	if ( count == this->_data_recv || buf[count] != SP )
-	{
-		LOG( " 404 Bad request" );
-		this->_status_code = BAD_REQUEST;
-		return ( EXIT_FAILURE );
-	}
 	else
-		++count;
+		line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
 
-	if ( HTTP::parse_request_target( buf, &count ) == EXIT_FAILURE )
+	this->_status_code = parse_target( this->_request, line );
+	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
-
-	if ( count == this->_data_recv || buf[count] != SP )
-	{
-		LOG( " 404 Bad request" );
-		this->_status_code = BAD_REQUEST;
-		return ( EXIT_FAILURE );
-	}
 	else
-		++count;
+		line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
 
-	if ( HTTP::parse_http_version( buf, &count ) == EXIT_FAILURE )
+	this->_status_code = parse_http_version( this->_request, line );
+	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 
-	// Check CRLF at end
-
-	if ( ( count != this->_data_recv && buf[count++] != CR )
-			|| ( count != this->_data_recv && buf[count] != LF ) )
+	if ( line.back() != CR )
 	{
-		LOG( " 404 Bad request" );
-		this->_status_code = BAD_REQUEST;
+		LOG( " BAD REQUEST" );
+		return ( EXIT_FAILURE );
 	}
 
 	return ( EXIT_SUCCESS );
 }
 
 int
-HTTP::parse_method ( char * buf, int64_t * pos )
+parse_method( t_request & request, std::string & line )
 {
-	int64_t count = *pos;
-	int     iterator;
+	std::string::size_type  pos;
+	std::string             value;
+	int                     iterator;
 
-	LOG( "call HTTP::parse_method()" );
+	LOG( "call parse_method()" );
 
-	while ( count < HTTP::n_longest_method
-			&& count < this->_data_recv
-			&& buf[count] != SP )
-		++count;
-
-	if ( count == this->_data_recv )
+	pos = line.find_first_of( SP, 0 );
+	if ( pos == std::string::npos )
 	{
-		LOG( " 400 Bad request" );
-		this->_status_code = BAD_REQUEST;
-		return ( EXIT_FAILURE );
+		LOG( " BAD_REQUEST" );
+		return ( BAD_REQUEST );
 	}
-	else if ( count == HTTP::n_longest_method )
+
+	value = line.substr( 0, pos );
+	LOG( " value: \"" << value << "\"" );
+
+	if ( value.length() > HTTP::n_longest_method )
 	{
-		LOG( " 501 Not implemented" );
-		this->_status_code = NOT_IMPLEMENTED;
-		return ( EXIT_FAILURE );
+		LOG( " NOT_IMPLEMENTED" );
+		return ( NOT_IMPLEMENTED );
 	}
 
 	for ( iterator = 0; iterator < HTTP::n_methods; ++iterator )
 	{
-		if ( ft_strncmp( buf,
-					this->_buffer_recv.c_str(), count - 1) == 0 )
+		if ( value.compare( HTTP::methods[iterator].method ) == 0 )
 			break ;
 	}
-
+		
 	if ( iterator == HTTP::n_methods )
 	{
-		LOG( " 501 Not implemented" );
-		this->_status_code = NOT_IMPLEMENTED;
-		return ( EXIT_FAILURE );
+		LOG( " NOT IMPLEMENTED" );
+		return ( NOT_IMPLEMENTED );
 	}
 
-
-	this->_request_line.method = HTTP::methods[iterator].code;
-	*pos = count;
-
-	http_get( *this );
+	request.method = &HTTP::methods[iterator];
 
 	return ( EXIT_SUCCESS );
 }
 
 int
-HTTP::parse_request_target ( char * buf, int64_t * pos )
+parse_target( t_request & request, std::string & line )
 {
-	int64_t count = *pos;
+	std::string::size_type  pos;
 
-	LOG( "call HTTP::parse_request_target()" );
+	LOG( "call parse_target()" );
 
-	while ( count < this->_data_recv && buf[count] != SP )
+	pos = line.find_first_of( SP, 0 );
+	
+	if ( pos == std::string::npos )
 	{
-		++count;
+		LOG( " BAD_REQUEST" );
+		return ( BAD_REQUEST );
 	}
-
-	this->_request_line.request_target = buf + *pos;
-	*pos = count;
+	
+	request.target = line.substr( 0, pos );
+	LOG( " value: \"" << request.target << "\"" );
 
 	return ( EXIT_SUCCESS );
 }
 
 int
-HTTP::parse_http_version ( char * buf, int64_t * pos )
+parse_http_version ( t_request & request, std::string & line )
 {
-	int64_t count = *pos;
+	std::string::size_type  pos;
+	std::string             value;
 
-	LOG( "call HTTP::parse_http_version()" );
+	LOG( "call parse_http_version()" );
 
-	while ( count < this->_data_recv
-			&& buf[count] != SP && buf[count] != CR )
+	pos = line.find_first_of( CR, 0 );
+
+	if ( pos == std::string::npos )
 	{
-		++count;
+		LOG( " BAD REQUEST" );
+		return ( BAD_REQUEST );
 	}
 
-	if ( ft_strncmp( buf + *pos, "HTTP/1.1", 8 ) != 0 )
-	{
-		LOG( " 400 Bad request" );
-		this->_status_code = BAD_REQUEST;
-		return ( EXIT_FAILURE );
-	}
-	else
-		this->_request_line.http_version = HTTP_11;
+	value = line.substr( 0, pos );
+	LOG( " value: \"" << value << "\"" );
 
-	*pos = count;
+	if ( value.compare( "HTTP/1.1" ) != 0 )
+	{
+		LOG( " BAD REQUEST" );
+		return ( BAD_REQUEST );
+	}
+
+	request.http_version = HTTP_11;
 
 	return ( EXIT_SUCCESS );
 }

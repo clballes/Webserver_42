@@ -325,67 +325,6 @@ ServerConf::set_index ( ServerConf & conf, const char * arg )
 	return ( EXIT_SUCCESS );
 }
 
-// ESTO EN LA RESPONSE ESTARA
-
-std::string
-getLink ( const std::string & dirEntry, const std::string & dirName,
-		const std::string & host, int port )
-{
-    std::stringstream ss;
-
-    ss << "\t\t<p><a href=\"http://" + host + ":" <<\
-        port << dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
-    
-	return ( ss.str() );
-}
-
-// void displayAutoIndex(path directory, host, port)
-// EN LA RESPONSE
-
-void
-displayAutoIndex ( void )
-{
-	const char * directory_path = "src/Server"; // Replace with your actual directory path
-	std::string dirName( directory_path );
-	DIR* directory = opendir( directory_path );
-	
-	std::string page =\
-		"<!DOCTYPE html>\n\
-		<html>\n\
-		<head>\n\
-				<title>" + dirName + "</title>\n\
-		</head>\n\
-		<body>\n\
-		<h1>Index of</h1>\n\
-		<p>\n";
-
-	if ( directory == NULL )
-	{
-		std::cerr << "Error opening directory: " << strerror( errno );
-		std::cerr << std::endl; // o que agafi default
-		return ;
-	}
-
-	if ( dirName[0] != '/' )
-		dirName = "/" + dirName;
-
-	if ( directory )
-	{
-		  for ( struct dirent *dirEntry = readdir( directory ); 
-				  dirEntry; dirEntry = readdir( directory ))
-		  {
-			  page += getLink( std::string( dirEntry->d_name ),
-					  dirName, "host", 80 );
-		  }
-	}
-
-	page +="</p>\n</body>\n</html>\n";
-
-    closedir( directory );
-	std::cout << page << std::endl;
-    // return ( page );
-}
-
 int
 ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
 {
@@ -400,10 +339,6 @@ ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
 	{
 		conf._allow_methods |= F_AUTOINDEX;
 		
-		// displayAutoIndex();
-		// //aixo no anira aqui, anira a la response, tipus html,
-		// es per fer probes mentre.
-
 		return ( EXIT_SUCCESS );
 	}
 

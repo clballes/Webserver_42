@@ -6,25 +6,41 @@
 #include "HTTP.hpp"
 #include "Log.hpp"
 
+// using namespace HTTP
+
 int
 HTTP::parse ( void )
 {
+	std::string::size_type  start, pos;
+	std::string             line;
+
 	LOG( "call HTTP::parse()" );
 
-	// - [ ] Read until end of header
-	// WIP
+	start = 0;
+	pos = this->_buffer_recv.find_first_of( LF, 0 );
 
-	// Read start-line into struct,
-	// then remove it.
+	while ( pos != std::string::npos )
+	{
+		line = this->_buffer_recv.substr( start, pos - start );
 
-	if ( HTTP::parse_start_line() == EXIT_FAILURE )
-		return ( EXIT_FAILURE );
-	else
-		this->_buffer_recv.erase( 0,
-				this->_buffer_recv.find_first_of( "\n" )  + 1 );
-
-	if ( HTTP::parse_field_lines() == EXIT_FAILURE )
-		return ( EXIT_FAILURE );
+		if ( start == 0 )
+		{
+			if ( parse_start_line( line ) == EXIT_FAILURE )
+				return ( EXIT_FAILURE );
+		}
+		else if ( std::isgraph( line.at( 0 ) ) != 0 )
+		{
+			if ( parse_field_line( line ) == EXIT_FAILURE )
+				return ( EXIT_FAILURE );
+		}
+		else if ( ( pos - start ) != 1 )
+		{
+			return ( EXIT_FAILURE );
+		}
+		
+		start = pos + 1;
+		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
+	}
 
 	return ( EXIT_SUCCESS );
 }

@@ -6,8 +6,6 @@
 #include "HTTP.hpp"
 #include "parse.hpp"
 
-static int parse_field_line ( t_headers & headers, std::string & line );
-
 /* No whitespace is allowed between the field name and colon. 
  * In the past, differences in the handling of such whitespace 
  * have led to security vulnerabilities in request routing 
@@ -18,38 +16,16 @@ static int parse_field_line ( t_headers & headers, std::string & line );
  */
 
 int
-HTTP::parse_field_lines ( void )
-{
-	std::string::size_type  start, pos;
-	std::string             line;
-
-	LOG( "call HTTP::parse_field_lines()" );
-
-	start = 0;
-	pos = this->_buffer_recv.find_first_of( LF, 0 );
-	while ( pos != std::string::npos )
-	{
-		std::string line = this->_buffer_recv.substr( start, pos - start );
-
-		if ( std::isgraph( line.at( 0 ) ) != 0 )
-			parse_field_line( this->_headers, line );
-		else if ( ( pos - start ) != 1 )
-			return ( EXIT_FAILURE );
-		
-		start = pos + 1;
-		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
-	}
-
-	return ( EXIT_SUCCESS );
-}
-
-int
-parse_field_line ( t_headers & headers, std::string & line )
+HTTP::parse_field_line ( std::string & line )
 {
 	std::string field_name, field_value;
 	std::string::size_type pos, len;
+	
+	trim_f( line, &std::isspace );
 
-	(void) headers;
+	LOG( "call HTTP::parse_field_line()" );
+	LOG_BUFFER( line.c_str() );
+
 	(void) field_name;
 	(void) field_value;
 
@@ -76,7 +52,7 @@ parse_field_line ( t_headers & headers, std::string & line )
 
 	// LOG_BUFFER( field_value.c_str() );
 
-	headers.insert( headers.end(),
+	this->_headers.insert( this->_headers.end(),
 			std::pair< std::string, std::string> ( field_name, field_value ) );
 
 	return ( EXIT_SUCCESS );

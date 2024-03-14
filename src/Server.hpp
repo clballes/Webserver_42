@@ -14,6 +14,7 @@
 
 class ServerConf;
 class Client;
+class HTTP;
 
 class Server: public IEvent
 {
@@ -35,6 +36,7 @@ class Server: public IEvent
 		typedef std::vector< Server * >:: iterator iterator;
 
 		friend class Client;
+		friend class HTTP;
 		friend std::ostream & operator << ( std::ostream &, const Server & );
 
 	private:

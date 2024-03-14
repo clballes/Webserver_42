@@ -24,12 +24,15 @@ int
 HTTP::n_methods = ( sizeof( HTTP::methods ) /
 		sizeof( *HTTP::methods ) ) - 1;
 
-int
+std::size_t
 HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
 
-HTTP::HTTP ( Client & client_instance ): _client( client_instance )
+HTTP::HTTP ( Client & client_instance ):
+	_client( client_instance )
 {
 	LOG( "call HTTP::HTTP( const Client & )" );
+
+	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
 	
 	return ;
 }

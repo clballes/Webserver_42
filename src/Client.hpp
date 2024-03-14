@@ -29,6 +29,8 @@ class Client: public IEvent, public HTTP
 		int request_recv ( int64_t );
 		int request_send ( void );
 
+		friend class HTTP;
+
 	private:
 	
 		int						_socket_fd;

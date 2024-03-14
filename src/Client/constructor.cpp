@@ -13,6 +13,9 @@ Client::Client ( Server & server_instance ):
 {
 	LOG( "call Client::Client()" );
 
+	// Each Client instance adds itself to a
+	// static 
+
 	server_instance._clients.push_back( const_cast< Client * >( this ) );
 
 	this->_socket_fd = ::accept( _server._socket_fd,

@@ -27,6 +27,7 @@
 
 class HTTP;
 class Client;
+class Server;
 
 typedef struct s_http_method
 {
@@ -38,8 +39,8 @@ typedef struct s_http_method
 
 typedef struct s_request
 {
-	int method;
-	char * request_target;
+	t_http_method * method;
+	std::string target;
 	int http_version;
 
 } t_request;
@@ -52,42 +53,41 @@ class HTTP
 
 		HTTP ( Client & );
 		~HTTP ( void );
+		
+		void perform ( void );
 
 		static int            n_methods;
-		static int            n_longest_method;
+		static std::size_t    n_longest_method;
 		static t_http_method  methods[];
 
+	protected:
+
+		Client &                _client;
+		//Server &			    _server;
+		t_headers               _headers;
+
+		std::string			    _buffer_recv;
+		std::string   			_buffer_send;
+		
+		t_request            	_request;
+		int                   	_status_code;
+		bool                  	_keep_alive;
+		
+		int parse ( void );
+		int parse_start_line ( std::string & );
+		int parse_field_line ( std::string & );
+		
 		static int http_get ( HTTP & );
 		static int http_head ( HTTP & );
 		static int http_post ( HTTP & );
 		static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
+		static int compose_response ( HTTP & );
+		static int autoindex ( HTTP & );
 
-		void perform ( void );
-
-	protected:
-
-		Client &                _client;
-		t_headers               _headers;
-
-		int64_t					_data_recv;
-		std::string			    _buffer_recv;
-		std::string   			_buffer_send;
-		
-		t_request            	_request_line;
-		int                   	_status_code;
-		bool                  	_keep_alive;
-
-		int parse ( void );
-		int parse_start_line ( void );
-		int parse_method ( char *, int64_t * );
-		int parse_request_target ( char *, int64_t * );
-		int parse_http_version ( char *, int64_t * );
-		int parse_field_lines ( void );
-
-		void compose_response ( void );
 };
 
 #include "Client.hpp"
+#include "Server.hpp"
 
 #endif /* !_HTTP_HPP_ */
