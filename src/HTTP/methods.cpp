@@ -49,12 +49,12 @@ HTTP::http_get ( HTTP & http )
 	//else
 	//{}
 
-	LOG( "size: " << http._message_body.size() );
-
 	// TODO: replace to_string(); it's not c++98.
 
 	if ( http._message_body.size() > 0 )
 		http._response_headers["content-length"] = std::to_string( http._message_body.size() );
+
+	http._status_code = OK;
 
 	return ( EXIT_SUCCESS );
 }

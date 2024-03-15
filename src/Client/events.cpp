@@ -108,5 +108,7 @@ Client::request_send ( void )
 			this->_buffer_send.length(),
 			0x0 );
 
+	this->_buffer_send.clear();
+
 	return ( EXIT_SUCCESS );
 }

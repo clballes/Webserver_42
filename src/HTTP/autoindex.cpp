@@ -7,18 +7,15 @@
 #include <sstream>
 
 /*
-std::string
-getLink ( const std::string & dirEntry, const std::string & directory_name,
-		const std::string & host, int port )
-{
-    std::stringstream ss;
-
-    ss << "\t\t<p><a href=\"http://" + host + ":" <<\
-        port << directory_name + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
-
-	return ( ss.str() );
-};
-*/
+ * From RFC9112:
+ * When making a request directly to an origin server, 
+ * other than a CONNECT or server-wide OPTIONS request 
+ * (as detailed below), a client MUST send only the 
+ * absolute path and query components of the target URI 
+ * as the request-target. If the target URI's path 
+ * component is empty, the client MUST send "/" as the 
+ * path within the origin-form of request-target.
+ */
 
 int
 HTTP::autoindex ( HTTP & http )
@@ -53,26 +50,26 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "</head>" );
 	page.append( "<body>" );
 	page.append( "<h1>Index of</h1>" );
-	
-	page.append( "<p>" );
 
-	/*
-	if ( directory_name[0] != '/' )
-		directory_name = "/" + directory_name;
-	*/
+	std::string host( "localhost:8080" );
 
-	// directory != 0x0 :ASERTION
-	
-	/*
-	for ( struct dirent *dirEntry = readdir( directory );
-			dirEntry; dirEntry = readdir( directory ))
+	for ( struct dirent *ent = readdir( directory );
+			ent != 0x0; ent = readdir( directory ) )
 	{
-		  page << getLink( std::string( dirEntry->d_name ),
-				  directory_name, "host", 80 );
+		// TODO: consider using table tr td format
+		page.append( "<p>" );
+		page.append( "<a href=\"" );
+		page.append( "http://" );
+		page.append( http._headers["Host"] );
+		if ( directory_name.size() > 1 )
+			page.append( directory_name );
+		page.append( "/" );
+		page.append( ent->d_name );
+		page.append( "\">" );
+		page.append( ent->d_name );
+		page.append( "</a>" );
+		page.append( "</p>\n" );
 	}
-	*/
-
-	page.append( "</p>" );
 	
 	// HTML end tags
 
@@ -84,7 +81,7 @@ HTTP::autoindex ( HTTP & http )
 	// TODO: add header content-length: page.length()
 	// TODO: compose_message will and HTTP message ending CRLF.
 
-	http._buffer_send.append( page.c_str() );
+	http._message_body.append( page.c_str() );
 
 	return ( EXIT_SUCCESS );
 }

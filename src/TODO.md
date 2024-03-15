@@ -1,3 +1,4 @@
+- [ ] function() decode_url / encode_url %20 whitespaces, etc
 - [ ] allow_methods -> flags (Server)
 - [ ] http Server & from Client
 - [ ] Tests: request headers
