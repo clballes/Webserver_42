@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 
 int count_brackets( std::deque< std::string > & );
-bool isRegularFile( const std::string & );
+bool is_regular_file( const std::string & );
 int count_servers( std::deque< std::string > & );
 
 std::string & trim_f( std::string &, int ( *func )( int ) );

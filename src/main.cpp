@@ -23,10 +23,10 @@ main ( int argc, char * const * argv )
 	
 	conf_filename = (argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
 
-	// isRegularFile() is in `parse.cpp', for the moment.
+	// is_regular_file() is in `parse.cpp', for the moment.
 	// Check if `conf_filename' is a regular file.
 
-	if ( isRegularFile( conf_filename ) == false )
+	if ( is_regular_file( conf_filename ) == false )
 	{
 		std::cerr << PROGRAM_NAME;
 		std::cerr << ": " << conf_filename;

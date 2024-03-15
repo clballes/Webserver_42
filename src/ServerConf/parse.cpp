@@ -133,8 +133,13 @@ count_brackets ( std::deque< std::string > & content )
 	return ( ( brace == 0 ) ? EXIT_SUCCESS : EXIT_FAILURE );
 }
 
+/*
+ * is_regular_file
+ * Returns false if `filename' is not a file.
+ */
+
 bool
-isRegularFile( const std::string & filename )
+is_regular_file( const std::string & filename )
 {
     struct stat file_info;
 
