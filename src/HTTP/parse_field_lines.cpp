@@ -7,9 +7,6 @@
 #include "parse.hpp"
 
 /* No whitespace is allowed between the field name and colon. 
- * In the past, differences in the handling of such whitespace 
- * have led to security vulnerabilities in request routing 
- * and response handling. 
  * A server MUST reject, with a response status code of 400 (Bad Request), 
  * any received request message that contains whitespace between 
  * a header field name and colon.
@@ -21,13 +18,8 @@ HTTP::parse_field_line ( std::string & line )
 	std::string field_name, field_value;
 	std::string::size_type pos, len;
 	
-	trim_f( line, &std::isspace );
-
-	LOG( "call HTTP::parse_field_line()" );
-	LOG_BUFFER( line.c_str() );
-
-	(void) field_name;
-	(void) field_value;
+	//LOG( "call HTTP::parse_field_line()" );
+	//LOG_BUFFER( line.c_str() );
 
 	// std::clog << "header: " << line << std::endl;
 	len = line.length();

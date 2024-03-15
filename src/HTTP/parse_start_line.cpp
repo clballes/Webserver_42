@@ -19,8 +19,8 @@ static int parse_http_version ( t_request &, std::string & );
 int
 HTTP::parse_start_line( std::string & line )
 {
-	LOG( "call HTTP::parse_start_line()" );
-	LOG_BUFFER( line.c_str() );
+	//LOG( "call HTTP::parse_start_line()" );
+	//LOG_BUFFER( line.c_str() );
 
 	this->_status_code = parse_method( this->_request, line );
 	if ( this->_status_code != EXIT_SUCCESS )
@@ -40,7 +40,7 @@ HTTP::parse_start_line( std::string & line )
 
 	if ( line.back() != CR )
 	{
-		LOG( " BAD REQUEST" );
+		//LOG( " BAD REQUEST" );
 		return ( EXIT_FAILURE );
 	}
 
@@ -54,21 +54,21 @@ parse_method( t_request & request, std::string & line )
 	std::string             value;
 	int                     iterator;
 
-	LOG( "call parse_method()" );
+	//LOG( "call parse_method()" );
 
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
 	{
-		LOG( " BAD_REQUEST" );
+		//LOG( " BAD_REQUEST" );
 		return ( BAD_REQUEST );
 	}
 
 	value = line.substr( 0, pos );
-	LOG( " value: \"" << value << "\"" );
+	//LOG( " value: \"" << value << "\"" );
 
 	if ( value.length() > HTTP::n_longest_method )
 	{
-		LOG( " NOT_IMPLEMENTED" );
+		//LOG( " NOT_IMPLEMENTED" );
 		return ( NOT_IMPLEMENTED );
 	}
 
@@ -80,7 +80,7 @@ parse_method( t_request & request, std::string & line )
 		
 	if ( iterator == HTTP::n_methods )
 	{
-		LOG( " NOT IMPLEMENTED" );
+		//LOG( " NOT IMPLEMENTED" );
 		return ( NOT_IMPLEMENTED );
 	}
 
@@ -94,18 +94,18 @@ parse_target( t_request & request, std::string & line )
 {
 	std::string::size_type  pos;
 
-	LOG( "call parse_target()" );
+	//LOG( "call parse_target()" );
 
 	pos = line.find_first_of( SP, 0 );
 	
 	if ( pos == std::string::npos )
 	{
-		LOG( " BAD_REQUEST" );
+		//LOG( " BAD_REQUEST" );
 		return ( BAD_REQUEST );
 	}
 	
 	request.target = line.substr( 0, pos );
-	LOG( " value: \"" << request.target << "\"" );
+	//LOG( " value: \"" << request.target << "\"" );
 
 	return ( EXIT_SUCCESS );
 }
@@ -116,22 +116,22 @@ parse_http_version ( t_request & request, std::string & line )
 	std::string::size_type  pos;
 	std::string             value;
 
-	LOG( "call parse_http_version()" );
+	//LOG( "call parse_http_version()" );
 
 	pos = line.find_first_of( CR, 0 );
 
 	if ( pos == std::string::npos )
 	{
-		LOG( " BAD REQUEST" );
+		//LOG( " BAD REQUEST" );
 		return ( BAD_REQUEST );
 	}
 
 	value = line.substr( 0, pos );
-	LOG( " value: \"" << value << "\"" );
+	//LOG( " value: \"" << value << "\"" );
 
 	if ( value.compare( "HTTP/1.1" ) != 0 )
 	{
-		LOG( " BAD REQUEST" );
+		//LOG( " BAD REQUEST" );
 		return ( BAD_REQUEST );
 	}
 

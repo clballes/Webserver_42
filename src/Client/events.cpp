@@ -72,7 +72,7 @@ Client::request_recv ( int64_t data )
 	this->_buffer_recv.resize( data + 1 );
 
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
-
+	
 	if ( n == 0 )
 	{
 		LOG( "client closed connection (fd=" << this->_socket_fd << ")" );
@@ -80,12 +80,17 @@ Client::request_recv ( int64_t data )
 		return ( EXIT_FAILURE );
 	}
 	
-	//this->register_send();
+	std::clog << "recv ";
+	LOG_BUFFER( this->_buffer_recv.c_str() );
+
+	// Do HTTP method, compose message.
+
 	this->perform();
+
+	// Finally send _buffer_send.
+	// Consider setting send() as an event.
+
 	this->request_send();
-	// register HTTP.method
-	// once ready should register Client::request_send
-	// which in turn should send() _buffer_send
 
 	return ( EXIT_SUCCESS );
 }

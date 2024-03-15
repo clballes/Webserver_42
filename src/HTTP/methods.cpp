@@ -5,6 +5,11 @@
 
 #include "HTTP.hpp"
 #include "ft_stdlib.h"
+#include "parse.hpp"
+
+/* 
+ * https://datatracker.ietf.org/doc/html/rfc9110#name-methods
+ */
 
 int
 HTTP::http_get ( HTTP & http )
@@ -19,33 +24,38 @@ HTTP::http_get ( HTTP & http )
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
 
-	if ( http._client._server._allow_methods & F_AUTOINDEX )
+	// TODO: translate target += root
+
+	if ( is_regular_file( http._request.target ) != false )
+	{
+		LOG( " will GET \"" << http._request.target << "\"" );
+
+		//http._message_body.append( "content-type: text/html; charset=UTF-8\r\n" );
+		//http._message_body.append( "content-length: 25\r\n" );
+		//http._message_body.append( "\r\n" );
+		http._message_body.append( "<html><h1>hey</h1></html>" );
+
+	}
+	else if ( http._client._server._allow_methods & F_AUTOINDEX )
 		HTTP::autoindex( http );
 	else
-	{}
+	{
+		// TODO: define response _status_code
+	}
 
 	// WIP: solve _client._server
-	if ( http._client._server._cgi_pass.length() != 0 )
-	{
-		std::cout << "tenim cgi en el get"<< std::endl;
-		// CgiHandler Cgi;
-	}
-	else
-	{
-		std::cout << "no tenim cgi en el get"<< std::endl;
-	}
+	//if ( http._client._server._cgi_pass.length() != 0 )
+	//{}
+	//else
+	//{}
 
-	http._buffer_send.append( "HTTP/1.1 200 \r\n" );
-	http._buffer_send.append( "content-type: text/html; charset=UTF-8\r\n" );
-	http._buffer_send.append( "content-length: 25\r\n" );
-	http._buffer_send.append( "\r\n" );
-	http._buffer_send.append( "<html><h1>hey</h1></html>" );
+	LOG( "size: " << http._message_body.size() );
 
-	// Set status line
-	// Compose message body
+	// TODO: replace to_string(); it's not c++98.
 
-	HTTP::compose_response( http );
-	
+	if ( http._message_body.size() > 0 )
+		http._response_headers["content-length"] = std::to_string( http._message_body.size() );
+
 	return ( EXIT_SUCCESS );
 }
 
@@ -55,16 +65,11 @@ HTTP::http_head ( HTTP & http )
 	LOG( "call HTTP::http_head()" );
 
 	if ( http._client._server._cgi_pass.length() != 0 )
-	{
-		std::cout << "tenim cgi en el post "<< std::endl;
-		// CgiHandler Cgi;
-	}
+	{}
 	else
-	{
-		std::cout << "no tenim cgi en el post"<< std::endl;
-	}
+	{}
 
-	HTTP::compose_response( http );
+	(void) http;
 	
 	return ( EXIT_SUCCESS );
 }
@@ -74,7 +79,7 @@ HTTP::http_post ( HTTP & http )
 {
 	LOG( "call HTTP::http_post()" );
 	
-	HTTP::compose_response( http );
+	(void) http;
 	
 	return ( EXIT_SUCCESS );
 }
@@ -83,9 +88,9 @@ int
 HTTP::http_put ( HTTP & http )
 {
 	LOG( "call HTTP::http_put()" );
-	
-	HTTP::compose_response( http );
-	
+
+	(void) http;
+
 	return ( EXIT_SUCCESS );
 }
 int
@@ -94,38 +99,7 @@ HTTP::http_delete ( HTTP & http )
 {
 	LOG( "call HTTP::http_delete()" );
 	
-	HTTP::compose_response( http );
+	(void) http;
 	
-	return ( EXIT_SUCCESS );
-}
-
-int
-HTTP::compose_response ( HTTP & http )
-{
-	char * itoa_status = 0x0;
-
-	LOG( "call HTTP::compose_response()" );
-
-	/* Set status-line */
-
-	http._status_code = 200;
-	http._buffer_send.assign( "HTTP/1.1 xxx\r\n" );
-
-	itoa_status = ft_itoa( http._status_code );
-	if ( itoa_status == 0x0 )
-		http._buffer_send.replace( 9, 3, "500" );
-	else
-		http._buffer_send.replace( 9, 3, itoa_status );
-	free( itoa_status );
-
-	/*
-	for ( t_headers::iterator it = this->_headers.begin();
-			it != this->_headers.end(); ++it )
-		LOG( "header: " << it->first << it->second );
-	*/
-
-	// If root is not a directory, ... autoindex only works with GET
-	// https://nginx.org/en/docs/http/ngx_http_autoindex_module.html
-
 	return ( EXIT_SUCCESS );
 }

@@ -30,7 +30,9 @@ HTTP::autoindex ( HTTP & http )
 	LOG( "call HTTP::autoindex()" );
 	
 	directory_name = http._request.target;
-	LOG( "directory_name: " << directory_name );
+	LOG( " directory_name: " << directory_name );
+
+	// TODO: translate directory using root.
 
 	directory = opendir( directory_name.c_str() );
 
@@ -41,6 +43,8 @@ HTTP::autoindex ( HTTP & http )
 		return ( EXIT_FAILURE );
 	}
 
+	// HTML init content tags ( html, head, title, body ).
+
 	page.append( "<!DOCTYPE html>" );
 	page.append( "<head>" );
 	page.append( "<title>" );
@@ -49,6 +53,7 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "</head>" );
 	page.append( "<body>" );
 	page.append( "<h1>Index of</h1>" );
+	
 	page.append( "<p>" );
 
 	/*
@@ -68,10 +73,17 @@ HTTP::autoindex ( HTTP & http )
 	*/
 
 	page.append( "</p>" );
+	
+	// HTML end tags
+
 	page.append( "</body>" );
 	page.append( "</html>" );
 
     closedir( directory );
+
+	// TODO: add header content-length: page.length()
+	// TODO: compose_message will and HTTP message ending CRLF.
+
 	http._buffer_send.append( page.c_str() );
 
 	return ( EXIT_SUCCESS );

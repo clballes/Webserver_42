@@ -13,13 +13,13 @@
 
 #include <map>
 
-#define HTTP_GET				0x00000001
-#define HTTP_HEAD				0x00000002
-#define HTTP_POST				0x00000003
-#define HTTP_PUT				0x00000004
-#define HTTP_DELETE				0x00000005
+#define HTTP_GET		0x00000001
+#define HTTP_HEAD		0x00000002
+#define HTTP_POST		0x00000003
+#define HTTP_PUT		0x00000004
+#define HTTP_DELETE		0x00000005
 
-#define HTTP_11					0x11
+#define HTTP_11			0x11
 
 #define LF 012
 #define CR 015
@@ -65,9 +65,11 @@ class HTTP
 		Client &                _client;
 		//Server &			    _server;
 		t_headers               _headers;
+		t_headers               _response_headers;
 
 		std::string			    _buffer_recv;
 		std::string   			_buffer_send;
+		std::string				_message_body;
 		
 		t_request            	_request;
 		int                   	_status_code;
@@ -88,6 +90,6 @@ class HTTP
 };
 
 #include "Client.hpp"
-#include "Server.hpp"
+//#include "Server.hpp"
 
 #endif /* !_HTTP_HPP_ */
