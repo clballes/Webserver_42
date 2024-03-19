@@ -59,6 +59,9 @@ class HTTP
 		static int            n_methods;
 		static std::size_t    n_longest_method;
 		static t_http_method  methods[];
+		
+		static std::string & urlencode ( std::string & );
+		static std::string & urldecode ( std::string & );
 
 	protected:
 

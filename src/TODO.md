@@ -1,3 +1,4 @@
+- [ ] excludes ?options from URI
 - [ ] proper log system
 - [ ] finish getoptions()
 - [ ] if not REUSE_SOCKET, loop timer to retry bind
