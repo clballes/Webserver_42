@@ -24,6 +24,10 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 	std::string directory_name;
 	DIR*        directory;
 
+	// http._request.target is where the client asks
+	// whilst directory_name is the translated location
+	// on the server.
+
 	LOG( "call HTTP::autoindex()" );
 	
 	directory_name = target;
@@ -42,7 +46,7 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 	page.append( "<!DOCTYPE html>" );
 	page.append( "<head>" );
 	page.append( "<title>" );
-	page.append( directory_name );
+	page.append( http._request.target );
 	page.append( "</title>" );
 	page.append( "</head>" );
 	page.append( "<body>" );
