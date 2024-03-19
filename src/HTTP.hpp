@@ -62,6 +62,7 @@ class HTTP
 		
 		static std::string & urlencode ( std::string & );
 		static std::string & urldecode ( std::string & );
+		static int load_file ( HTTP &, std::string & );
 
 	protected:
 

@@ -52,6 +52,7 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/HTTP/post.cpp \
 					$(SRC_DIR)/HTTP/put.cpp \
 					$(SRC_DIR)/HTTP/delete.cpp \
+					$(SRC_DIR)/HTTP/file.cpp \
 					$(SRC_DIR)/HTTP/autoindex.cpp \
 					$(SRC_DIR)/HTTP/urlencode.cpp \
 					$(SRC_DIR)/HTTP/events.cpp

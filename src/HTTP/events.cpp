@@ -47,10 +47,14 @@ HTTP::compose_response ( HTTP & http )
 
 	http._buffer_send.append( std::to_string( http._status_code ) );
 	http._buffer_send.append( " \r\n" );
+	
+	// TODO: replace to_string(); it's not c++98.
+
+	http._response_headers["content-length"] = std::to_string( http._message_body.size() );
 
 	// Add response headers, if any.
 	// + ending CRLF
-
+	
 	for ( t_headers::iterator it = http._response_headers.begin();
 			it != http._response_headers.end(); ++it )
 	{

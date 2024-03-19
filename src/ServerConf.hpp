@@ -11,6 +11,8 @@
 #include <vector>
 #include <map>
 
+#define DEFAULT_ERROR_DIR "www"
+
 class Server;
 class ServerConf;
 

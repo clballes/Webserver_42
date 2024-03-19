@@ -1,3 +1,4 @@
+- [ ] load file function
 - [ ] excludes ?options from URI
 - [ ] proper log system
 - [ ] finish getoptions()

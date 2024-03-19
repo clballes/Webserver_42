@@ -28,10 +28,9 @@ HTTP::http_get ( HTTP & http )
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
 	
-	if ( is_regular_file( target ) != false )
+	if ( is_regular_file( target ) == true )
 	{
-		http._message_body.append( "<html><h1>hey</h1></html>" );
-		http._status_code = OK;
+		http._status_code = HTTP::load_file( http, target );
 	}
 	else if ( http._server._allow_methods & F_AUTOINDEX )
 	{
@@ -45,9 +44,13 @@ HTTP::http_get ( HTTP & http )
 	else
 	{}
 
-	// TODO: replace to_string(); it's not c++98.
+	// implement loop fashion
 
-	http._response_headers["content-length"] = std::to_string( http._message_body.size() );
+	if ( http._status_code == 404 )
+	{
+		LOG( http._server._error_page[404] );
+		(void) HTTP::load_file( http, http._server._error_page[404] );
+	}
 
 	return ( EXIT_SUCCESS );
 }
