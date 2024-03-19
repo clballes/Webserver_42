@@ -9,6 +9,9 @@
 #include <fstream>
 
 int
+IEvent::kq = 0;
+
+int
 main ( int argc, char * const * argv )
 {
 	std::string   conf_filename;
