@@ -1,3 +1,7 @@
+- [ ] proper log system
+- [ ] finish getoptions()
+- [ ] if not REUSE_SOCKET, loop timer to retry bind
+- [ ] send connection: close header
 - [ ] function() decode_url / encode_url %20 whitespaces, etc
 - [ ] allow_methods -> flags (Server)
 - [ ] Tests: request headers

@@ -39,10 +39,7 @@ HTTP::parse_start_line( std::string & line )
 		return ( EXIT_FAILURE );
 
 	if ( line.back() != CR )
-	{
-		//LOG( " BAD REQUEST" );
 		return ( EXIT_FAILURE );
-	}
 
 	return ( EXIT_SUCCESS );
 }
@@ -58,19 +55,12 @@ parse_method( t_request & request, std::string & line )
 
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
-	{
-		//LOG( " BAD_REQUEST" );
 		return ( BAD_REQUEST );
-	}
 
 	value = line.substr( 0, pos );
-	//LOG( " value: \"" << value << "\"" );
 
 	if ( value.length() > HTTP::n_longest_method )
-	{
-		//LOG( " NOT_IMPLEMENTED" );
 		return ( NOT_IMPLEMENTED );
-	}
 
 	for ( iterator = 0; iterator < HTTP::n_methods; ++iterator )
 	{
@@ -79,10 +69,7 @@ parse_method( t_request & request, std::string & line )
 	}
 		
 	if ( iterator == HTTP::n_methods )
-	{
-		//LOG( " NOT IMPLEMENTED" );
 		return ( NOT_IMPLEMENTED );
-	}
 
 	request.method = &HTTP::methods[iterator];
 
@@ -99,14 +86,9 @@ parse_target( t_request & request, std::string & line )
 	pos = line.find_first_of( SP, 0 );
 	
 	if ( pos == std::string::npos )
-	{
-		//LOG( " BAD_REQUEST" );
 		return ( BAD_REQUEST );
-	}
 
-	LOG( "pre request.target: " << request.target );
 	request.target = line.substr( 0, pos );
-	//LOG( " value: \"" << request.target << "\"" );
 
 	return ( EXIT_SUCCESS );
 }
@@ -122,19 +104,12 @@ parse_http_version ( t_request & request, std::string & line )
 	pos = line.find_first_of( CR, 0 );
 
 	if ( pos == std::string::npos )
-	{
-		//LOG( " BAD REQUEST" );
 		return ( BAD_REQUEST );
-	}
 
 	value = line.substr( 0, pos );
-	//LOG( " value: \"" << value << "\"" );
 
 	if ( value.compare( "HTTP/1.1" ) != 0 )
-	{
-		//LOG( " BAD REQUEST" );
 		return ( BAD_REQUEST );
-	}
 
 	request.http_version = HTTP_11;
 

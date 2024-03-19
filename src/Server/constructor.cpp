@@ -13,7 +13,9 @@ Server::servers;
 Server::Server ( const ServerConf & instance ): good( true )
 {
 	LOG( "call Server::Server( const ServerConf & )" );
-	LOG( instance );
+	
+	// This should only be logged on certain mode
+	//LOG( instance );
 
 	std::memcpy( &this->_address, &instance._address,
 			sizeof( instance._address ) );

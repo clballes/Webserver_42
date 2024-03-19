@@ -27,7 +27,6 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 	LOG( "call HTTP::autoindex()" );
 	
 	directory_name = target;
-	LOG( " directory_name: " << directory_name );
 
 	directory = opendir( directory_name.c_str() );
 
@@ -58,8 +57,6 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 		page.append( "<a href=\"" );
 		page.append( "http://" );
 		page.append( http._headers["Host"] );
-		LOG( " you should know directory_name is: " << directory_name );
-		LOG( " whilst http._request.target is: " << http._request.target );
 		if ( http._request.target.size() > 1 )
 			page.append( http._request.target );
 		page.append( "/" );

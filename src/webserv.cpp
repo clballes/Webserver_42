@@ -69,8 +69,7 @@ webserv ( void )
 void
 graceful_stop ( int n )
 {
-	LOG( "" );
-	LOG( "Stopping " << PROGRAM_NAME << " gracefully (s=" << n << ")" );
+	LOG( "\nStopping " << PROGRAM_NAME << " gracefully (s=" << n << ")" );
 	status = false;
 
 	for ( Server::iterator it = Server::servers.begin();
