@@ -10,7 +10,6 @@
 #include <iostream>
 #include "Log.hpp"
 #include "HTTP_status_codes.hpp"
-
 #include <map>
 
 #define HTTP_GET		0x00000001
@@ -42,7 +41,6 @@ typedef struct s_request
 	t_http_method * method;
 	std::string target;
 	int http_version;
-
 } t_request;
 
 typedef std::map< std::string, std::string > t_headers;
@@ -77,6 +75,8 @@ class HTTP
 		t_request            	_request;
 		int                   	_status_code;
 		bool                  	_keep_alive;
+
+		friend class CgiHandler;
 		
 		int parse ( void );
 		int parse_start_line ( std::string & );
@@ -89,6 +89,8 @@ class HTTP
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP &, std::string & );
+		static char **    init_env(std::string method, std::string target);
+		static void executeCGI(const std::string& scriptPath, char **env);
 
 };
 

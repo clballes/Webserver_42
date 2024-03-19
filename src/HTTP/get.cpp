@@ -41,7 +41,16 @@ HTTP::http_get ( HTTP & http )
 		http._status_code = INTERNAL_SERVER_ERROR;
 
 	if ( http._server._cgi_pass.length() != 0 )
-	{}
+	{
+		LOG( " Executing Cgi" );
+		//executing CGI, establishing parameters
+		std::cout <<"------------------- "<< std::endl;
+		char **env = init_env(http._request.method->method, target);
+		executeCGI(http._server._cgi_pass, env);
+		std::cout <<"-------------------- "<< std::endl;
+
+		// CgiHandler Cgi( http );
+	}
 	else
 	{}
 

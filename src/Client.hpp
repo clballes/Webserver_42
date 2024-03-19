@@ -8,6 +8,8 @@
 
 #include "IEvent.hpp"
 #include "HTTP.hpp"
+#include "CgiHandler.hpp"
+
 #include "Server.hpp"
 #include "webserv.hpp"
 
