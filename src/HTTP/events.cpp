@@ -49,7 +49,7 @@ HTTP::compose_response ( HTTP & http )
 	http._buffer_send.append( " \r\n" );
 	
 	// TODO: replace to_string(); it's not c++98.
-
+	http._response_headers["content-type"] = "text/html"; //SUPER IMPORTANT PER FER LA RESPONSE I QUE ES PUGUI VEURE ALMENYS MISSTGES DERRORS !!!! nose mha petat abnas
 	http._response_headers["content-length"] = std::to_string( http._message_body.size() );
 
 	// Add response headers, if any.
@@ -68,6 +68,7 @@ HTTP::compose_response ( HTTP & http )
 	// Add [message body], if any.
 
 	http._buffer_send.append( http._message_body );
+	std::cout << "message body: " << http._response_headers["content-length"] << std::endl;
 	http._message_body.clear();
 
 	return ( EXIT_SUCCESS );

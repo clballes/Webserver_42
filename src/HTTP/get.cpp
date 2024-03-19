@@ -46,9 +46,10 @@ HTTP::http_get ( HTTP & http )
 		std::cout <<"------------------- "<< std::endl;
 		char **env = init_env(http._request.method->method, target);
 		executeCGI(http._server._cgi_pass, env);
-		std::cout <<"-------------------- "<< std::endl;
-
-		// CgiHandler Cgi( http );
+		// forco q fucioni el cgi
+		// http._message_body.append("<html><head><title>CGI Python Script</title></head><body>hola estic forcant el cgi script<body></html> ");
+		// http._status_code = 200;
+		// std::cout <<"-------------------- "<< std::endl;
 	}
 	else
 	{}

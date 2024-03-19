@@ -76,8 +76,6 @@ class HTTP
 		t_request            	_request;
 		int                   	_status_code;
 		bool                  	_keep_alive;
-
-		friend class CgiHandler;
 		
 		int parse ( void );
 		int parse_start_line ( std::string & );

@@ -12,8 +12,6 @@
 
 char **    HTTP::init_env(std::string method, std::string target)
 {
-    // char **envp = NULL;
-
     char** env = new char*[4];
     env[0] = ft_strdup(("REQUEST_METHOD=" + method).c_str());
     env[1] = ft_strdup(("PATH_INFO=" + target).c_str());
@@ -31,7 +29,7 @@ char **    HTTP::init_env(std::string method, std::string target)
 void HTTP::executeCGI(const std::string& scriptPath, char **env)
 {
     LOG("Execute CGI")
-
+    
     int pipefd[2];
 
     if (pipe(pipefd) == -1) {
@@ -39,7 +37,7 @@ void HTTP::executeCGI(const std::string& scriptPath, char **env)
         exit(EXIT_FAILURE);
     }
 
-    int fdopen = open("/Users/clballes/Desktop/web42/www/400.html", O_RDONLY);
+    int fdopen = open("/Users/clballes/Desktop/web42/www/100.html", O_RDONLY);
     if(fdopen == -1){
         std::cerr << "ERROR OPENING THE FILE IN CGI" << std::endl;
     }
@@ -67,16 +65,13 @@ void HTTP::executeCGI(const std::string& scriptPath, char **env)
         exit(EXIT_FAILURE);
     }
 
-    write(pipefd[WRITE], "hola clara", 11);
+    write(pipefd[WRITE], "<html><head><title>CGI Python Script</title></head><body>", 58);
     close(pipefd[WRITE]);
     char buff[1024];
    // read(pipefd[READ], &buff, 1024);
     memset(&buff,0,1024);
     std::cout << "el read es: " << read(pipefd[READ], &buff, 1024) << std::endl;
     std::cout << "buff es: "<< buff << std::endl;
-
-
     // close(pipefd[READ]);
     waitpid(pid, NULL, 0);
 }
-
