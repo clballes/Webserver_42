@@ -6,7 +6,7 @@
 #include "Client.hpp"
 
 Client::Client ( Server & server_instance ):
-	HTTP( *this ),
+	HTTP( *this, server_instance ),
 	good( true ),
 	_socket_fd( 0 ),
 	_server( server_instance )

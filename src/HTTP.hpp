@@ -51,7 +51,7 @@ class HTTP
 {
 	public:
 
-		HTTP ( Client & );
+		HTTP ( Client &, Server & );
 		~HTTP ( void );
 		
 		void perform ( void );
@@ -63,7 +63,7 @@ class HTTP
 	protected:
 
 		Client &                _client;
-		//Server &			    _server;
+		Server &			    _server;
 		t_headers               _headers;
 		t_headers               _response_headers;
 
@@ -85,7 +85,7 @@ class HTTP
 		static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
-		static int autoindex ( HTTP & );
+		static int autoindex ( HTTP &, std::string & );
 
 };
 

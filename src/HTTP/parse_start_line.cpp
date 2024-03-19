@@ -103,7 +103,8 @@ parse_target( t_request & request, std::string & line )
 		//LOG( " BAD_REQUEST" );
 		return ( BAD_REQUEST );
 	}
-	
+
+	LOG( "pre request.target: " << request.target );
 	request.target = line.substr( 0, pos );
 	//LOG( " value: \"" << request.target << "\"" );
 

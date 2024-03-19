@@ -138,7 +138,7 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 	
 	conf._root = arg;
 
-	if ( conf._root.back() == '/' )
+	while ( conf._root.back() == '/' )
 		conf._root.erase( conf._root.length() - 1, 1 );
 	
 	return ( EXIT_SUCCESS );

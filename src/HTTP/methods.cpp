@@ -13,8 +13,9 @@
 
 int
 HTTP::http_get ( HTTP & http )
-// Reads start-line into struct s_request;
 {
+	std::string target;
+
 	LOG( "call HTTP::http_get()" );
 
 	// WIP
@@ -24,24 +25,25 @@ HTTP::http_get ( HTTP & http )
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
 
-	// TODO: translate target += root
+	target.append( http._server._root );
+	target.append( http._request.target );
 
-	if ( is_regular_file( http._request.target ) != false )
+	LOG( " target: " << target );
+
+	if ( is_regular_file( target ) != false )
 	{
-		LOG( " will GET \"" << http._request.target << "\"" );
+		LOG( " will GET \"" << target << "\"" );
 
-		//http._message_body.append( "content-type: text/html; charset=UTF-8\r\n" );
-		//http._message_body.append( "content-length: 25\r\n" );
-		//http._message_body.append( "\r\n" );
 		http._message_body.append( "<html><h1>hey</h1></html>" );
+		http._status_code = OK;
 
 	}
-	else if ( http._client._server._allow_methods & F_AUTOINDEX )
-		HTTP::autoindex( http );
-	else
+	else if ( http._server._allow_methods & F_AUTOINDEX )
 	{
-		// TODO: define response _status_code
+		http._status_code = HTTP::autoindex( http, target );
 	}
+	else
+		http._status_code = INTERNAL_SERVER_ERROR;
 
 	// WIP: solve _client._server
 	//if ( http._client._server._cgi_pass.length() != 0 )
@@ -51,10 +53,8 @@ HTTP::http_get ( HTTP & http )
 
 	// TODO: replace to_string(); it's not c++98.
 
-	if ( http._message_body.size() > 0 )
-		http._response_headers["content-length"] = std::to_string( http._message_body.size() );
-
-	http._status_code = OK;
+	//if ( http._message_body.size() > 0 )
+	http._response_headers["content-length"] = std::to_string( http._message_body.size() );
 
 	return ( EXIT_SUCCESS );
 }

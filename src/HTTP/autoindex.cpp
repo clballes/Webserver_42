@@ -18,7 +18,7 @@
  */
 
 int
-HTTP::autoindex ( HTTP & http )
+HTTP::autoindex ( HTTP & http, std::string & target )
 {
 	std::string page;
 	std::string directory_name;
@@ -26,10 +26,8 @@ HTTP::autoindex ( HTTP & http )
 
 	LOG( "call HTTP::autoindex()" );
 	
-	directory_name = http._request.target;
+	directory_name = target;
 	LOG( " directory_name: " << directory_name );
-
-	// TODO: translate directory using root.
 
 	directory = opendir( directory_name.c_str() );
 
@@ -37,7 +35,7 @@ HTTP::autoindex ( HTTP & http )
 	{
 		std::cerr << directory_name << ": " << strerror( errno );
 		std::cerr << std::endl;
-		return ( EXIT_FAILURE );
+		return ( NOT_FOUND );
 	}
 
 	// HTML init content tags ( html, head, title, body ).
@@ -57,6 +55,7 @@ HTTP::autoindex ( HTTP & http )
 			ent != 0x0; ent = readdir( directory ) )
 	{
 		// TODO: consider using table tr td format
+		
 		page.append( "<p>" );
 		page.append( "<a href=\"" );
 		page.append( "http://" );
@@ -77,9 +76,6 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "</html>" );
 
     closedir( directory );
-
-	// TODO: add header content-length: page.length()
-	// TODO: compose_message will and HTTP message ending CRLF.
 
 	http._message_body.append( page.c_str() );
 

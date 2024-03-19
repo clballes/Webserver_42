@@ -46,7 +46,7 @@ HTTP::compose_response ( HTTP & http )
 	// TODO replace to_string()
 
 	http._buffer_send.append( std::to_string( http._status_code ) );
-	http._buffer_send.append( "\r\n" );
+	http._buffer_send.append( " \r\n" );
 
 	// Add response headers, if any.
 	// + ending CRLF

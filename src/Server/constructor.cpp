@@ -5,9 +5,6 @@
 
 #include "Server.hpp"
 
-int
-IEvent::kq = 0;
-
 // Initialize static `vector' of servers
 
 std::vector< Server * >
@@ -31,12 +28,4 @@ Server::Server ( const ServerConf & instance ): good( true )
 	_error_page = instance._error_page;
 
 	return ;
-}
-
-std::ostream &
-operator << ( std::ostream & os, const Server & server )
-{
-	os << "server socket: " << server._socket_fd;
-
-	return (os);
 }
