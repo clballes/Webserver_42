@@ -4,6 +4,7 @@
 /* Tue Mar 19 14:33:32 2024                                                   */
 
 #include "HTTP.hpp"
+#include "ft_stdlib.h"
 
 std::string &
 HTTP::urlencode ( std::string & url )
@@ -16,9 +17,25 @@ HTTP::urlencode ( std::string & url )
 std::string &
 HTTP::urldecode ( std::string & url )
 {
-	LOG( "call HTTP::urldecode()" );
+	std::string::size_type pos = 0;
+	std::string            num;
+	int n;
 
+	LOG( "call HTTP::urldecode()" );
 	LOG( url );
+
+	pos = url.find_first_of( "%", pos );
+	while ( pos != std::string::npos )
+	{
+		if ( pos + 2 >= url.length() )
+			LOG( "SHOULD ABORT" );
+
+		num = url.substr( pos + 1, 2 );
+		n = std::stoi( num, 0, 16 );
+		url.replace( pos, 3, sizeof( char ), static_cast<char>( n ) );
+
+		pos = url.find_first_of( "%", pos + 1 );
+	}
 
 	return ( url );
 }

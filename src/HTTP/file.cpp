@@ -24,9 +24,8 @@ HTTP::load_file( HTTP & http, std::string & target )
 	if ( file.good() == false )
 	{
 		LOG( "!file errored" );
+		return ( FORBIDDEN );
 	}
 
-	(void) http;
-	(void) target;
 	return ( OK );
 }
