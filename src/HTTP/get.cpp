@@ -66,33 +66,3 @@ HTTP::http_head ( HTTP & http )
 	
 	return ( EXIT_SUCCESS );
 }
-
-int
-HTTP::http_post ( HTTP & http )
-{
-	LOG( "call HTTP::http_post()" );
-	
-	(void) http;
-	
-	return ( EXIT_SUCCESS );
-}
-
-int
-HTTP::http_put ( HTTP & http )
-{
-	LOG( "call HTTP::http_put()" );
-
-	(void) http;
-
-	return ( EXIT_SUCCESS );
-}
-int
-
-HTTP::http_delete ( HTTP & http )
-{
-	LOG( "call HTTP::http_delete()" );
-	
-	(void) http;
-	
-	return ( EXIT_SUCCESS );
-}
