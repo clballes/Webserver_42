@@ -1,14 +1,15 @@
-- [ ] load file function
 - [ ] excludes ?options from URI
 - [ ] proper log system
 - [ ] finish getoptions()
 - [ ] if not REUSE_SOCKET, loop timer to retry bind
 - [ ] send connection: close header
-- [ ] function() decode_url / encode_url %20 whitespaces, etc
+- [ ] encode_url %20 whitespaces, etc
 - [ ] allow_methods -> flags (Server)
 - [ ] Tests: request headers
 - [ ] Clear unused / properly reorder included headers!
 - [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
+- [x] load file function
+- [x] decode_url
 - [x] http Server & from Client
 - [x] HTTP::http_get: translate target += root
 - [x] parse headers
