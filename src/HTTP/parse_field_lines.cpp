@@ -21,12 +21,10 @@ HTTP::parse_field_line ( std::string & line )
 	//LOG( "call HTTP::parse_field_line()" );
 	//LOG_BUFFER( line.c_str() );
 
-	// std::clog << "header: " << line << std::endl;
 	len = line.length();
-
 	pos = line.find_first_of( ":" );
 
-	// WIP
+	// TODO
 	//if ( pos == std::string::npos
 	//		|| line.find( " ", 0, pos ) != std::string::npos )
 	//	return ( EXIT_FAILURE );
@@ -34,15 +32,11 @@ HTTP::parse_field_line ( std::string & line )
 	field_name = line.substr( 0, pos );
 	++pos;
 	
-	// LOG_BUFFER( field_name.c_str() );
-
 	if ( pos == len )
 		return ( EXIT_FAILURE );
 
 	field_value = line.substr( pos, len - pos );
 	trim_f( field_value, &std::isspace );
-
-	// LOG_BUFFER( field_value.c_str() );
 
 	this->_headers.insert( this->_headers.end(),
 			std::pair< std::string, std::string> ( field_name, field_value ) );

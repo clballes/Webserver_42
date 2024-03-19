@@ -44,7 +44,7 @@ webserv ( void )
 	// For each Server instance,
 	// register an event with the queue.
 
-	// WIP: maybe just set_init_events (sockets mainly)
+	// TODO: maybe just set_init_events (sockets mainly)
 	// ; there will be more events to register later,
 	// during program execution and loop execution.
 
@@ -53,7 +53,7 @@ webserv ( void )
 	{
 		if ( ( *it )->start() )
 		{
-			// WIP: retry once after ~30 seconds.
+			// TODO: retry once after ~30 seconds.
 			return ( EXIT_FAILURE );
 		}
 	}

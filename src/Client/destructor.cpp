@@ -22,7 +22,7 @@ Client::~Client ( void )
 	{
 		if ( *it == this )
 		{
-			// WIP !!
+			// TODO !!
 			/*
 			LOG("dddddddestructorr");
 			this->_buffer_send.assign( "HTTP/1.1 200 OK\r\nconnection: close\r\n" );
