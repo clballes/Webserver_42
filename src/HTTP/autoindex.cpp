@@ -49,8 +49,6 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 	page.append( "<body>" );
 	page.append( "<h1>Index of</h1>" );
 
-	std::string host( "localhost:8080" );
-
 	for ( struct dirent *ent = readdir( directory );
 			ent != 0x0; ent = readdir( directory ) )
 	{
@@ -60,8 +58,10 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 		page.append( "<a href=\"" );
 		page.append( "http://" );
 		page.append( http._headers["Host"] );
-		if ( directory_name.size() > 1 )
-			page.append( directory_name );
+		LOG( " you should know directory_name is: " << directory_name );
+		LOG( " whilst http._request.target is: " << http._request.target );
+		if ( http._request.target.size() > 1 )
+			page.append( http._request.target );
 		page.append( "/" );
 		page.append( ent->d_name );
 		page.append( "\">" );
