@@ -79,5 +79,5 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 
 	http._message_body.append( page.c_str() );
 
-	return ( EXIT_SUCCESS );
+	return ( OK );
 }
