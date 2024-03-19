@@ -35,13 +35,14 @@ ServerConf::ServerConf ( void ):
 	_index(1, "index.html")
 {
 	LOG( "call ServerConf::ServerConf( void )" );
-	this->_error_page[400] = "src/err_pages/400.html";
-	this->_error_page[403] = "src/err_pages/403.html";
-	this->_error_page[404] = "src/err_pages/404html";
-	this->_error_page[405] = "src/err_pages/405.html";
-	this->_error_page[410] = "src/err_pages/410.html";
-	this->_error_page[413] = "src/err_pages/413.html";
-	this->_error_page[500] = "src/err_pages/500.html";
+	
+	this->_error_page[400].assign( DEFAULT_ERROR_DIR ).append( "/400.html" );
+	this->_error_page[403].assign( DEFAULT_ERROR_DIR ).append( "/403.html" );
+	this->_error_page[404].assign( DEFAULT_ERROR_DIR ).append( "/404.html" );
+	this->_error_page[405].assign( DEFAULT_ERROR_DIR ).append( "/405.html" );
+	this->_error_page[410].assign( DEFAULT_ERROR_DIR ).append( "/410.html" );
+	this->_error_page[413].assign( DEFAULT_ERROR_DIR ).append( "/413.html" );
+	this->_error_page[500].assign( DEFAULT_ERROR_DIR ).append( "/500.html" );
 	this->_address.sin_port = 80;
 	return ;
 }
@@ -64,13 +65,13 @@ ServerConf::ServerConf ( const std::deque< std::string > & server_block ):
 {
 	LOG( "call ServerConf( const std::deque< std::string > &" )
 
-	this->_error_page[400] = "src/err_pages/400.html";
-	this->_error_page[403] = "src/err_pages/403.html";
-	this->_error_page[404] = "src/err_pages/404html";
-	this->_error_page[405] = "src/err_pages/405.html";
-	this->_error_page[410] = "src/err_pages/410.html";
-	this->_error_page[413] = "src/err_pages/413.html";
-	this->_error_page[500] = "src/err_pages/500.html";
+	this->_error_page[400].assign( DEFAULT_ERROR_DIR ).append( "/400.html" );
+	this->_error_page[403].assign( DEFAULT_ERROR_DIR ).append( "/403.html" );
+	this->_error_page[404].assign( DEFAULT_ERROR_DIR ).append( "/404.html" );
+	this->_error_page[405].assign( DEFAULT_ERROR_DIR ).append( "/405.html" );
+	this->_error_page[410].assign( DEFAULT_ERROR_DIR ).append( "/410.html" );
+	this->_error_page[413].assign( DEFAULT_ERROR_DIR ).append( "/413.html" );
+	this->_error_page[500].assign( DEFAULT_ERROR_DIR ).append( "/500.html" );
 	this->_address.sin_port = 80;
 
 	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
