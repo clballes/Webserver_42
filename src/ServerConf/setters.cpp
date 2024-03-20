@@ -294,13 +294,13 @@ ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
     while ( iss >> word )
 	{
         if ( word == "GET" )
-            conf._allow_methods |= METHOD_GET;
+            conf._flags |= METHOD_GET;
         else if ( word == "POST" )
-            conf._allow_methods |= METHOD_POST;
+            conf._flags |= METHOD_POST;
         else if ( word == "PUT" )
-            conf._allow_methods |= METHOD_PUT;
+            conf._flags |= METHOD_PUT;
         else if ( word == "DELETE" )
-            conf._allow_methods |= METHOD_DELETE;
+            conf._flags |= METHOD_DELETE;
         else
             return ( EXIT_FAILURE );
     }
@@ -340,7 +340,7 @@ ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
 		return ( EXIT_SUCCESS );
 	else if ( strcmp( arg, "on" ) == 0 )
 	{
-		conf._allow_methods |= F_AUTOINDEX;
+		conf._flags |= F_AUTOINDEX;
 		
 		return ( EXIT_SUCCESS );
 	}

@@ -29,10 +29,10 @@ ServerConf::_config_directives[] = {
 
 ServerConf::ServerConf ( void ):
 	good( true ),
-	_root("html"),
-	_allow_methods(0),
-	_client_max_body_size(0),
-	_index(1, "index.html")
+	_root( "html" ),
+	_flags( 0 ),
+	_client_max_body_size( 0 ),
+	_index( 1, "index.html" )
 {
 	LOG( "call ServerConf::ServerConf( void )" );
 	
@@ -58,10 +58,10 @@ ServerConf::ServerConf ( const ServerConf & instance )
 
 ServerConf::ServerConf ( const std::deque< std::string > & server_block ):
 	good( true ),
-	_root("html"),
-	_allow_methods(0), 
-	_client_max_body_size(0),
-	_index(1, "index.html")
+	_root( "html" ),
+	_flags( 0 ), 
+	_client_max_body_size( 0 ),
+	_index( 1, "index.html" )
 {
 	LOG( "call ServerConf( const std::deque< std::string > &" )
 
@@ -82,17 +82,6 @@ ServerConf::ServerConf ( const std::deque< std::string > & server_block ):
 	return ;
 }
 
-ServerConf &
-ServerConf::operator = ( const ServerConf & instance )
-{
-	this->good = instance.good;
-	// WIP
-
-	LOG( "call ServerConf::operator=ServerConf" );
-
-	return ( *this );
-}
-
 std::ostream &
 operator << ( std::ostream & out, const ServerConf & instance )
 {
@@ -111,21 +100,14 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << " root: " << instance._root;
 	out << std::endl;
 
-	/*
-	out << "Allowed methods: Bitwise representation: ";
-	for ( int i = 6; i >= 0; --i )
-		out << ( (instance._allow_methods & ( 1 << i ) ) ? '1' : '0' );
-	out << std::endl;
-	*/
-
     out << " allowed_methods:";
-    if ( instance._allow_methods & METHOD_GET )
+    if ( instance._flags & METHOD_GET )
         out << " GET";
-    if ( instance._allow_methods & METHOD_POST )
+    if ( instance._flags & METHOD_POST )
         out << " POST";
-    if ( instance._allow_methods & METHOD_PUT )
+    if ( instance._flags & METHOD_PUT )
         out << " PUT";
-    if ( instance._allow_methods & METHOD_DELETE )
+    if ( instance._flags & METHOD_DELETE )
         out << " DELETE";
     out << std::endl;
 
@@ -138,7 +120,7 @@ operator << ( std::ostream & out, const ServerConf & instance )
 	out << " cgi_param: " << instance._cgi_param;
 	out << std::endl;
 
-	if ( instance._allow_methods & F_AUTOINDEX )
+	if ( instance._flags & F_AUTOINDEX )
         out << " autoindex: on" << std::endl;
 	
 	out << " index:";

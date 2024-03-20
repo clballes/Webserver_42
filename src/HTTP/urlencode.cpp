@@ -22,7 +22,6 @@ HTTP::urldecode ( std::string & url )
 	int n;
 
 	LOG( "call HTTP::urldecode()" );
-	LOG( url );
 
 	pos = url.find_first_of( "%", pos );
 	while ( pos != std::string::npos )

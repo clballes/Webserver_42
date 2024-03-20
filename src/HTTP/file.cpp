@@ -9,18 +9,23 @@ int
 HTTP::load_file( HTTP & http, std::string & target )
 {
 	std::ifstream file;
-	std::string   line;
+	std::ifstream::pos_type pos;
 	
 	LOG( "call HTTP::load_file()" );
 
-	file.open( target );
+	file.open( target, std::ios::in | std::ios::binary | std::ios::ate );
 
-	while ( file.good() == true && file.eof() == false )
+	if ( file.good() == true && file.eof() == false )
 	{
-		file >> line;
-		http._message_body.append( line + " " );
-		// http._message_body.append( line);
+		// TODO: sanity checks
+		
+		pos = file.tellg();
+		file.seekg( 0, std::ios::beg );
+
+		http._message_body.resize( pos );
+		file.read( (char *) http._message_body.data(), pos );
 	}
+	
 	if ( file.good() == false )
 	{
 		LOG( "!file errored" );

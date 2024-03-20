@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include "Server.hpp"
+#include "webserv.hpp"
 #include <fstream>
 #include <deque>
 #include <vector>
 #include <map>
+#include "Log.hpp"
 
 #define DEFAULT_ERROR_DIR "www"
 
@@ -48,7 +49,6 @@ class ServerConf
 		ServerConf ( void );
 		ServerConf ( const ServerConf & );
 		ServerConf ( const std::deque< std::string > & );
-		ServerConf & operator = ( const ServerConf & );
 		~ServerConf ( void );
 
 		static int file2mem ( std::ifstream &, std::deque< std::string > & );
@@ -78,7 +78,7 @@ class ServerConf
 		struct sockaddr_in			_address;
 		std::vector< std::string>	_server_name;
 		std::string					_root;
-		unsigned int 				_allow_methods;
+		unsigned int 				_flags;
 		std::size_t					_client_max_body_size;
 		std::vector< std::string>	_index;
 		std::string 				_cgi_param; //nse si guardar en un vector

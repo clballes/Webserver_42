@@ -89,11 +89,11 @@ parse_target( t_request & request, std::string & line )
 		return ( BAD_REQUEST );
 
 	request.target = line.substr( 0, pos );
-	LOG( " request.target: " << request.target );
+	LOG( " request.target: \"" << request.target << "\"" );
 
 	// TODO: decode url
 	HTTP::urldecode( request.target );
-	LOG( " request.target: " << request.target );
+	LOG( " request.target: \"" << request.target << "\"" );
 
 	return ( EXIT_SUCCESS );
 }

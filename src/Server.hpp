@@ -53,7 +53,7 @@ class Server: public IEvent
 
 		std::vector< std::string>	_server_name;
 		std::string					_root;
-		unsigned int 				_allow_methods;
+		unsigned int 				_flags;
 		std::size_t					_client_max_body_size;
 		std::vector< std::string>	_index;
 		std::string 				_cgi_param; //nse si guardar en un vector
