@@ -1,6 +1,6 @@
 /*                                                                            */
-/* CgiHandler.cpp                                                             */
-/* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
+/* handler.cpp                                                                */
+/* clballes <clballes@student.42barcelona.com>                                */
 /* Mon Mar  4 15:43:13 2024                                                   */
 
 
