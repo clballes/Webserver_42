@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include "Server.hpp"
+#include "webserv.hpp"
 #include <fstream>
 #include <deque>
 #include <vector>
 #include <map>
+#include "Log.hpp"
 
 #define DEFAULT_ERROR_DIR "www"
 

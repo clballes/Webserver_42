@@ -3,7 +3,12 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Wed Feb 14 16:44:34 2024                                                   */
 
+#include "IEvent.hpp"
 #include "webserv.hpp"
+#include "Log.hpp"
+
+int
+IEvent::kq = 0;
 
 extern bool status;
 

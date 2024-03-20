@@ -56,6 +56,8 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/HTTP/autoindex.cpp \
 					$(SRC_DIR)/HTTP/urlencode.cpp \
 					$(SRC_DIR)/HTTP/events.cpp \
+					$(SRC_DIR)/CGI/constructor.cpp \
+					$(SRC_DIR)/CGI/destructor.cpp \
 					$(SRC_DIR)/CGI/handler.cpp
 					
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)

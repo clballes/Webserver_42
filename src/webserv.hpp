@@ -65,14 +65,9 @@
 
 # include <sys/cdefs.h>
 # include <set>
-# include "Server.hpp"
-
-#include "Server.hpp"
 
 __BEGIN_DECLS extern "C"
 int webserv ( void );
 __END_DECLS
-
-#include "Log.hpp"
 
 #endif /* webserv.hpp */

@@ -4,12 +4,10 @@
 /* Thu Jan 25 14:26:11 2024                                                   */
 
 #include "webserv.hpp"
+#include "Server.hpp"
 #include "init.hpp"
 #include "parse.hpp"
 #include <fstream>
-
-int
-IEvent::kq = 0;
 
 int
 main ( int argc, char * const * argv )
