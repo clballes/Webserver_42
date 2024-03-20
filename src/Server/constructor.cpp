@@ -22,7 +22,7 @@ Server::Server ( const ServerConf & instance ): good( true )
 
 	_server_name = instance._server_name;
 	_root = instance._root;
-	_allow_methods = instance._allow_methods;
+	_flags = instance._flags;
 	_client_max_body_size = instance._client_max_body_size;
 	_index = instance._index;
 	_cgi_param = instance._cgi_param;

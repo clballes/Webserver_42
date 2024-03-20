@@ -41,6 +41,8 @@ typedef struct s_request
 {
 	t_http_method * method;
 	std::string target;
+	std::string query;
+	std::string fragments;
 	int http_version;
 
 } t_request;

@@ -32,7 +32,7 @@ HTTP::http_get ( HTTP & http )
 	{
 		http._status_code = HTTP::load_file( http, target );
 	}
-	else if ( http._server._allow_methods & F_AUTOINDEX )
+	else if ( http._server._flags & F_AUTOINDEX )
 	{
 		http._status_code = HTTP::autoindex( http, target );
 	}
