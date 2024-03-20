@@ -67,6 +67,8 @@ class HTTP: public CGI
 		static std::string & urldecode ( std::string & );
 		static int load_file ( HTTP &, std::string & );
 
+		friend class CGI;
+
 	protected:
 
 		Client &                _client;

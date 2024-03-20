@@ -35,4 +35,6 @@ class CGI
 
 };
 
+#include "HTTP.hpp"
+
 #endif /* CGI.hpp */

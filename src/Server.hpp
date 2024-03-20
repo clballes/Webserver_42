@@ -37,6 +37,7 @@ class Server: public IEvent
 
 		friend class Client;
 		friend class HTTP;
+		friend class CGI;
 		friend std::ostream & operator << ( std::ostream &, const Server & );
 
 	private:

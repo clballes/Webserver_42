@@ -15,6 +15,7 @@ int
 HTTP::http_get ( HTTP & http )
 {
 	std::string target;
+	bool file_is_regular;
 
 	LOG( "call HTTP::http_get()" );
 
@@ -23,12 +24,14 @@ HTTP::http_get ( HTTP & http )
 
 	LOG( " target: " << target );
 
+	file_is_regular = is_regular_file( target );
+
 	// Try find `target'
 	//
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
 	
-	if ( is_regular_file( target ) == true )
+	if ( file_is_regular == true )
 	{
 		http._status_code = HTTP::load_file( http, target );
 	}
@@ -41,18 +44,11 @@ HTTP::http_get ( HTTP & http )
 
 	if ( http._server._cgi_pass.length() != 0 )
 	{
-		LOG( " Executing Cgi" );
-		//executing CGI, establishing parameters
-		std::cout <<"------------------- "<< std::endl;
 		http.execute();
-		//executeCGI(http._server._cgi_pass, env);
-		// forco q fucioni el cgi
-		// http._message_body.append("<html><head><title>CGI Python Script</title></head><body>hola estic forcant el cgi script<body></html> ");
-		// http._status_code = 200;
-		// std::cout <<"-------------------- "<< std::endl;
 	}
 	else
-	{}
+	{
+	}
 
 	// implement loop fashion
 
