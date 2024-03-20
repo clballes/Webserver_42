@@ -18,7 +18,7 @@ HTTP::load_file( HTTP & http, std::string & target )
 	if ( file.good() == true && file.eof() == false )
 	{
 		// TODO: sanity checks
-		
+		std::cout << "TARGET IS: " << target << std::endl;
 		pos = file.tellg();
 		file.seekg( 0, std::ios::beg );
 

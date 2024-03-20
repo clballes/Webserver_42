@@ -20,3 +20,10 @@
 - [x] Move Server::kq to IEvent::kq
 - [x] Each client has it's own HTTP instance
 - [x] Find out why binded addresses keep binded for some seconds after cntrl+D
+
+## CLARA
+- [ ] Fer el post
+- [] cgi fer set env
+- [] cgi fer unsset env
+- [] cgi_param de la server confi(podriem passar)
+- [] fer err page

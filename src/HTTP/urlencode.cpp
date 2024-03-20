@@ -35,6 +35,6 @@ HTTP::urldecode ( std::string & url )
 
 		pos = url.find_first_of( "%", pos + 1 );
 	}
-
+	std::cout << " ---------- url:"<< url << std::endl;
 	return ( url );
 }

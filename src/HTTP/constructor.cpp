@@ -37,6 +37,7 @@ HTTP::HTTP ( Client & client_instance, Server & server_instance ):
 	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
 
 	this->_request.target = this->_server._root;
+	std::cout << "request target: " << this->_request.target << std::endl;
 	
 	return ;
 }
