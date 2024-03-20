@@ -18,9 +18,10 @@ HTTP::load_file( HTTP & http, std::string & target )
 	while ( file.good() == true && file.eof() == false )
 	{
 		file >> line;
-		http._message_body.append( line );
+		//TODO: getline()
+		http._message_body.append( line + " " );
+		// http._message_body.append( line);
 	}
-
 	if ( file.good() == false )
 	{
 		LOG( "!file errored" );

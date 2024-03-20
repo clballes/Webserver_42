@@ -90,6 +90,8 @@ class HTTP
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP &, std::string & );
+		static char **    init_env(std::string method, std::string target);
+		static void executeCGI(const std::string& scriptPath, char **env);
 
 };
 
