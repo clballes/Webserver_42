@@ -44,6 +44,7 @@ typedef struct s_request
 	std::string target;
 	std::string query;
 	std::string fragments;
+	std::string body;
 	int http_version;
 
 } t_request;

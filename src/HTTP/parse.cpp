@@ -26,15 +26,22 @@ HTTP::parse ( void )
 		if ( start == 0 )
 		{
 			if ( parse_start_line( line ) == EXIT_FAILURE )
+			{
+				LOG( "START_LINE" );
 				return ( EXIT_FAILURE );
+			}
 		}
 		else if ( std::isgraph( line.at( 0 ) ) != 0 )
 		{
 			if ( parse_field_line( line ) == EXIT_FAILURE )
+			{
+				LOG( "TT" );
 				return ( EXIT_FAILURE );
+			}
 		}
 		else if ( ( pos - start ) != 1 )
 		{
+			LOG( "HERE" );
 			return ( EXIT_FAILURE );
 		}
 		
