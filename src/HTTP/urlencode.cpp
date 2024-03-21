@@ -17,6 +17,8 @@ HTTP::urlencode ( std::string & url )
 std::string &
 HTTP::urldecode ( std::string & url )
 {
+	std::replace(url.begin(), url.end(), '+', ' '); //aixi fa la peticio de decoded sense signes de + en el %20
+
 	std::string::size_type pos = 0;
 	std::string            num;
 	int n;
@@ -35,6 +37,5 @@ HTTP::urldecode ( std::string & url )
 
 		pos = url.find_first_of( "%", pos + 1 );
 	}
-	std::cout << " ---------- url:"<< url << std::endl;
 	return ( url );
 }

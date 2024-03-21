@@ -86,6 +86,8 @@ class HTTP: public CGI
 		int parse ( void );
 		int parse_start_line ( std::string & );
 		int parse_field_line ( std::string & );
+		void generateHTML();
+		int put_file();
 		
 		static int http_get ( HTTP & );
 		static int http_head ( HTTP & );
