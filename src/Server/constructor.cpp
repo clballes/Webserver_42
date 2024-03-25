@@ -7,27 +7,36 @@
 
 // Initialize static `vector' of servers
 
-std::vector< Server * >
-Server::servers;
+// std::vector< Server * >
+// Server::servers;
 
-Server::Server ( const ServerConf & instance ): good( true )
-{
-	LOG( "call Server::Server( const ServerConf & )" );
+// Server::Server ( const ServerConf & instance ): good( true )
+// {
+// 	LOG( "call Server::Server( const ServerConf & )" );
 	
-	// This should only be logged on certain mode
-	//LOG( instance );
+// 	// This should only be logged on certain mode
+// 	LOG( instance );
 
-	std::memcpy( &this->_address, &instance._address,
-			sizeof( instance._address ) );
+// 	// std::memcpy( &this->_address, &instance._address,
+// 	// 		sizeof( instance._address ) );
 
-	_server_name = instance._server_name;
-	_root = instance._root;
-	_flags = instance._flags;
-	_client_max_body_size = instance._client_max_body_size;
-	_index = instance._index;
-	_cgi_param = instance._cgi_param;
-	_cgi_pass = instance._cgi_pass;
-	_error_page = instance._error_page;
+// 	// _server_name = instance._server_name;
+// 	// _root = instance._root;
+// 	// _flags = instance._flags;
+// 	// _client_max_body_size = instance._client_max_body_size;
+// 	// _index = instance._index;
+// 	// _cgi_param = instance._cgi_param;
+// 	// _cgi_pass = instance._cgi_pass;
+// 	// _error_page = instance._error_page;
 
-	return ;
+// 	return ;
+// }
+
+Server::Server(const struct sockaddr_in& add)
+{
+	LOG( "Server setup adress" );
+	memcpy(&this->_address, &add, sizeof(add));
+	// std::cout << "Address Family: " << _address.sin_family << std::endl;
+	// std::cout << "Port: " << ntohs(_address.sin_port) << std::endl; // Convert network byte order to host byte order
+	// std::cout << "Host: " << inet_ntoa(_address.sin_addr) << std::endl; // Convert IP address to string
 }

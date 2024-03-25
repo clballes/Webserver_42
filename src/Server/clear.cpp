@@ -5,13 +5,13 @@
 
 #include "Server.hpp"
 
-void
-Server::clear ( void )
-{
-	Server::iterator it = Server::servers.begin();
+// void
+// Server::clear ( void )
+// {
+// 	Server::iterator it = Server::servers.begin();
 
-	for ( ; it != Server::servers.end(); ++it )
-		delete *it;
+// 	for ( ; it != Server::servers.end(); ++it )
+// 		delete *it;
 
-	return ;
-}
+// 	return ;
+// }

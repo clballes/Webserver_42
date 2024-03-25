@@ -10,7 +10,7 @@ Server::start ( void )
 {
 	LOG( "call Server::start()" );
 
-	//LOG( "call socket()" );
+	LOG( "call socket()" );
 
 	// Create socket ( server's )
 
@@ -45,8 +45,12 @@ Server::start ( void )
 	// Bind server's address to newly
 	// create socket.
 
-	//LOG( "call bind() (fd=" << this->_socket_fd << ")" );
+	LOG( "call bind() (fd=" << this->_socket_fd << ")" );
 
+	std::cout << this->_socket_fd << std::endl;
+	std::cout << "Address Family: " << _address.sin_family << std::endl;
+	std::cout << "Port: " << ntohs(_address.sin_port) << std::endl; // Convert network byte order to host byte order
+	std::cout << "Host: " << inet_ntoa(_address.sin_addr) << std::endl; // Convert I
 	if ( ::bind( this->_socket_fd, (struct sockaddr *) &this->_address,
 				sizeof( this->_address ) ) == -1 )
 	{
@@ -58,7 +62,7 @@ Server::start ( void )
 	// Start listening on server's address
 	// through binded socket.
 
-	//LOG( "call listen() (fd=" << this->_socket_fd << ")" );
+	LOG( "call listen() (fd=" << this->_socket_fd << ")" );
 
 	if ( ::listen( this->_socket_fd, 0x0 ) == -1 )
 	{

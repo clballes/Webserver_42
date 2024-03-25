@@ -22,10 +22,9 @@ LDFLAGS			:=	-L$(dir $(LIBFT)) -lft
 SILENCE_LOGS	?=	false
 
 SRC_FILES		:=	$(SRC_DIR)/main.cpp \
-					$(SRC_DIR)/init.cpp \
-					$(SRC_DIR)/getoptions.cpp \
-					$(SRC_DIR)/webserv.cpp \
-					$(SRC_DIR)/loop.cpp \
+					$(SRC_DIR)/ServerConf/constructor.cpp \
+					$(SRC_DIR)/ServerConf/destructor.cpp \
+					$(SRC_DIR)/ServerConf/setters.cpp \
 					$(SRC_DIR)/ServerHandler/add.cpp \
 					$(SRC_DIR)/ServerHandler/ServerHandler.cpp \
 					$(SRC_DIR)/ServerHandler/file2mem.cpp \
@@ -38,26 +37,30 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/Server/start.cpp \
 					$(SRC_DIR)/Server/stop.cpp \
 					$(SRC_DIR)/Server/clear.cpp \
-					$(SRC_DIR)/Client/constructor.cpp \
-					$(SRC_DIR)/Client/destructor.cpp \
-					$(SRC_DIR)/Client/events.cpp \
-					$(SRC_DIR)/HTTP/constructor.cpp \
-					$(SRC_DIR)/HTTP/destructor.cpp \
-					$(SRC_DIR)/HTTP/parse.cpp \
-					$(SRC_DIR)/HTTP/parse_start_line.cpp \
-					$(SRC_DIR)/HTTP/parse_field_lines.cpp \
-					$(SRC_DIR)/HTTP/get.cpp \
-					$(SRC_DIR)/HTTP/post.cpp \
-					$(SRC_DIR)/HTTP/put.cpp \
-					$(SRC_DIR)/HTTP/delete.cpp \
-					$(SRC_DIR)/HTTP/file.cpp \
-					$(SRC_DIR)/HTTP/autoindex.cpp \
-					$(SRC_DIR)/HTTP/urlencode.cpp \
-					$(SRC_DIR)/HTTP/events.cpp \
 					$(SRC_DIR)/Cluster.cpp \
+					$(SRC_DIR)/init.cpp \
+					$(SRC_DIR)/getoptions.cpp \
+					#$(SRC_DIR)/loop.cpp \
+					#$(SRC_DIR)/webserv.cpp \
+					# $(SRC_DIR)/HTTP/constructor.cpp \
+					# $(SRC_DIR)/HTTP/destructor.cpp \
+					# $(SRC_DIR)/HTTP/parse.cpp \
+					# $(SRC_DIR)/HTTP/parse_start_line.cpp \
+					# $(SRC_DIR)/HTTP/parse_field_lines.cpp \
+					# $(SRC_DIR)/HTTP/get.cpp \
+					# $(SRC_DIR)/HTTP/post.cpp \
+					# $(SRC_DIR)/HTTP/put.cpp \
+					# $(SRC_DIR)/HTTP/delete.cpp \
+					# $(SRC_DIR)/HTTP/file.cpp \
+					# $(SRC_DIR)/HTTP/autoindex.cpp \
+					# $(SRC_DIR)/HTTP/urlencode.cpp \
+					# $(SRC_DIR)/HTTP/events.cpp \
 					# $(SRC_DIR)/CGI/constructor.cpp \
 					# $(SRC_DIR)/CGI/destructor.cpp \
-					# $(SRC_DIR)/CGI/handler.cpp
+					# $(SRC_DIR)/CGI/handler.cpp \
+					# (SRC_DIR)/Client/constructor.cpp \
+					# $(SRC_DIR)/Client/destructor.cpp \
+					# $(SRC_DIR)/Client/events.cpp \
 					
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)

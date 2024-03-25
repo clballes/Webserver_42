@@ -6,6 +6,8 @@
 #include "IEvent.hpp"
 #include "webserv.hpp"
 #include "Server.hpp"
+#include "ServerHandler.hpp"
+#include "Cluster.hpp"
 
 void graceful_stop ( int );
 void set_events ( int );

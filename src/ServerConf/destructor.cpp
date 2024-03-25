@@ -17,15 +17,16 @@ ServerConf::~ServerConf ( void )
 void
 ServerConf::clear ( void )
 {
-	ServerConf::iterator it = ServerConf::instances.begin();
+	std::cout << "Clear serverconf, de moment no fa res" << std::endl;
+	// ServerConf::iterator it = ServerConf::instances.begin();
 
-	while ( it != ServerConf::instances.end() )
-	{
-		delete ( *it );
-		++it;
-	}
+	// while ( it != ServerConf::instances.end() )
+	// {
+	// 	delete ( *it );
+	// 	++it;
+	// }
 
-	ServerConf::instances.clear();
+	// ServerConf::instances.clear();
 
 	return ;
 }

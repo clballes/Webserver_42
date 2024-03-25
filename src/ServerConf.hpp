@@ -14,8 +14,16 @@
 
 #define DEFAULT_ERROR_DIR "www"
 
-class Server;
+// class Server;
 class ServerConf;
+
+// struct s_configuration_directives
+// {
+// 	const char *directive_name;
+// 	int ( *set_func )( ServerConf &, const char * );
+// };
+
+// typedef struct s_configuration_directives t_configuration_directives;
 
 typedef struct s_configuration_directives
 {
@@ -31,17 +39,12 @@ class ServerConf
 		ServerConf ( const ServerConf & );
 		ServerConf ( const std::deque< std::string > & );
 		~ServerConf ( void );
-		friend class Server;
+		// friend class Server;
 		
 		bool good;
-		// static std::deque< const ServerConf * >instances;
-	
-		// typedef std::deque< const ServerConf * >::iterator iterator;
-		// typedef std::deque< const ServerConf * >::const_iterator const_iterator;
-		
-		static void clear ( void );
-		
-		// friend std::ostream & operator << ( std::ostream&, const ServerConf & );
+		static void clear ( void ); // crec q no va aqui
+		friend std::ostream & operator << ( std::ostream&, const ServerConf & );
+		struct sockaddr_in getAddress() const;
 
 	private:
 		int set_directives ( const std::deque< std::string > & );

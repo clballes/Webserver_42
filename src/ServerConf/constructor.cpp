@@ -10,11 +10,10 @@
 // We use <deque> because we don't know beforehand
 // how many `server {}' there are.
 
-std::deque< const ServerConf * >
-ServerConf::instances;
+// std::deque< const ServerConf * >
+// ServerConf::instances;
 
-t_configuration_directives
-ServerConf::_config_directives[] = {
+t_configuration_directives ServerConf::_config_directives[] = {
 	{ "listen", &ServerConf::set_listen },
 	{ "root", &ServerConf::set_root },
 	{ "server_name", &ServerConf::set_server_name },
@@ -74,7 +73,7 @@ ServerConf::ServerConf ( const std::deque< std::string > & server_block ):
 	this->_error_page[500].assign( DEFAULT_ERROR_DIR ).append( "/500.html" );
 	this->_address.sin_port = 80;
 
-	if ( ServerConf::set_directives( server_block ) == EXIT_FAILURE )
+	if ( ServerConf::set_directives( server_block) == EXIT_FAILURE )
 	{
 		std::cerr << "check_directives" << std::endl;
 		this->good = ! good;
@@ -128,7 +127,6 @@ operator << ( std::ostream & out, const ServerConf & instance )
 			it != instance._index.end(); ++it )
 		out << " " << *it;
 
-	/*
     out << "Error Pages:";
 	std::map<int, std::string>::const_iterator it2 = instance._error_page.begin();
 	while ( it2 != instance._error_page.end() )
@@ -137,7 +135,10 @@ operator << ( std::ostream & out, const ServerConf & instance )
 		out << std::endl;
 		++it2;
 	}
-	*/
-
 	return ( out );
+}
+
+struct sockaddr_in ServerConf::getAddress() const
+{
+	return _address;
 }

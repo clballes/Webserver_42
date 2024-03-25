@@ -6,11 +6,12 @@
 #include "IEvent.hpp"
 #include "webserv.hpp"
 #include "Log.hpp"
+#include "Cluster.hpp"
 
 int
 IEvent::kq = 0;
 
-extern bool status;
+extern bool _status;
 
 void
 event_loop ( int kq )
@@ -20,7 +21,7 @@ event_loop ( int kq )
 	IEvent *        instance;
 
 	n_events = 1;
-	status = true;
+	_status = true;
 
 	LOG( "call event_loop() (fd=" << kq << ")" );
 

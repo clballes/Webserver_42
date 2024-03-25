@@ -22,9 +22,11 @@ class ServerHandler
 		// ServerHandler ( const std::deque< std::string > & );
 		~ServerHandler ( void );
 
+		// getters serverconf for creating servers, acceding host and port
+		const std::vector<ServerConf>& getServers() const;
+		
 		// add calls the other function to parse the config server and create the serverConf
-
-		static int add ( std::ifstream & );
+		int add ( std::ifstream & );
 		static int file2mem ( std::ifstream &, std::deque< std::string > & );
 		static void normalize ( std::deque< std::string > & );
 		static void split_elements ( std::deque< std::string > & );

@@ -37,7 +37,7 @@ ServerHandler::add ( std::ifstream & file )
 	// // Removes comments, trims `isspace()' characters
 	
 	ServerHandler::normalize( mem );
-	
+
 	// // Pre-parse `mem' is contents.
 	
 	if ( ServerHandler::pre_parse( mem ) == EXIT_FAILURE )
@@ -49,14 +49,12 @@ ServerHandler::add ( std::ifstream & file )
 	if ( ServerHandler::parse( mem, server_blocks ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	LOG( "server_blocks & creating ServerConf classes: " << server_blocks.size() );
+	LOG( " - -- - -  - - Creating ServerConf classes: " << server_blocks.size() );
 	for(size_t i = 0; i < server_blocks.size(); i++)
 	{
-		ServerConf serverConf;
-		if ( serverConf != EXIT_FAILURE)
-		{
-			_servers.push_back( serverConf );
-		}
+		ServerConf serverConf( server_blocks[i] );
+		this->_servers.push_back( serverConf );
 	}
+
 	return ( EXIT_SUCCESS );
 }

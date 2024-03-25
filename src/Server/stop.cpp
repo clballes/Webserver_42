@@ -8,15 +8,16 @@
 void
 Server::stop ( void )
 {
-	std::vector< Client * >::iterator it;
+	std::cout <<"aaaa"<< std::endl;
+	// std::vector< Client * >::iterator it;
 
-	while ( this->_clients.empty() == false )
-	{
-		it = this->_clients.begin();
-		delete *it;
-	}
+	// while ( this->_clients.empty() == false )
+	// {
+	// 	it = this->_clients.begin();
+	// 	delete *it;
+	// }
 
-	delete ( this );
+	// delete ( this );
 
 	return ;
 }

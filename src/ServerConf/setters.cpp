@@ -21,6 +21,7 @@ error_missingvalues( const char * arg )
 
 int
 ServerConf::set_directives ( const std::deque< std::string > & server_block )
+// ServerConf::set_directives ( )
 {
 	std::deque< std::string >::const_iterator it = server_block.begin();
 
