@@ -27,39 +27,23 @@ typedef struct s_configuration_directives
 class ServerConf
 {
 	public:
-
-		friend class Server;
-		
-		bool good;
-		static std::deque< const ServerConf * >instances;
-	
-		typedef std::deque< const ServerConf * >::iterator iterator;
-		typedef std::deque< const ServerConf * >::const_iterator const_iterator;
-		
-		static int add ( std::ifstream & );
-		static void clear ( void );
-		
-		friend std::ostream & operator << ( std::ostream&, const ServerConf & );
-
-	private:
-		
-		//  An empty ServerConf instance 
-		//  may be created for testing purposes.
-		
 		ServerConf ( void );
 		ServerConf ( const ServerConf & );
 		ServerConf ( const std::deque< std::string > & );
 		~ServerConf ( void );
-
-		static int file2mem ( std::ifstream &, std::deque< std::string > & );
-		static void normalize ( std::deque< std::string > & );
-		static void split_elements ( std::deque< std::string > & );
-		static void split2blocks( std::deque< std::string > &,
-				std::deque< std::deque< std::string > > &, const char * );
-		static int pre_parse ( std::deque< std::string > & );
-		static int parse ( std::deque< std::string > &,
-				std::deque< std::deque< std::string > > & );
+		friend class Server;
 		
+		bool good;
+		// static std::deque< const ServerConf * >instances;
+	
+		// typedef std::deque< const ServerConf * >::iterator iterator;
+		// typedef std::deque< const ServerConf * >::const_iterator const_iterator;
+		
+		static void clear ( void );
+		
+		// friend std::ostream & operator << ( std::ostream&, const ServerConf & );
+
+	private:
 		int set_directives ( const std::deque< std::string > & );
 
 		static int set_listen ( ServerConf &, const char * );
@@ -83,6 +67,6 @@ class ServerConf
 		std::vector< std::string>	_index;
 		std::string 				_cgi_param; //nse si guardar en un vector
 		std::string					_cgi_pass; 
-		std::map<int, std::string>	_error_page; //falta fer
+		std::map<int, std::string>	_error_page;
 		
 };

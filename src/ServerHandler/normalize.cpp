@@ -3,7 +3,7 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Fri Feb 16 13:15:29 2024                                                   */
 
-#include "ServerConf.hpp"
+#include "ServerHandler.hpp"
 #include <deque>
 #include <string>
 #include "parse.hpp"
@@ -13,7 +13,7 @@ void replace_sp( std::string & str, int ( *func )( int ) );
 void del_multipl_sp( std::string & str, int ( *func )( int ) );
 
 void
-ServerConf::normalize ( std::deque< std::string > & mem )
+ServerHandler::normalize ( std::deque< std::string > & mem )
 {
 	std::deque< std::string >::iterator it;
 

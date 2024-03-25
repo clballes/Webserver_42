@@ -4,7 +4,7 @@
 /* Thu Feb 15 16:50:45 2024                                                   */
 
 #include "Log.hpp"
-#include "ServerConf.hpp"
+#include "ServerHandler.hpp"
 #include <vector>
 #include <deque>
 #include <string>
@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 
 int
-ServerConf::pre_parse ( std::deque< std::string > & content )
+ServerHandler::pre_parse ( std::deque< std::string > & content )
 {
 	// LOG( "call pre_parse()" )
 
@@ -38,15 +38,15 @@ ServerConf::pre_parse ( std::deque< std::string > & content )
 }
 
 int
-ServerConf::parse ( std::deque< std::string > & content,
+ServerHandler::parse ( std::deque< std::string > & content,
 	   std::deque< std::deque< std::string > > & server_blocks )
 {	
 	// LOG( "call parse()" )
 	
 	// Split into `server {}' blocks.
 	
-	//ServerConf::split2blocks( content, server_blocks, "server" );
-	ServerConf::split2blocks( content, server_blocks, "server" );
+	//ServerHandler::split2blocks( content, server_blocks, "server" );
+	ServerHandler::split2blocks( content, server_blocks, "server" );
 
 	// The following condition turns count_servers() useless
 	// consider removing it ( in pre_parse )
@@ -95,7 +95,7 @@ fill_block( std::deque< std::string >::iterator it,
 // adapted from splitServers
 
 void
-ServerConf::split2blocks( std::deque< std::string > & content,
+ServerHandler::split2blocks( std::deque< std::string > & content,
 		std::deque< std::deque< std::string > > & block_list,
 		const char * block_name )
 {

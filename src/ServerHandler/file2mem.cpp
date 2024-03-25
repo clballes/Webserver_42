@@ -4,14 +4,14 @@
 /* Thu Feb 15 16:51:17 2024                                                   */
 
 #include "Log.hpp"
-#include "ServerConf.hpp"
+#include "ServerHandler.hpp"
 #include <fstream>
 #include <deque>
 #include <string>
 #include "parse.hpp"
 
 int
-ServerConf::file2mem ( std::ifstream & file, std::deque< std::string > & mem )
+ServerHandler::file2mem ( std::ifstream & file, std::deque< std::string > & mem )
 {
 	std::string line;
 	

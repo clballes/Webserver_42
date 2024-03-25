@@ -14,23 +14,24 @@
 //ft_setenv("PATH_INFO", target.c_str(), 1, &envp);
 //ft_setenv("SERVER_PROTOCOL", "HTTP/1.1", 1, &envp);
 
-class HTTP;
+// class HTTP;
 
 class CGI
 {
 	public:
 
-		CGI ( HTTP & );
+		// CGI ( HTTP & );
+		CGI ( void );
 		~CGI ( void );
 
 		void dispatch ( void );
 		int execute ( void );
 
-		friend class HTTP;
+		// friend class HTTP;
 
 	protected:
 
-		HTTP &  _http;
+		// HTTP &  _http;
 		char ** _env;
 
 };

@@ -73,14 +73,16 @@ HTTP::http_post ( HTTP & http )
 
 	LOG( " target: " << target );
 
-	if ( http._server._cgi_pass.length() != 0 ) //nose si va junt o per separat, entenc que si te cgi ho fa atraves del cgi pero poder el post despres tamb el pugui fer sense cgi DUDA
+	if ( http._server._cgi_pass.length() == 0 )
 	{
 		std::cout <<" ------------------- "<< std::endl;
 		LOG( " Executing Cgi for post method " );
-		http.execute();
-		std::cout <<" ------------------- "<< std::endl;
-		http.generateHTML(); 
-   		http._status_code = 200;
+		// Cgi CgiHandler;
+
+		// http.execute();
+
+		// http.generateHTML(); 
+   		// http._status_code = 200;
 	}
 	// else if (!http._request.body.empty()) //SI EXISTEIX INFO QUE MOSTRAR EN LA RESPONSE DEL POST 
 	// {
@@ -89,6 +91,9 @@ HTTP::http_post ( HTTP & http )
 	// }
 	else
 	{
+		http._status_code = 413;
+		HTTP::load_file( http, http._server._error_page[413] );
+
 		// _https_status.code = 204; 
 		// loadfile ---- ggeenretare response without content length 
 	}

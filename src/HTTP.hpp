@@ -28,7 +28,7 @@
 class HTTP;
 class Client;
 class Server;
-class CGI;
+class Cgi;
 
 typedef struct s_http_method
 {
@@ -51,10 +51,9 @@ typedef struct s_request
 
 typedef std::map< std::string, std::string > t_headers;
 
-class HTTP: public CGI
+class HTTP
 {
 	public:
-
 		HTTP ( Client &, Server & );
 		~HTTP ( void );
 		
@@ -96,10 +95,8 @@ class HTTP: public CGI
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP &, std::string & );
-
 };
 
 #include "Client.hpp"
-//#include "Server.hpp"
 
 #endif /* !_HTTP_HPP_ */

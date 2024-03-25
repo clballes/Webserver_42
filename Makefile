@@ -13,7 +13,7 @@ LIBFT			:=	$(SRC_DIR)/libft/libft.a
 
 CC				:=	c++
 CPPFLAGS		:=	-MMD
-CPPFLAGS		+=	-I$(INC_DIR) -I$(SRC_DIR)/ServerConf
+CPPFLAGS		+=	-I$(INC_DIR) -I$(SRC_DIR)/ServerHandler
 CPPFLAGS		+=	-I$(dir $(LIBFT))/include
 CPPFLAGS		+=	-g -fsanitize='address,undefined'
 #CPPFLAGS		+=	-D SILENCE_LOGS
@@ -26,14 +26,12 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/getoptions.cpp \
 					$(SRC_DIR)/webserv.cpp \
 					$(SRC_DIR)/loop.cpp \
-					$(SRC_DIR)/ServerConf/constructor.cpp \
-					$(SRC_DIR)/ServerConf/destructor.cpp \
-					$(SRC_DIR)/ServerConf/add.cpp \
-					$(SRC_DIR)/ServerConf/file2mem.cpp \
-					$(SRC_DIR)/ServerConf/normalize.cpp \
-					$(SRC_DIR)/ServerConf/split_elements.cpp \
-					$(SRC_DIR)/ServerConf/setters.cpp \
-					$(SRC_DIR)/ServerConf/parse.cpp \
+					$(SRC_DIR)/ServerHandler/add.cpp \
+					$(SRC_DIR)/ServerHandler/ServerHandler.cpp \
+					$(SRC_DIR)/ServerHandler/file2mem.cpp \
+					$(SRC_DIR)/ServerHandler/normalize.cpp \
+					$(SRC_DIR)/ServerHandler/split_elements.cpp \
+					$(SRC_DIR)/ServerHandler/parse.cpp \
 					$(SRC_DIR)/Server/constructor.cpp \
 					$(SRC_DIR)/Server/destructor.cpp \
 					$(SRC_DIR)/Server/events.cpp \
@@ -56,9 +54,10 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/HTTP/autoindex.cpp \
 					$(SRC_DIR)/HTTP/urlencode.cpp \
 					$(SRC_DIR)/HTTP/events.cpp \
-					$(SRC_DIR)/CGI/constructor.cpp \
-					$(SRC_DIR)/CGI/destructor.cpp \
-					$(SRC_DIR)/CGI/handler.cpp
+					$(SRC_DIR)/Cluster.cpp \
+					# $(SRC_DIR)/CGI/constructor.cpp \
+					# $(SRC_DIR)/CGI/destructor.cpp \
+					# $(SRC_DIR)/CGI/handler.cpp
 					
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)

@@ -14,7 +14,7 @@ static std::deque< std::string >::iterator split_line (
 		std::deque< std::string > & );
 
 void
-ServerConf::split_elements ( std::deque< std::string > & mem )
+ServerHandler::split_elements ( std::deque< std::string > & mem )
 {
 	std::deque< std::string >::iterator it = mem.begin();
 

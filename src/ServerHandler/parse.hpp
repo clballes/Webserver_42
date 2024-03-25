@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Log.hpp"
-#include "ServerConf.hpp"
+#include "ServerHandler.hpp"
 #include <deque>
 #include <string>
 
