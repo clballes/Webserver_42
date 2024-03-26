@@ -3,15 +3,12 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Mon Mar 25 11:48:33 2024                                                   */
 
-#include "Controller.hpp"
 #include <iostream>
-
 #include <getopt.h>
+#include "Controller.hpp"
 #include "define.hpp"
-
 #include "debug.hpp"
-
-// TODO: envp -> DEBUG variables / mode
+#include "Server.hpp"
 
 static int decode_arguments ( int, char * const * );
 
@@ -20,7 +17,7 @@ main ( int argc, char * const * argv )
 {
 	DEBUG( "" );
 	
-	Controller controller;
+	Controller< Server > controller;
 	
 	decode_arguments ( argc, argv );
 	controller.load( argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
@@ -33,37 +30,36 @@ decode_arguments ( int argc, char * const * argv )
 {
 	DEBUG( "" );
 	
-	int					c = 0, cc = 0;
+	int					c = 0;
 	int 				option_index = 0;
 	const char *		shortopts = "vm:l:";
 	
 	const struct option longopts[] =
 	{
-		{ "version", no_argument, 0x0, 'v'},
-		{ "log", required_argument, 0x0, 'l'},
-		{ "mode", required_argument, 0x0, 'm'},
+		{ "version", no_argument, 0x0, 'v' },
+		{ "log", required_argument, 0x0, 'l' },
+		{ "mode", required_argument, 0x0, 'm' },
 		{ 0, 0, 0, 0 }
 	};
 	
 	while ( c != -1 )
 	{
 		c = getopt_long ( argc, argv, shortopts, longopts, &option_index );
-		(void) cc;
 		//cc = getoptions_long ( argc, argv, shortopts, longopts, &option_index );
 
 		switch ( c )
 		{
 			case 'v':
 				std::cout << WEBSERV_VER << std::endl;
-				exit (EXIT_SUCCESS);
+				exit ( EXIT_SUCCESS );
 			case 'l':
-				std::cout << "logging into " << optarg << std::endl;
+				DEBUG( "l: " << optarg );
 				break ;
 			case 'm':
-				std::cout << "mode: " << optarg << std::endl;
+				DEBUG( "m: " << optarg );
 				break ;
 			case '?':
-				exit (EXIT_FAILURE);
+				exit ( EXIT_FAILURE );
 			default:
 				break ;
 		}
