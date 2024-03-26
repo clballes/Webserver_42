@@ -18,11 +18,11 @@ class Cluster
         ~Cluster(void);
         // Cluster & operator=(const Cluster & src);
 
-        int     config(std::string fileconf);   
-        int		setup(void);
-        int     webserver(void); //stablish the kque
-        static  void graceful_stop ( int n );
-        static void    event_loop ( int kq );
+        int             config(std::string fileconf);   
+        int             setup(void);
+        int             webserver(void); //stablish the kque
+        static  void    graceful_stop ( int n );
+        static void     event_loop ( int kq );
         // static void graceful_stop(int signal);
         // void	clean(void);
         // void signal_handler_wrapper(int signal);

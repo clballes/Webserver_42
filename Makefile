@@ -40,6 +40,9 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/Cluster.cpp \
 					$(SRC_DIR)/init.cpp \
 					$(SRC_DIR)/getoptions.cpp \
+					$(SRC_DIR)/Client/constructor.cpp \
+					$(SRC_DIR)/Client/destructor.cpp \
+					$(SRC_DIR)/Client/events.cpp \
 					#$(SRC_DIR)/loop.cpp \
 					#$(SRC_DIR)/webserv.cpp \
 					# $(SRC_DIR)/HTTP/constructor.cpp \
@@ -58,9 +61,7 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					# $(SRC_DIR)/CGI/constructor.cpp \
 					# $(SRC_DIR)/CGI/destructor.cpp \
 					# $(SRC_DIR)/CGI/handler.cpp \
-					# (SRC_DIR)/Client/constructor.cpp \
-					# $(SRC_DIR)/Client/destructor.cpp \
-					# $(SRC_DIR)/Client/events.cpp \
+					
 					
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)

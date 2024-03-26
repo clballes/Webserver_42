@@ -33,3 +33,8 @@ Client::Client ( Server & server_instance ):
 
 	return ;
 }
+
+int getSocket_fd()
+{
+	return this->_socket_fd;
+}

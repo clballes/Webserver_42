@@ -9,11 +9,11 @@
 void
 Server::dispatch ( struct kevent & ev )
 {
-	// Client * c;
+	Client * c;
 
 	LOG( "call Server::dispatch() (fd=" << ev.ident << ")" );
 
-	// c = new Client( *this );
+	c = new Client( *this );
 
 	// (void) c;
 	// (void) ev;	
@@ -27,18 +27,17 @@ void
 Server::register_read_socket ( void ) const
 {
 	struct kevent ev;
-	(void)ev;
-	//static struct timespec ev_timeout;
+	// static struct timespec ev_timeout;
 	
 	LOG( "call Server::register_read() (fd=" << this->_socket_fd << ")" );
 
-	// EV_SET( &ev, this->_socket_fd, EVFILT_READ,
-	// 		EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
+	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
+			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
 
-	// if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
-	// 	std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
+	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
+		std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
 	
-	// return ;
+	return ;
 }
 
 // not being used ... ?
@@ -46,17 +45,16 @@ Server::register_read_socket ( void ) const
 int
 Server::receive_request ( int64_t data )
 {
-	( void ) data;
-	/*
+	// ( void ) data;
 	char buffer[1024];
 
 	LOG( "call Server::receive_request() (fd=" << this->_client_socket_fd << ")" );
-
+	
 	std::memset( buffer, '\0', data );
 	ssize_t n = recv( this->_client_socket_fd, buffer, 1024, 0 );
 	LOG( "n: " << n );
 
 	write( STDOUT_FILENO, buffer, data );
-	*/
+
 	return ( EXIT_SUCCESS );
 }
