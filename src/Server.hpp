@@ -10,6 +10,8 @@
 #include "t_address.hpp"
 #include "t_server_conf.hpp"
 
+// TODO: make t_server_conf into class ServerConf
+
 class Server: public IEvent
 {
 	public:
