@@ -11,19 +11,16 @@
 #include <iostream>
 #include <fstream>
 
+#include "define.hpp"
 #include "debug.hpp"
 
-class Server
-{
-	public:
-	private:
-};
+bool is_regular_file( const std::string & );
 
 // TODO: Make Controller a singleton ?
-// TODO: Make Controller a template Controller< Server >
+// TODO: expand template to define underlying container; default vector
 
 /*
- * class Controller:
+ * class Controller< T>:
  *
  * Provides
  *  - a way to load multiple configuration files
@@ -32,6 +29,7 @@ class Server
  *
  */
 
+template<typename T>
 class Controller 
 {
 	public:
@@ -44,40 +42,43 @@ class Controller
 		int load ( std::string & );
 		int start ( void );
 
-		const std::vector< Server > & getInstances ( void ) const;
+		const std::vector< T > & getInstances ( void ) const;
+
+		typedef typename std::vector< T >::iterator iterator;
 
 	private:
 
-		bool                  _good;
-		std::vector< Server > _instances;
+		bool _good;
+		std::vector< T > _instances;
 
 };
 
-bool is_regular_file( const std::string & );
-
-Controller::Controller ( void ):
-	_good( true )
+template<typename T>
+Controller< T >::Controller ( void ): _good( true )
 {
 	DEBUG( this );
 
 	return ;
 }
 
-Controller::~Controller ( void )
+template<typename T>
+Controller< T >::~Controller ( void )
 {
 	DEBUG( this );
 
 	return ;
 }
 
+template<typename T>
 bool
-Controller::good ( void ) const
+Controller< T>::good ( void ) const
 {
 	return ( this->_good );
 }
 
+template<typename T>
 int
-Controller::load ( const char * conf_filename_ptr )
+Controller< T >::load ( const char * conf_filename_ptr )
 {
 	std::ifstream conf_file;
 	
@@ -147,16 +148,18 @@ Controller::load ( const char * conf_filename_ptr )
 	return ( EXIT_SUCCESS );
 }
 
+template<typename T>
 int
-Controller::load ( std::string & conf_filename )
+Controller< T >::load ( std::string & conf_filename )
 {	
 	DEBUG( this );
 
 	return ( this->load( conf_filename.c_str() ) );
 }
 
+template<typename T>
 int
-Controller::start ( void )
+Controller< T >::start ( void )
 {
 	DEBUG( this );
 
@@ -165,12 +168,30 @@ Controller::start ( void )
 		ERROR( "webserv: faulty controller" );
 		return ( EXIT_FAILURE );
 	}
-	
+
+	this->_instances.shrink_to_fit();
+
+	for ( Controller::iterator it = this->_instances.begin();
+			it != this->_instances.end(); ++it )
+	{
+		if ( it->good() == false )
+		{
+			ERROR( PROGRAM_NAME << ": faulty server (" << it->id() << ")" );
+			return ( EXIT_FAILURE );
+		}
+		if ( it->start() )
+		{
+			// TODO: retry once after ~30 seconds.
+			return ( EXIT_FAILURE );
+		}
+	}
+
 	return ( EXIT_SUCCESS );
 }
 
-const std::vector< Server > &
-Controller::getInstances ( void ) const
+template<typename T>
+const std::vector< T > &
+Controller< T>::getInstances ( void ) const
 {
 	DEBUG( this );
 	
