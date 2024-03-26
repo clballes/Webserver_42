@@ -7,62 +7,96 @@
 #define _SERVER_HPP_
 
 #include "IEvent.hpp"
-#include "webserv.hpp"
-#include "ServerConf.hpp"
-#include "Client.hpp"
-#include <vector>
-
-class ServerConf;
-class Client;
-class HTTP;
+#include "t_address.hpp"
+#include "t_server_conf.hpp"
 
 class Server: public IEvent
 {
 	public:
 
-		Server ( const ServerConf & );
+		Server ( void );
+		Server& operator= ( t_server_conf & );
 		~Server ( void );
-
-		bool good;
-		void dispatch ( struct kevent & );
+		
+		bool good ( void ) const;
+		int id ( void ) const;
 		int start ( void );
-		void stop ( void );
+		int stop ( void );
 
-		static int kq;     // kqueue's file descriptor
-		static std::vector< Server * > servers;
-		static void clear ( void );
+		void dispatch ( struct kevent & ev );
 
-		typedef std::vector< Server * >:: const_iterator const_iterator;
-		typedef std::vector< Server * >:: iterator iterator;
-
-		friend class Client;
-		friend class HTTP;
-		friend class CGI;
-		friend std::ostream & operator << ( std::ostream &, const Server & );
+		t_server_conf & getConf ( void );
 
 	private:
 
+		bool           _good;
+		t_address      _address;
+		t_server_conf  _conf;
+		
+		/*
 		void register_read_socket ( void ) const;
 		int receive_request ( int64_t );
-
-		int						_socket_fd;
-		unsigned				_address_len;
-		struct sockaddr_in		_address;
-		
 		std::vector< Client * > _clients;
-
-
-		std::vector< std::string>	_server_name;
-		std::string					_root;
-		unsigned int 				_flags;
-		std::size_t					_client_max_body_size;
-		std::vector< std::string>	_index;
-		std::string 				_cgi_param; //nse si guardar en un vector
-		std::string					_cgi_pass; 
-		std::map<int, std::string>	_error_page; //falta fer
+		*/
 
 };
 
-extern bool status;
+Server::Server ( void )
+{
+	DEBUG ( "" );
+
+	return ;
+}
+
+Server::~Server ( void )
+{
+	DEBUG ( "" );
+	
+	return ;
+}
+
+bool
+Server::good ( void ) const
+{
+	return ( this->_good );
+}
+
+int
+Server::id ( void ) const
+{
+	return ( this->_address.socket_fd );
+}
+
+int
+Server::start ( void )
+{
+	DEBUG ( "" );
+
+	return ( EXIT_SUCCESS );
+}
+
+int
+Server::stop ( void )
+{
+	DEBUG ( "" );
+
+	return ( EXIT_SUCCESS );
+}
+
+void
+Server::dispatch ( struct kevent & ev )
+{
+	(void) ev;
+
+	return ;
+}
+
+t_server_conf &
+Server::getConf ( void )
+{
+	DEBUG ( "" );
+
+	return ( this->_conf );
+}
 
 #endif /* !_SERVER_HPP_ */
