@@ -3,6 +3,7 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Fri Feb 16 13:15:29 2024                                                   */
 
+#include "debug.hpp"
 #include "ServerConf.hpp"
 #include <deque>
 #include <string>
@@ -17,8 +18,6 @@ ServerConf::normalize ( std::deque< std::string > & mem )
 {
 	std::deque< std::string >::iterator it;
 
-	// LOG( "call normalize()" )
-	
 	it = mem.begin();
 	while ( it != mem.end() )
 	{
@@ -40,16 +39,12 @@ trim_comments( std::string & str )
 {
 	std::string::iterator it;
 
-	// LOG( "call trim_comments()" )
-
 	it = str.begin();
 	while ( it != str.end() && *it != '#' )
 		++it;
 
 	if ( it != str.end() )
 		str.erase( it, str.end() );
-
-
 
 	return ;
 }
@@ -59,8 +54,6 @@ trim( std::string & input )
 {
     std::string result;
     bool leadingSpacesOrTabs = true;
-
-	// LOG( "call trim()" )
 
     for ( std::size_t i = 0; i < input.length(); ++i )
 	{
@@ -89,8 +82,6 @@ trim_f( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
 
-	// LOG( "call trim_f" )
-
 	it = str.end() - 1;
 	while ( it != str.begin() && func( *it ) )
 		str.erase( it-- );
@@ -107,8 +98,6 @@ replace_sp( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
 
-	// LOG( "call replace_sp" )
-
 	it = str.begin();
 	while ( it != str.end() )
 	{
@@ -124,8 +113,6 @@ void
 del_multipl_sp( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
-
-	// LOG( "call multople_sp" )
 
 	it = str.begin();
 	while ( it != str.end() )

@@ -3,6 +3,7 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Fri Feb 16 14:39:05 2024                                                   */
 
+#include "debug.hpp"
 #include <string>
 #include <deque>
 #include <iterator>
@@ -13,22 +14,28 @@ static std::deque< std::string >::iterator split_line (
 		std::deque< std::string >::iterator,
 		std::deque< std::string > & );
 
+// TODO
+
 void
 ServerConf::split_elements ( std::deque< std::string > & mem )
 {
-	std::deque< std::string >::iterator it = mem.begin();
-
-	// LOG( "call split_elements()" )
+	size_t pos, pos2;
+	std::deque< std::string >::iterator it;
+	
+	DEBUG( "" );
+	it = mem.begin();
 
 	while ( it != mem.end() )
 	{
-		size_t pos = it->find_first_of( "{}", 0 );
+		pos = it->find_first_of( "{}", 0 );
+		
 		if ( it->find_first_of( "{}", 0 ) != std::string::npos )
 		{
-			size_t pos2 = it->find("#");
+			pos2 = it->find("#");
 			if (pos2 != std::string::npos && pos > pos2){
 				break;
 			}
+			
 			it = split_line( it, mem );
 		}
 		++it;
@@ -46,7 +53,7 @@ split_line ( std::deque< std::string >::iterator it,
 	std::string::size_type start = 0, end;
 	std::string line( *it );
 
-	// LOG( "call split_line()" )
+	DEBUG( line );
 
 	it = mem.erase( it ) - 1;
 

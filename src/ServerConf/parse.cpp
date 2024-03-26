@@ -3,6 +3,7 @@
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
 /* Thu Feb 15 16:50:45 2024                                                   */
 
+#include "debug.hpp"
 #include "Log.hpp"
 #include "ServerConf.hpp"
 #include <vector>
@@ -17,8 +18,6 @@
 int
 ServerConf::pre_parse ( std::deque< std::string > & content )
 {
-	// LOG( "call pre_parse()" )
-
 	if ( count_brackets( content ) == EXIT_FAILURE )
 	{
 		std::cerr << PROGRAM_NAME;
@@ -34,6 +33,7 @@ ServerConf::pre_parse ( std::deque< std::string > & content )
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
 	}
+
 	return ( EXIT_SUCCESS );
 }
 
@@ -41,11 +41,7 @@ int
 ServerConf::parse ( std::deque< std::string > & content,
 	   std::deque< std::deque< std::string > > & server_blocks )
 {	
-	// LOG( "call parse()" )
-	
 	// Split into `server {}' blocks.
-	
-	//ServerConf::split2blocks( content, server_blocks, "server" );
 	ServerConf::split2blocks( content, server_blocks, "server" );
 
 	// The following condition turns count_servers() useless
@@ -72,8 +68,6 @@ fill_block( std::deque< std::string >::iterator it,
 	std::deque< std::string > list;
 	std::string::size_type brackets = 0;
 
-	// LOG( "call fill_block()" )
-
 	if ( *it == "{" )
 		++it;
 
@@ -87,12 +81,9 @@ fill_block( std::deque< std::string >::iterator it,
 	}
 
 	block_list.push_back( list );
-
+	
 	return ( it + 1 );
 }
-
-
-// adapted from splitServers
 
 void
 ServerConf::split2blocks( std::deque< std::string > & content,
@@ -101,7 +92,6 @@ ServerConf::split2blocks( std::deque< std::string > & content,
 {
 	std::deque< std::string >::iterator it = content.begin();
 
-	// LOG( "call split2blocks()" )
 	while ( it != content.end() )
 	{
 		if ( it->compare( block_name ) == 0 )
@@ -111,25 +101,25 @@ ServerConf::split2blocks( std::deque< std::string > & content,
 		else
 			++it;
 	}
-
+	
 	return ;
 }
 
 int
 count_brackets ( std::deque< std::string > & content )
 {
-	int brace = 0;
-	std::deque< std::string>::iterator it = content.begin();
+	int brace;
+	std::deque< std::string>::iterator it;
+	
+	brace = 0;
+	it = content.begin();
 
-	// LOG( "call count_brackets()" )
-
-	while ( it != content.end())
+	while ( it != content.end() )
 	{
 		if ( *it == "{" || *it == "}" )
 			brace += ( 124 - it->at( 0x0 ) );
 		++it;
 	}
-	
 	return ( ( brace == 0 ) ? EXIT_SUCCESS : EXIT_FAILURE );
 }
 
@@ -147,8 +137,8 @@ is_regular_file( const std::string & filename )
 
     if ( stat( filename.c_str(), &file_info ) != 0 )
         return ( false );
-
-    return ( S_ISREG( file_info.st_mode ) );
+    
+	return ( S_ISREG( file_info.st_mode ) );
 }
 
 int
@@ -156,8 +146,6 @@ count_servers( std::deque< std::string > & content )
 {
     int count;
    
-	// LOG( "call count_servers()" )
-
 	count = 0;
     for ( std::deque< std::string >::iterator it = content.begin();
 			it != content.end(); ++it )
@@ -168,6 +156,6 @@ count_servers( std::deque< std::string > & content )
                 ++count;
         }
     }
-
-    return (count);
+    
+	return (count);
 }
