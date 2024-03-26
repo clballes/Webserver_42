@@ -17,9 +17,6 @@ CGI::dispatch ( void )
 	return ;
 }
 
-//int
-//CGI::execute ( const std::string& scriptPath, char **env )
-
 int
 CGI::execute ( void )
 {
@@ -55,7 +52,6 @@ CGI::execute ( void )
         close( pipefd[READ] );
 
         execve( scriptPath.c_str(), NULL, this->_env );
-		//el scriptpath estabe aqui es el cgi pass
         
 		std::cerr << "exec: ";
 		std::cerr << ::strerror( errno );

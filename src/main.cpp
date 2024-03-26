@@ -79,7 +79,7 @@ main ( int argc, char * const * argv )
 		}
 
 	}
-	exit(1);
+	// exit(1);
 
 	ServerConf::clear();
 	Server::servers.shrink_to_fit();

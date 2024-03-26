@@ -178,61 +178,43 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 	return ( EXIT_SUCCESS );
 }
 
-int ServerConf::set_error_page(ServerConf &conf, const char *arg) {
-
+int ServerConf::set_error_page(ServerConf &conf, const char *arg)
+{
 	LOG("call set_error_page()");
+
     if (error_missingvalues(arg) == EXIT_FAILURE)
         return EXIT_FAILURE;
+	// LOG( "call set_error_page()" );
 
-    std::string argStr(arg);
-    std::istringstream iss(argStr);
-    std::string errorCodeStr;
-    std::string uri;
+  	std::string argStr( arg );
+  	std::string uri;
+	int number;
 
-    std::vector<int> errorCodes;
-
-   while (iss >> errorCodeStr){
-		if (errorCodeStr.empty()) continue;
-		if (!isdigit(errorCodeStr[0])) {
-			if (errorCodeStr[0] == ' ') continue;
-			else break;
-		}
-		
-		std::istringstream errorCodeIss(errorCodeStr);
-		int errorCode;
-		if (!(errorCodeIss >> errorCode))
-		{
-			std::cout << "EEE BREAK" << std::endl;	
-			break; // Conversion failed
-		}
-		errorCodes.push_back(errorCode);
-		std::cout << "Extracted error code: " << errorCode << std::endl;
-    }
-    if (!(iss >> uri)) {
-	std::cout << "Extracted uri: " << uri << std::endl;
-    iss.clear(); // Clear the fail state
-	std::cout << "iss.fail() = " << iss.fail() << std::endl; // Debugging output
-    std::cout << "Failed to extract URI." << std::endl;
-    return EXIT_FAILURE;  // No URI specified
-}
-
-if (uri.empty()) {
-    std::cout << "Empty URI." << std::endl;
-    return EXIT_FAILURE;  // Empty URI
-}
-
-if (uri[0] != '/') {
-    std::cout << "URI is not absolute." << std::endl;
-    return EXIT_FAILURE;  // URI is not absolute
-}
-    // Store the URI for each error code
-	for (size_t i = 0; i < errorCodes.size(); ++i)
+    for ( std::size_t i = 0; i <= argStr.length(); i++ )
 	{
-		conf._error_page[errorCodes[i]] = uri;
-		std::cout << "Assigned URI '" << uri << "' to error code " << errorCodes[i] << std::endl;
-	}
+		if ( std::isdigit( arg[i] ) )
+		{
+			if ( arg[i + 1] == 32 )
+			{
+				std::string numberStr = argStr.substr( 0, i + 1 );
+				number = std::atoi( numberStr.c_str() );
+				i++;
 
-    return EXIT_SUCCESS;
+				if ( arg[i + 1] == '/' )
+				{
+					uri = argStr.substr( i + 1, argStr.length() );
+					std::string uri_complet = DEFAULT_ERROR_DIR + uri;
+					conf._error_page[number] = uri_complet;
+					return ( EXIT_SUCCESS );
+				}
+				else
+					return ( EXIT_FAILURE );
+			}
+		}
+		else
+			return ( EXIT_FAILURE );
+    }
+	return ( EXIT_SUCCESS );
 }
 
 int

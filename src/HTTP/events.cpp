@@ -21,14 +21,15 @@ HTTP::perform ( void )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	else
 	{
-		// Do HTTP method GET/POST...
-		// Each method sets _status_code, _headers, ...
-
+		this->_target.append( this->_server._root );
+		this->_target.append( this->_request.target );
 		this->_request.method->method_func( * this );
+		this->_target.clear();
 	}
 
 	// Generic response composition based on _status_code.
-
+	// this->_target.append( this->_server._root );
+	// this->_target.append( this->_request.target );
 	HTTP::compose_response( *this );
 
 	return ;

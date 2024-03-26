@@ -83,7 +83,8 @@ Client::request_recv ( int64_t data )
 	std::clog << "recv ";
 	LOG_BUFFER( this->_buffer_recv.c_str() );
 
-	// Do HTTP method, compose message.
+	// Do HTTP method
+	// compose message.
 
 	this->perform();
 

@@ -51,7 +51,7 @@ typedef struct s_request
 
 typedef std::map< std::string, std::string > t_headers;
 
-class HTTP: public CGI
+class HTTP
 {
 	public:
 
@@ -82,6 +82,8 @@ class HTTP: public CGI
 		t_request            	_request;
 		int                   	_status_code;
 		bool                  	_keep_alive;
+
+		std::string				_target;
 		
 		int parse ( void );
 		int parse_start_line ( std::string & );

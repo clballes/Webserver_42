@@ -62,38 +62,27 @@ void HTTP::generateHTML() {
 
 
 int
-HTTP::http_post ( HTTP & http )
-{
-	std::string target;
+HTTP::http_post ( HTTP & http ){
 
 	LOG( "call HTTP::http_post()" );
 
-	target.append( http._server._root );
-	target.append( http._request.target );
-
-	LOG( " target: " << target );
-
-	if ( http._server._cgi_pass.length() != 0 ) //nose si va junt o per separat, entenc que si te cgi ho fa atraves del cgi pero poder el post despres tamb el pugui fer sense cgi DUDA
+	if(	http._status_code == INTERNAL_SERVER_ERROR)
 	{
-		std::cout <<" ------------------- "<< std::endl;
-		LOG( " Executing Cgi for post method " );
-		http.execute();
-		std::cout <<" ------------------- "<< std::endl;
-		http.generateHTML(); 
-   		http._status_code = 200;
+		LOG( http._server._error_page[500] );
+		(void) HTTP::load_file( http, http._server._error_page[500] );
 	}
-	// else if (!http._request.body.empty()) //SI EXISTEIX INFO QUE MOSTRAR EN LA RESPONSE DEL POST 
-	// {
-   	// 	http.generateHTML(); 
-   	// 	http._status_code = 200;
-	// }
+	if ( http._server._cgi_pass.length() != 0 )
+	{
+		LOG( " Executing Cgi" );
+		CGI cgi( http );
+		if (cgi.execute() == EXIT_FAILURE)
+			return EXIT_FAILURE;
+		http._status_code = 200;
+	}
 	else
 	{
-		// _https_status.code = 204; 
-		// loadfile ---- ggeenretare response without content length 
+		http._status_code = 204;
+		http._message_body = "";
 	}
-	// if(	http._status_code = INTERNAL_SERVER_ERROR)
-	//algo aixi q peti si ha eptat per algun lloc
-
 	return ( EXIT_SUCCESS );
 }

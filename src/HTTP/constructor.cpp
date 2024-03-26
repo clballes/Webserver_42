@@ -28,7 +28,6 @@ std::size_t
 HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
 
 HTTP::HTTP ( Client & client_instance, Server & server_instance ):
-	CGI( *this ),
 	_client( client_instance ),
 	_server( server_instance )
 {
