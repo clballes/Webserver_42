@@ -9,6 +9,8 @@
 #include <ctime>
 
 // TODO: define DEBUG to nothing if not -DDEBUG
+// TODO: implement hierarchy INFO -> WARN -> ERROR
+// nginx's: debug | info | notice | warn | error | crit | alert | emerg
 
 #ifdef PRETTY
 #define __FN__ __PRETTY_FUNCTION__
