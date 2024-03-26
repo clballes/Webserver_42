@@ -10,6 +10,12 @@
 
 // TODO: define DEBUG to nothing if not -DDEBUG
 
+#ifdef PRETTY
+#define __FN__ __PRETTY_FUNCTION__
+#else
+#define __FN__ __FUNCTION__
+#endif
+
 #define DEBUG_TIME \
 	char t[10]; \
 	std::time_t tt = std::time( 0x0 ); \
@@ -22,7 +28,7 @@
 { \
 	DEBUG_TIME \
 	std::clog \
-	<< __PRETTY_FUNCTION__ \
+	<< __FN__ \
 	<< " [" << item << "]" \
 	<< std::endl; \
 }
