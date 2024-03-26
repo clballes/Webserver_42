@@ -15,8 +15,6 @@ static int decode_arguments ( int, char * const * );
 int
 main ( int argc, char * const * argv )
 {
-	DEBUG( "" );
-	
 	Controller< Server > controller;
 	
 	decode_arguments ( argc, argv );
@@ -45,7 +43,7 @@ decode_arguments ( int argc, char * const * argv )
 	while ( c != -1 )
 	{
 		c = getopt_long ( argc, argv, shortopts, longopts, &option_index );
-		//cc = getoptions_long ( argc, argv, shortopts, longopts, &option_index );
+		// c = getoptions_long ( argc, argv, shortopts, longopts, &option_index );
 
 		switch ( c )
 		{

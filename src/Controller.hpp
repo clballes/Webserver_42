@@ -86,8 +86,7 @@ Controller< T >::load ( const char * conf_filename_ptr )
 
 	if ( conf_filename_ptr == 0x0 )
 	{
-		std::clog << "[" << this << "] ";
-		std::clog << "0x0: cannot load" << std::endl;
+		ERROR( "nullptr: cannot load" );
 		return ( EXIT_FAILURE );
 	}
 
