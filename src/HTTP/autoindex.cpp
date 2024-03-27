@@ -63,7 +63,8 @@ HTTP::autoindex ( HTTP & http, std::string & target )
 		page.append( http._headers["Host"] );
 		if ( http._request.target.size() > 1 )
 			page.append( http._request.target );
-		page.append( "/" );
+		if ( page.back() != '/' )
+			page.append( "/" );
 		page.append( ent->d_name );
 		page.append( "\">" );
 		page.append( ent->d_name );

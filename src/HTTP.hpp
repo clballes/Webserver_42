@@ -68,6 +68,7 @@ class HTTP
 		static std::string & urldecode ( std::string & );
 		static int load_file ( HTTP &, std::string & );
 
+		friend class CGI;
 	protected:
 
 		Client &                _client;
@@ -82,9 +83,7 @@ class HTTP
 		t_request            	_request;
 		int                   	_status_code;
 		bool                  	_keep_alive;
-
-		std::string				_target;
-		
+				
 		int parse ( void );
 		int parse_start_line ( std::string & );
 		int parse_field_line ( std::string & );

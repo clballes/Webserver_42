@@ -84,16 +84,21 @@ parse_target( t_request & request, std::string & line )
 	//LOG( "call parse_target()" );
 
 	pos = line.find_first_of( SP, 0 );
+	std::cout << "pos is: "<< pos << "line is: " << line << std::endl;
 	
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
+	// int checkuRL = request.target.find("");
+	// if (request.target)
 
-	request.target = line.substr( 0, pos );
-	LOG( " request.target: \"" << request.target << "\"" );
+	LOG( " abans de modificarlo ets: \"" << request.target << "\"" );
+
+	request.target.append( line.substr( 0, pos ));
+	LOG( " PARSE START LINE; request.target: \"" << request.target << "\"" );
 
 	// TODO: decode url
 	HTTP::urldecode( request.target );
-	LOG( " request.target: \"" << request.target << "\"" );
+	LOG( " AFTER DECODE; request.target: \"" << request.target << "\"" );
 
 	return ( EXIT_SUCCESS );
 }

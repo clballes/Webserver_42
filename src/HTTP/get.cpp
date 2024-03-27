@@ -16,22 +16,22 @@ HTTP::http_get ( HTTP & http )
 {
 	LOG( "call HTTP::http_get()" );
 
-	// http._target.append( http._server._root );
-	// http._target.append( http._request.target );
-	LOG( " target: " << http._target );
+	// http._request.target.append( http._server._root );
+	// http._request.target.append( http._request.target );
+	LOG( " target: " << http._request.target );
 
 	// Try find `_target'
 	//
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
 	
-	if ( is_regular_file( http._target ) == true )
+	if ( is_regular_file( http._request.target ) == true )
 	{
-		http._status_code = HTTP::load_file( http, http._target );
+		http._status_code = HTTP::load_file( http, http._request.target );
 	}
 	else if ( http._server._flags & F_AUTOINDEX )
 	{
-		http._status_code = HTTP::autoindex( http, http._target );
+		http._status_code = HTTP::autoindex( http, http._request.target );
 	}
 	else
 		http._status_code = INTERNAL_SERVER_ERROR;

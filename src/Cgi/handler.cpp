@@ -9,13 +9,17 @@
 #define READ 0
 #define WRITE 1
 
+
 void
-CGI::dispatch ( void )
+CGI::dispatch ( struct kevent & ev )
 {
 	LOG( "call CGI::dispatch()" );
-
+	(void)ev;
 	return ;
 }
+
+//int
+//CGI::execute ( const std::string& scriptPath, char **env )
 
 int
 CGI::execute ( void )
@@ -24,14 +28,18 @@ CGI::execute ( void )
     int   pipefd[2];
 	pid_t pid;
 
-	std::string scriptPath( "/Users/mpuig-ma/Documents/webserv/tests/cgi_script.py" );
-    
-	LOG( "Execute CGI" );
-    
-    fdopen = open( "/Users/clballes/Desktop/web42/www/100.html", O_RDONLY );
+	LOG( "call CGI::execute()" );
+
+	// TODO: should come from http.target
+	std::string target;
+	
+	// target.append( this->_http._server._root );
+	// target.append( this->_http._request.target );
+
+    fdopen = open( target.c_str(), O_RDONLY );
     if ( fdopen == -1 )
 	{
-        std::cerr << "cgi: ";
+        std::cerr << target << " ";
 		std::cerr << ::strerror( errno );
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
@@ -44,23 +52,7 @@ CGI::execute ( void )
     }
 
     pid = fork();
-
-    if ( pid == 0 )
-    {
-        dup2( fdopen, STDIN_FILENO );
-        //dup2( pipefd[WRITE], STDOUT_FILENO );
-        close( pipefd[READ] );
-
-        execve( scriptPath.c_str(), NULL, this->_env );
-        
-		std::cerr << "exec: ";
-		std::cerr << ::strerror( errno );
-		std::cerr << std::endl;
-        exit( EXIT_FAILURE );
-		
-		// TODO: timeout
-    }
-    else if ( pid == -1 )
+	if ( pid == -1 )
     {
         std::cerr << "fork: ";
 		std::cerr << ::strerror( errno );
@@ -71,17 +63,40 @@ CGI::execute ( void )
 		return ( EXIT_FAILURE );
     }
 
-    write( pipefd[WRITE], "<html><title>CGI Script</title></html>", 39 );
+    if ( pid == 0 )
+    {
+        close( pipefd[READ] );
+        
+		dup2( pipefd[WRITE], STDOUT_FILENO );
+        dup2( fdopen, STDIN_FILENO );
+
+		close( pipefd[WRITE] );
+
+        execve( this->_http._server._cgi_pass.c_str(), NULL, this->_env );
+        
+		std::cerr << "exec: ";
+		std::cerr << ::strerror( errno );
+		std::cerr << std::endl;
+        exit( EXIT_FAILURE );
+		
+		// TODO: timeout
+    }
+
     close( pipefd[WRITE] );
     
-	char buff[1024];
-	// read(pipefd[READ], &buff, 1024);
-    memset( &buff, 0, 1024 );
-
-    std::cout << "el read es: " << read( pipefd[READ], &buff, 1024 ) << std::endl;
-    std::cout << "buff es: "<< buff << std::endl;
-    // close( pipefd[READ] );
-    waitpid( pid, NULL, 0 );
+	std::clog << "waitpid: " << waitpid( pid, NULL, 0 );
+	std::clog << std::endl;
+   
+	std::string line;
+	
+	while ( read( pipefd[READ], (void*)line.data(), line.capacity() ) > 0 )
+	{
+		//std::clog << "buff ";
+		//LOG_BUFFER( line.c_str() );
+		this->_http._message_body.append( line.c_str() );
+	}
+	
+	close( pipefd[READ] );
 
 	return ( EXIT_SUCCESS );
 }

@@ -23,11 +23,7 @@
 
 ## CLARA
 
-- [ ] Fer el post falta mirar tema cgi com va mab post, retorna una string que seria la response no? llavors jo lhe fet dinamica ya
-- [ ]mirar si tinc rao en aixo, i sino, display 204, no response todo ok
-- [ ] fer err page parseo config
-- [ ] proves d eparseo config a muerte amb # tota la pesca
-- [] parse.cpp he forcat la response body jeje, aixo ho tenia el martins
+- [ ] Fer el post falta mirar tema cgi com va amb post, retorna una string que seria la response no? llavors jo lhe fet dinamica ya
 - [ ] no posem a la response htto1.1 404 NOt found ¿? aqest header?
 - [ ] el delete nose com veurel sense curl
 - [ ] el put falta mirar be els errors com ferho o que fer el display
