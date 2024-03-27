@@ -72,6 +72,7 @@ class ServerConf
 		static int set_allow_methods ( ServerConf &, const char * );
 		static int set_index ( ServerConf &, const char * );
 		static int set_autoindex ( ServerConf &, const char * );
+		static int set_location ( ServerConf &, const char * );
 
 		static t_configuration_directives _config_directives[];
 

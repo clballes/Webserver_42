@@ -5,6 +5,7 @@
 
 /* vim:set colorcolumn=80 :                                                   */
 
+#include "debug.hpp"
 #include "ServerConf.hpp"
 #include <sstream>
 
@@ -16,6 +17,7 @@ error_missingvalues( const char * arg )
         std::cerr << "Missing directive value ";
 		return ( EXIT_FAILURE );
 	}
+
 	return ( EXIT_SUCCESS );
 }
 
@@ -144,9 +146,6 @@ ServerConf::set_root ( ServerConf & conf, const char * arg )
 	return ( EXIT_SUCCESS );
 }
 
-// Server_name accoridng to nginx: alphanumeric characters, minus signs ("-"), and periods (".").
-// They must begin with an alphabetic character and end with an alphanumeric character.
-
 int
 ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 {
@@ -156,8 +155,6 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
     std::istringstream iss( arg );
     std::vector< std::string > words;
     std::string word;
-
-	// LOG( "call set_server_name()" );
 
     while ( iss >> word )
 	{
@@ -223,8 +220,6 @@ ServerConf::set_client_body ( ServerConf & conf, const char * arg )
 	if ( error_missingvalues( arg ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	// LOG( "call set_client_body()" );
-
     int alpha = 10;
 	std::string str( arg );
 
@@ -260,8 +255,6 @@ ServerConf::set_cgi_param ( ServerConf & conf, const char * arg )
 	if ( error_missingvalues( arg ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	// LOG( "call set_cgi_param()" );
-
 	conf._cgi_param = arg;
 
 	return ( EXIT_SUCCESS );
@@ -273,8 +266,6 @@ ServerConf::set_cgi_pass ( ServerConf & conf, const char * arg )
 	if ( error_missingvalues( arg ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	
-	// LOG( "call set_cgi_pass()" );
-
 	conf._cgi_pass = arg;
 
 	return ( EXIT_SUCCESS );
@@ -286,8 +277,6 @@ ServerConf::set_allow_methods ( ServerConf & conf, const char * arg )
 	if ( error_missingvalues( arg ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	
-	// LOG( "call set_allow_methods()" );
-
 	std::istringstream iss( arg );
     std::string word;
 
@@ -333,17 +322,24 @@ ServerConf::set_autoindex ( ServerConf & conf, const char * arg )
 {
 	if ( error_missingvalues( arg ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-
-	// LOG( "call set_autoindex()" );
 	
 	if ( strcmp( arg, "off") == 0 )
 		return ( EXIT_SUCCESS );
 	else if ( strcmp( arg, "on" ) == 0 )
 	{
 		conf._flags |= F_AUTOINDEX;
-		
 		return ( EXIT_SUCCESS );
 	}
 
 	return ( EXIT_FAILURE );
+}
+
+int
+ServerConf::set_location ( ServerConf & conf, const char * arg )
+{
+	DEBUG( arg );
+
+	(void) arg; (void) conf;
+
+	return ( EXIT_SUCCESS );
 }

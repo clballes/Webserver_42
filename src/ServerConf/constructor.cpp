@@ -25,6 +25,7 @@ ServerConf::_config_directives[] = {
 	{ "allow_methods", &ServerConf::set_allow_methods, },
 	{ "index", &ServerConf::set_index },
 	{ "autoindex", &ServerConf::set_autoindex },
+	{ "location", &ServerConf::set_location },
 	{ 0x0, 0x0 } };
 
 ServerConf::ServerConf ( void ):

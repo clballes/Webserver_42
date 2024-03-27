@@ -14,15 +14,12 @@ static std::deque< std::string >::iterator split_line (
 		std::deque< std::string >::iterator,
 		std::deque< std::string > & );
 
-// TODO
-
 void
 ServerConf::split_elements ( std::deque< std::string > & mem )
 {
 	size_t pos, pos2;
 	std::deque< std::string >::iterator it;
 	
-	DEBUG( "" );
 	it = mem.begin();
 
 	while ( it != mem.end() )
@@ -32,8 +29,10 @@ ServerConf::split_elements ( std::deque< std::string > & mem )
 		if ( it->find_first_of( "{}", 0 ) != std::string::npos )
 		{
 			pos2 = it->find("#");
-			if (pos2 != std::string::npos && pos > pos2){
-				break;
+			if ( pos2 != std::string::npos && pos > pos2 )
+			{
+				++it;
+				continue ;
 			}
 			
 			it = split_line( it, mem );
@@ -52,8 +51,6 @@ split_line ( std::deque< std::string >::iterator it,
 {
 	std::string::size_type start = 0, end;
 	std::string line( *it );
-
-	DEBUG( line );
 
 	it = mem.erase( it ) - 1;
 

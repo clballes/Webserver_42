@@ -18,21 +18,23 @@ ServerConf::add ( std::ifstream & file )
 	std::deque< std::deque< std::string > > server_blocks;
 	std::deque< std::deque< std::string > >::iterator block;
 	
-	// LOG( "call add()" )
 	// Check if file has been properly opened.
-
+	
 	if ( file.good() == false )
 		return ( EXIT_FAILURE );
 
 	// Store file into `mem'
+	
 	if ( ServerConf::file2mem( file, mem ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
 	// Split lines by `{}' and directives.
+	
 	ServerConf::split_elements( mem );
 	
 	// Normalize `mem' contents:
 	// Removes comments, trims `isspace()' characters
+	
 	ServerConf::normalize( mem );
 	
 	{
@@ -42,18 +44,18 @@ ServerConf::add ( std::ifstream & file )
 	}
 
 	// Pre-parse `mem' is contents.
+	
 	if ( ServerConf::pre_parse( mem ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
 	// Parse `mem' is contents.
+	
 	if ( ServerConf::parse( mem, server_blocks ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 
-	//LOG( "server_blocks: " << server_blocks.size() );
-	
 	// Create a new instance `ServerConf'
 	// for each `server {}' block.
-	// WIP
+	
 	block = server_blocks.begin();
 	while ( block != server_blocks.end() )
 	{
