@@ -22,7 +22,7 @@
 - [x] Find out why binded addresses keep binded for some seconds after cntrl+D
 
 ## CLARA
-
+- [ ] http get - no va la url despres
 - [ ] Fer el post falta mirar tema cgi com va amb post, retorna una string que seria la response no? llavors jo lhe fet dinamica ya
 - [ ] no posem a la response htto1.1 404 NOt found ¿? aqest header?
 - [ ] el delete nose com veurel sense curl
