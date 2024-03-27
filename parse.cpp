@@ -12,7 +12,8 @@
 #define CONTEXT			0
 #define DIRECTIVE		1
 
-#define CONTEXT_MAIN	0
+#define no	false
+#define yes	true
 
 typedef struct s_conf_opts
 {
@@ -136,48 +137,6 @@ normalize ( std::string & line )
 	return ( line );
 }
 
-std::string::iterator
-parse_next_token ( std::string::iterator it,
-		std::string::iterator end,
-		t_parse * parse_obj )
-{
-	static std::string __context__( "main" );
-	std::string::size_type size;
-
-	while ( it != end && std::isspace( *it ) != 0 )
-		++it;
-
-	DEBUG ( *it );
-
-	if ( *it == '{' )
-	{
-		std::clog << "++context\n";
-		return ( ++it );
-	}
-	if ( *it == '}' )
-	{
-		std::clog << "--context\n";
-		return ( ++it );
-	}
-
-	size = 0;
-	while ( it != end )
-	{
-		if ( *it == '{' || *it == '}' )
-			break ;
-		if ( *it == ';' )
-		{
-			++it;
-			break ;
-		}
-		++it;
-		++size;
-	}
-
-	(void) parse_obj;
-	return ( it );
-}
-
 std::size_t
 next_token ( std::string & buffer, std::size_t pos, std::string & token )
 {
@@ -201,68 +160,159 @@ next_token ( std::string & buffer, std::size_t pos, std::string & token )
 	return ( len == 0 ? 1 : len );
 }
 
-int
-parse ( std::string & buffer, t_parse * parse_obj )
+std::size_t
+next_context ( std::string & buffer, std::size_t pos, std::string & context )
 {
-	std::size_t				pos;
-	std::string				token;
-	const t_conf_opts		opts[] =
-	{
-		{ CONTEXT, "http", false, "main", 0x0 },
-		{ CONTEXT, "server", true, "http", 0x0 },
-		{ CONTEXT, "location", true, "server,location", 0x0 },
-		{ DIRECTIVE, "server_name", false, "server", 0x0 },
-		{ 0, 0x0, 0, 0x0, 0x0 }
-	};
+	std::size_t len, it, lvl;
 
-	DEBUG( buffer.c_str() );
-	parse_obj->tree.type = CONTEXT;
-	
-	pos = 0;
-	while ( pos != buffer.length() )
+	lvl = 0;
+	len = 0;
+	it = pos;
+	while ( it != buffer.length() )
 	{
-		pos += next_token( buffer, pos, token );
-		DEBUG( token.c_str() );
+		if ( buffer[it] == '{' )
+			++lvl;
+		if ( buffer[it] == '}' )
+			--lvl;
+		if ( buffer[it] == '}' && lvl == 0 )
+		{
+			++len;
+			break ;
+		}
+		++len;
+		++it;
 	}
-
-	(void) opts;
-	return ( EXIT_SUCCESS );
+	context.assign ( buffer.substr( pos, len == 0 ? 1 : len ) );
+	return ( len == 0 ? 1 : len );
 }
-
 int
-load ( const char * filename, std::string & mem )
+load ( std::string & filename, std::string & mem )
 {
 	std::size_t   line_nb;
 	std::string   line;
 	std::ifstream file;
 	
-	if ( filename == 0x0 )
-		return ( EXIT_FAILURE );
 	file.open( filename );
 	line_nb = 0;
 	while ( file.good() == true && file.eof() == false )
 	{
 		std::getline( file, line );
 		if ( normalize( line ).empty() == false )
-			mem.append( line );
+			mem.append( line ).append( " " );
 		++line_nb;
 	}
+	trim_f( mem, &std::isspace );
+	return ( EXIT_SUCCESS );
+}
+
+std::size_t
+how_many_options_are_there ( const t_conf_opts * opts )
+{
+	std::size_t n;
+
+	n = 0;
+	while ( opts != NULL && opts[n].identifier != 0x0 )
+		++n;
+	return ( n );
+}
+
+int
+parse_context ( std::string & context, const t_conf_opts * opts )
+{
+	DEBUG( context.c_str() );
+	(void) opts;
 	return ( EXIT_SUCCESS );
 }
 
 int
+parse_token ( std::string & token, const t_conf_opts * opts )
+{
+	const std::size_t 	opts_len = how_many_options_are_there( opts );
+	std::size_t			i;
+	std::string			word;
+
+	// TODO: fix.
+	// temporal measure: if token has no content, do nothing
+	if ( token.empty() == true )
+		return ( EXIT_SUCCESS );
+
+	DEBUG( token.c_str() );
+	i = 0;
+	if ( token.compare( "{" ) == 0 )
+	{
+		DEBUG( "++context" );
+		return ( EXIT_SUCCESS );
+	}
+	if ( token.compare( "}" ) == 0 )
+	{
+		DEBUG( "--context" );
+		return ( EXIT_SUCCESS );
+	}
+
+	word = token.substr( 0, token.find_first_of( " " ) );
+	while ( i < opts_len && word.compare( opts[i].identifier ) != 0 )
+		++i;
+	
+	if ( i == opts_len )
+	{
+		ERROR( "unknown directive \"" << word.c_str() << "\"" );
+		return ( EXIT_FAILURE );
+	}
+	if ( opts[i].type == DIRECTIVE && token.back() != ';' )
+	{
+		ERROR( "directive \"" << word << " is not terminated by \";\"" );
+		return ( EXIT_FAILURE );
+	}
+
+	return ( EXIT_SUCCESS );
+}
+
+int
+parse ( std::string filename )
+{
+	std::size_t			pos = 0;
+	std::string			buffer, context, token;
+	t_conf_item			tree;
+	const t_conf_opts	opts[] =
+	{
+		{ CONTEXT, "events", no, "main", 0x0 },
+		{ CONTEXT, "http", no, "main", 0x0 },
+		{ CONTEXT, "server", yes, "http", 0x0 },
+		{ CONTEXT, "location", yes, "server,location", 0x0 },
+		{ DIRECTIVE, "server_name", no, "server", 0x0 },
+		{ DIRECTIVE, "listen", no, "server", 0x0 },
+		{ DIRECTIVE, "allow_methods", no, "server,location", 0x0 },
+		{ DIRECTIVE, "root", no, "server", 0x0 },
+		{ DIRECTIVE, "index", no, "server", 0x0 },
+		{ DIRECTIVE, "autoindex", no, "server", 0x0 },
+		{ DIRECTIVE, "cgi_pass", no, "server,location", 0x0 },
+		{ DIRECTIVE, "cgi_param", no, "server,location", 0x0 },
+		{ 0, 0x0, 0, 0x0, 0x0 }
+	};
+
+	std::memset( &tree, 0, sizeof( tree ) );
+	load( filename, buffer );
+	while ( pos != buffer.length() )
+	{
+		pos += next_token( buffer, pos, token );
+		trim_f( token, &std::isspace );
+		if ( parse_token( token, opts ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+		//pos += next_context( buffer, pos, context );
+		//parse_context( context, (t_conf_opts *) &opts );
+	}
+	print_conf_item( &tree, 1 );
+	return ( EXIT_SUCCESS );
+}
+
+#define DEFAULT_CONF "conf/default.conf"
+
+int
 main ( int argc, const char ** argv )
 {
-	std::string		buffer;
-	t_parse			parse_obj;
-
-	std::memset( &parse_obj, 0, sizeof( parse_obj ) );
-	if ( argc != 2 || argv[1] == 0x0 )
+	if ( argc != 2 )
 		return ( EXIT_FAILURE );
-	if ( load( argv[1], buffer ) != EXIT_SUCCESS )
+	if ( parse( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] ) != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
-	if ( parse( buffer, &parse_obj ) != EXIT_SUCCESS )
-		return ( EXIT_FAILURE );
-	print_conf_item( &parse_obj.tree, 1 );
 	return ( EXIT_SUCCESS );
 }
