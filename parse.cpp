@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include "debug.hpp"
 #include "Log.hpp"
@@ -17,22 +18,23 @@
 
 typedef struct s_conf_opts
 {
-	int          type;
-	const char * identifier;
-	bool         duplicate;
-	const char * nest;
-	int * func;
+	int				type;
+	const char *	identifier;
+	bool			duplicate;
+	const char *	nest;
+	int *			func;
 
-} t_conf_opts;
+}					t_conf_opts;
 
 typedef struct s_conf_item
 {
-	int type;
-	struct s_conf_item * next;
-	struct s_conf_item * items;
-	struct s_conf_item * parent;
+	int						type;
+	int						lvl;
+	struct s_conf_item *	next;
+	struct s_conf_item *	items;
+	struct s_conf_item *	parent;
 
-} t_conf_item;
+} 							t_conf_item;
 
 typedef struct s_parse
 {
@@ -46,9 +48,9 @@ clear_parse_tree ( t_conf_item * tree )
 {
 	t_conf_item * temp;
 
-	while ( tree != NULL )
+	while ( tree != nullptr )
 	{
-		if ( tree->items != NULL )
+		if ( tree->items != nullptr )
 			clear_parse_tree( tree->items );
 
 		temp = tree;
@@ -62,18 +64,15 @@ clear_parse_tree ( t_conf_item * tree )
 void
 print_conf_item ( t_conf_item * tree, int offset )
 {
-	DEBUG ( "" );
-
-	while ( tree != NULL )
+	while ( tree != nullptr )
 	{
-		if ( tree->type == CONTEXT && tree->items != NULL )
-			print_conf_item( tree->items, offset + 2 );
-
 		for ( int i = 0; i < offset; ++i )
 			std::cout << " ";
-
 		std::cout << "L " << tree->type << '\n';
 
+		if ( tree->type == CONTEXT && tree->items != nullptr )
+			print_conf_item( tree->items, offset + 2 );
+		
 		tree = tree->next;
 	}
 
@@ -100,6 +99,8 @@ trim_f( std::string & str, int ( *func )( int ) )
 {
 	std::string::iterator it;
 
+	if ( str.empty() )
+		return ( str );
 	it = str.end() - 1;
 	while ( it != str.begin() && func( *it ) )
 		str.erase( it-- );
@@ -107,7 +108,6 @@ trim_f( std::string & str, int ( *func )( int ) )
 	it = str.begin();
 	while ( it != str.end() && func( *it ) )
 		it = str.erase ( it );
-	
 	return ( str );
 }
 
@@ -211,16 +211,54 @@ how_many_options_are_there ( const t_conf_opts * opts )
 	std::size_t n;
 
 	n = 0;
-	while ( opts != NULL && opts[n].identifier != 0x0 )
+	while ( opts != nullptr && opts[n].identifier != 0x0 )
 		++n;
 	return ( n );
 }
 
 int
-parse_context ( std::string & context, const t_conf_opts * opts )
+old_parse_positions ( std::string & buffer,
+		t_conf_item * main_node,
+		const t_conf_opts * opts )
 {
-	DEBUG( context.c_str() );
+	std::string::iterator	it;
+	t_conf_item * 			context;
+	t_conf_item * 			node;
+
 	(void) opts;
+	LOG_BUFFER( buffer.c_str() );
+	if ( main_node == nullptr )
+		return ( EXIT_FAILURE );
+
+	context = main_node;
+	it = buffer.begin();
+	while ( it != buffer.end() )
+	{
+		if ( *it == '{' || *it == '}' )
+		{
+			DEBUG( context << " (" << context->lvl << ")" );
+			DEBUG( *it );
+		}
+		if ( *it == '{' )
+		{
+			node = context->items;
+			while ( node != nullptr && node->next != nullptr )
+				node = node->next;
+			node = new t_conf_item;
+			node->parent = context;
+			node->lvl = context->lvl + 1;
+			node->items = nullptr;
+			node->next = nullptr;
+			context = node;
+		}
+		if ( *it == '}' )
+		{
+			context = context->parent == nullptr ? context : context->parent;
+		}
+		++it;
+	}
+	DEBUG( context << " (" << context->lvl << ")" );
+
 	return ( EXIT_SUCCESS );
 }
 
@@ -231,28 +269,17 @@ parse_token ( std::string & token, const t_conf_opts * opts )
 	std::size_t			i;
 	std::string			word;
 
-	// TODO: fix.
-	// temporal measure: if token has no content, do nothing
+	// TODO: fix temporal measure: if token has no content, do nothing
 	if ( token.empty() == true )
 		return ( EXIT_SUCCESS );
-
-	DEBUG( token.c_str() );
 	i = 0;
 	if ( token.compare( "{" ) == 0 )
-	{
-		DEBUG( "++context" );
 		return ( EXIT_SUCCESS );
-	}
 	if ( token.compare( "}" ) == 0 )
-	{
-		DEBUG( "--context" );
 		return ( EXIT_SUCCESS );
-	}
-
 	word = token.substr( 0, token.find_first_of( " " ) );
 	while ( i < opts_len && word.compare( opts[i].identifier ) != 0 )
 		++i;
-	
 	if ( i == opts_len )
 	{
 		ERROR( "unknown directive \"" << word.c_str() << "\"" );
@@ -263,16 +290,56 @@ parse_token ( std::string & token, const t_conf_opts * opts )
 		ERROR( "directive \"" << word << " is not terminated by \";\"" );
 		return ( EXIT_FAILURE );
 	}
+	return ( EXIT_SUCCESS );
+}
 
+int
+validate_directive ( std::string & buffer, std::size_t * pos,
+		const t_conf_opts * opts )
+{
+	const std::size_t 	opts_len = how_many_options_are_there( opts );
+	std::size_t			position, size;
+	std::string			word;
+
+	(void) opts_len;
+	size = 0;
+	position = *pos;
+	while ( position < buffer.length() )
+	{
+		if ( buffer[position] == '{' || buffer[position] == '}' )
+			break;
+		++size;
+		++position;
+	}
+	word = buffer.substr( position, size );
+	*pos = position + 1;
+	return ( EXIT_SUCCESS );
+}
+
+
+int
+parse_positions ( std::string & buffer, t_conf_item * main_node,
+		const t_conf_opts * opts )
+{
+	std::size_t size, pos;
+
+	(void) size;
+	pos = 0;
+	while ( pos < buffer.length() )
+	{
+		if ( validate_directive( buffer, &pos, opts ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+	}
+	(void) main_node;
 	return ( EXIT_SUCCESS );
 }
 
 int
 parse ( std::string filename )
 {
-	std::size_t			pos = 0;
+	// std::size_t		pos = 0;
 	std::string			buffer, context, token;
-	t_conf_item			tree;
+	t_conf_item			tree = {};
 	const t_conf_opts	opts[] =
 	{
 		{ CONTEXT, "events", no, "main", 0x0 },
@@ -290,17 +357,15 @@ parse ( std::string filename )
 		{ 0, 0x0, 0, 0x0, 0x0 }
 	};
 
-	std::memset( &tree, 0, sizeof( tree ) );
 	load( filename, buffer );
-	while ( pos != buffer.length() )
+	parse_positions( buffer, &tree, opts );
+	/* while ( pos != buffer.length() )
 	{
 		pos += next_token( buffer, pos, token );
 		trim_f( token, &std::isspace );
 		if ( parse_token( token, opts ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
-		//pos += next_context( buffer, pos, context );
-		//parse_context( context, (t_conf_opts *) &opts );
-	}
+	} */
 	print_conf_item( &tree, 1 );
 	return ( EXIT_SUCCESS );
 }
