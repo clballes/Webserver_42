@@ -89,23 +89,18 @@ parse_target( t_request & request, std::string & line )
 		return ( BAD_REQUEST );
 
 	HTTP::urldecode( request.target );
+	// line = HTTP::urldecode( line );
 	std::string p_string = line.substr( 0, pos );
 	if (p_string.length() < request.target.length())
 	{
-		std::cout << "ENTRAS QUE FAS 0" << std::endl;
-
 		return ( FORBIDDEN );
 	}
 	else if (line.compare(0,request.target.length() - 1, request.target))
 	{
-		std::cout << "ENTRAS QUE FAS 1" << line << std::endl;
-		std::string a = line.substr( request.target.length(), pos - request.target.length());
-		std::cout << "line es" << line << " sub es" << " a es:" << a << std::endl;
 		request.target.append( line.substr( request.target.length(), pos - request.target.length()  ));
 	}
 	else
 	{
-		std::cout << "ENTRAS QUE FAS" << std::endl;
 		request.target.append( line.substr( 0, pos ));
 	}
 	

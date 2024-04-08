@@ -16,24 +16,16 @@ HTTP::http_get ( HTTP & http )
 {
 	LOG( "call HTTP::http_get()" );
 
-	// http._request.target.append( http._server._root );
-	// http._request.target.append( http._request.target );
 	LOG( " target: " << http._request.target << " status code: " << http._status_code);
 
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
-	if ( http._status_code ==  400 )
-	{
-		LOG( http._server._error_page[400] );
-		(void) HTTP::load_file( http, http._server._error_page[400] );
+	if ( http._status_code >= 300) {
+		LOG( http._server._error_page[http._status_code] );
+		(void) HTTP::load_file( http, http._server._error_page[http._status_code] );
 		return (EXIT_FAILURE);
 	}
-	if ( http._status_code ==  403 )
-	{
-		LOG( http._server._error_page[403] );
-		(void) HTTP::load_file( http, http._server._error_page[403] );
-		return (EXIT_FAILURE);
-	}
+	
 	if ( is_regular_file( http._request.target ) == true )
 	{
 		http._status_code = HTTP::load_file( http, http._request.target );
@@ -56,7 +48,7 @@ HTTP::http_get ( HTTP & http )
 	}
 	else
 	{
-		
+		// no content status code
 	}	
 
 	// implement loop fashion

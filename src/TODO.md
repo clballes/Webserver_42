@@ -22,9 +22,24 @@
 - [x] Find out why binded addresses keep binded for some seconds after cntrl+D
 
 ## CLARA
+- [ ] acabar CGI
+
 - [ ] http get - no va la url despres
 - [ ] Fer el post falta mirar tema cgi com va amb post, retorna una string que seria la response no? llavors jo lhe fet dinamica ya
 - [ ] no posem a la response htto1.1 404 NOt found ¿? aqest header?
 - [ ] el delete nose com veurel sense curl
 - [ ] el put falta mirar be els errors com ferho o que fer el display
 - [ ] el put quan envia data (curl -d "data to be sent" -X PUT http://localhost:90/clara3.txt) - data to be snet em surt quan crea el fitxer que esta encoded o bimary -- open anyway, sense el body request no em apssa aixo
+
+## WIP COMMENTS
+- [ ] add.cpp WIP
+- [ ] events.cpp WIP
+- [ ] ftbzero.cpp
+- [ ] ftrealpath.cpp
+- [ ]  HTTP::generateHTML() en el post.cpp
+- [] parse_start_line.cpp - int
+HTTP::parse_start_line( std::string & line )
+- [] compose response en events.cpp
+- [] destructor.cpp en el client
+- [] cgi param mirar amb marti que fer
+- [] gestio errors i merge amb marti

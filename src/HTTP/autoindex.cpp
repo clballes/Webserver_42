@@ -64,7 +64,6 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "<table>");
 	page.append("<thead>" );
 	page.append( "<tr class=\"header\" ><th tabindex=\"0\" role=\"button\">Name</th></tr></thead>" );
-
 	// page.append( "<tr class=\"header\" ><th tabindex=\"0\" role=\"button\">Name</th><th  class=\"detailsColumn\" tabindex=\"0\" role=\"button\">Size</th><th class=\"detailsColumn\" tabindex=\"0\" role=\"button\">Date Modified</th></tr></thead>" );
 	page.append( "<tbody>" );
 
@@ -99,7 +98,6 @@ HTTP::autoindex ( HTTP & http )
 			// page.append("<td class=\"detailsColumn\" data-value=\"1712583523\">4/8/24, 3:38:43 PM</td>");
 			page.append("</tr>");
 		}
-		
 	}
 	
 	// HTML end tags

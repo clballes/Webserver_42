@@ -30,16 +30,16 @@ CGI::execute ( void )
 
 	LOG( "call CGI::execute()" );
 
-	// TODO: should come from http.target
-	std::string target;
+	// TODO: should come from http.target DONE MIRAR SI ESTA OK (CLARA)
+	// std::string target;
 	
 	// target.append( this->_http._server._root );
 	// target.append( this->_http._request.target );
 
-    fdopen = open( target.c_str(), O_RDONLY );
+    fdopen = open( this->_http._request.target.c_str(), O_RDONLY );
     if ( fdopen == -1 )
 	{
-        std::cerr << target << " ";
+        std::cerr << this->_http._request.target << " ";
 		std::cerr << ::strerror( errno );
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
