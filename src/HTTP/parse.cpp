@@ -19,6 +19,7 @@ HTTP::parse ( void )
 
 	start = 0;
 	pos = this->_buffer_recv.find_first_of( LF, 0 );
+	this->_request.target = this->_server._root;
 	while ( pos != std::string::npos )
 	{
 		line = this->_buffer_recv.substr( start, pos - start );
@@ -26,7 +27,9 @@ HTTP::parse ( void )
 		if ( start == 0 )
 		{
 			if ( parse_start_line( line ) == EXIT_FAILURE )
+			{
 				return ( EXIT_FAILURE );
+			}
 		}
 		else if ( std::isgraph( line.at( 0 ) ) != 0 )
 		{

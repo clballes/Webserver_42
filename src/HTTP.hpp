@@ -96,7 +96,7 @@ class HTTP
 		static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
-		static int autoindex ( HTTP &, std::string & );
+		static int autoindex ( HTTP & );
 
 };
 

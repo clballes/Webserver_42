@@ -34,7 +34,7 @@ HTTP::urldecode ( std::string & url )
 		num = url.substr( pos + 1, 2 );
 		n = std::stoi( num, 0, 16 );
 		url.replace( pos, 3, sizeof( char ), static_cast<char>( n ) );
-
+		
 		pos = url.find_first_of( "%", pos + 1 );
 	}
 	return ( url );

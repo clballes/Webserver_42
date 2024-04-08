@@ -14,11 +14,7 @@ HTTP::perform ( void )
 
 	if ( this->parse() == EXIT_FAILURE )
 		LOG( " KO" );
-
 	this->_buffer_recv.clear();
-
-
-
 	if ( this->_request.method == 0x0 )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	else
@@ -30,7 +26,6 @@ HTTP::perform ( void )
 	// target el creem en el constructr del HTTP i aqui fem un clear
 	HTTP::compose_response( *this );
 	this->_request.target.clear();
-
 	return ;
 }
 
