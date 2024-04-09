@@ -17,6 +17,8 @@ CGI::CGI ( HTTP & http ): _http( http ), _env( 0x0 )
 	this->_env[3] = nullptr;
 
 	(void) http;
+	// aqui afegim coses 
+	
 
 	return ;
 }

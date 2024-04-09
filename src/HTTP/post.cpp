@@ -74,9 +74,10 @@ HTTP::http_post ( HTTP & http ){
 	if ( http._server._cgi_pass.length() != 0 )
 	{
 		LOG( " Executing Cgi" );
-		CGI cgi( http );
-		if (cgi.execute() == EXIT_FAILURE)
+		CGI *cgi_ptr = new CGI( http );
+		if (cgi_ptr->execute() == EXIT_FAILURE)
 			return EXIT_FAILURE;
+		std::cout << " ---------------------------------------------------------------------------------------------------------------- AFTER CGI AAAAAA A A A A"<< http._message_body << std::endl;
 		http._status_code = 200;
 	}
 	else

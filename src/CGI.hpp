@@ -22,6 +22,7 @@ class CGI : public IEvent
 		~CGI ( void );
 
 		void dispatch ( struct kevent & ev );
+		int register_process( void );
 		int execute ( void );
 
 		friend class HTTP;
@@ -30,7 +31,7 @@ class CGI : public IEvent
 
 		HTTP &  _http;
 		char ** _env;
-
+		pid_t _cgi_pid;
 };
 
 #include "HTTP.hpp"
