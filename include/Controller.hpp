@@ -36,6 +36,8 @@
 #include <sys/event.h>		/* kqueue, ... */
 #include <sys/time.h>		/* kqueue */
 
+#include "string.hpp"
+#include "file.hpp"
 #include "Server.hpp"
 #include "define.hpp"
 #include "debug.hpp"

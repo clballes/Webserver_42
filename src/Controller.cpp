@@ -5,12 +5,6 @@
 
 #include "Controller.hpp"
 
-bool is_regular_file( const std::string & filename );
-std::string & trim_comments ( std::string & str, const char * comment_type );
-std::string & trim_f( std::string & str, int ( *func )( int ) );
-std::string & replace_f ( std::string & str, int ( *func )( int ), char c );
-std::string & normalize ( std::string & line );
-
 t_conf_opts
 Controller::_opts[] =
 {
@@ -38,7 +32,6 @@ Controller::Controller ( void ): _good( true )
 		ERROR( PROGRAM_NAME << ": kqueue: " << ::strerror( errno ) );
 		this->_good = false;
 	}
-	DEBUG( IEvent::kq );
 	return ;
 }
 
@@ -73,7 +66,7 @@ Controller::load ( std::string & filename )
 	if ( file.good() == false && file.eof() != true )
 		return ( EXIT_FAILURE );
 	trim_f( this->_buffer, &std::isspace );
-	DEBUG( this->_buffer.c_str() );
+	//DEBUG( this->_buffer.c_str() );
 	file.close();
 	setup_instances();
 	return ( EXIT_SUCCESS );
@@ -127,14 +120,17 @@ get_directive_length ( std::string & buffer, std::size_t position )
 	std::size_t len;
 
 	len = 0;
-	while ( position < buffer.length() && std::isspace( buffer[position] ) )
+	while ( position < buffer.length()
+			&& std::isspace( buffer[position] ) )
 	{
 		++len;
 		++position;
 	}
 	while ( position < buffer.length() )
 	{
-		if ( buffer[position] == '{' || buffer[position] == '}' || buffer[position] == ';' )
+		if ( buffer[position] == '{'
+				|| buffer[position] == '}'
+				|| buffer[position] == ';' )
 		{
 			++len;
 			++position;
@@ -143,7 +139,8 @@ get_directive_length ( std::string & buffer, std::size_t position )
 		++len;
 		++position;
 	}
-	while ( position < buffer.length() && std::isspace( buffer[position] ) )
+	while ( position < buffer.length()
+			&& std::isspace( buffer[position] ) )
 	{
 		++len;
 		++position;
@@ -196,7 +193,6 @@ Controller::setup_instances ( void )
 		directive = this->_buffer.substr( pos, directive_len );
 		trim_f( directive, &std::isspace );
 		word = directive.substr( 0, directive.find_first_of( " \f\n\r\t\v{};" ) );
-		DEBUG( directive.c_str() );
 		pos += directive_len;
 		if ( directive == "}" )
 		{
@@ -217,7 +213,6 @@ Controller::setup_instances ( void )
 			{
 				this->_instances.resize( this->_instances.size() + 1 );
 				current_instance = &this->_instances.back();
-				LOG( "current_instance: " << current_instance->id() );
 			}
 			else if ( word == "location" )
 			{
@@ -225,6 +220,8 @@ Controller::setup_instances ( void )
 						directive.find_first_of( " \f\n\r\t\v{};" ) + word.length() );
 				trim_f( argument, &std::ispunct );
 				trim_f( argument, &std::isspace );
+
+				// TODO
 				// current_instance->locations new location ...
 			}
 			continue ;
@@ -254,14 +251,13 @@ Controller::setup_instances ( void )
 				++i;
 			if ( i == how_many_options_are_there( Controller::_opts ) )
 				return ( EXIT_FAILURE );
-
-			std::clog << "set (" << argument << ") " << word << '\n';
+			// TODO
 		}
 		else
 		{
+			// TODO
 			std::cout << "else\n";
 		}
-
 	}
 	return ( EXIT_SUCCESS );
 }
@@ -327,101 +323,9 @@ Controller::event_loop ( void )
 const std::vector< Server > &
 Controller::getInstances ( void ) const
 {
-	DEBUG( this );
+	//DEBUG( this );
 	return ( this->_instances );
 }
-
-#include <sys/stat.h>
-
-bool
-is_regular_file( const std::string & filename )
-{
-	struct stat file_info;
-
-	DEBUG( filename.c_str() );
-    if ( stat( filename.c_str(), &file_info ) != 0 )
-        return ( false );
-    return ( S_ISREG( file_info.st_mode ) );
-}
-
-std::string &
-trim_comments ( std::string & str, const char * comment_type )
-{
-	size_t pos;
-
-	if ( comment_type == 0x0 )
-		return ( str );
-	pos = str.find_first_of( comment_type, 0 );
-	if ( pos != std::string::npos )
-		str = str.erase( pos, str.length() - pos );
-	return ( str );
-}
-
-std::string &
-trim_f( std::string & str, int ( *func )( int ) )
-{
-	std::string::iterator it;
-
-	if ( str.empty() )
-		return ( str );
-	it = str.end() - 1;
-	while ( it != str.begin() && func( *it ) )
-		str.erase( it-- );
-	it = str.begin();
-	while ( it != str.end() && func( *it ) )
-		it = str.erase ( it );
-	return ( str );
-}
-
-std::string &
-replace_f ( std::string & str, int ( *func )( int ), char c )
-{
-	std::string::iterator it;
-
-	it = str.begin();
-	while ( it != str.end() )
-	{
-		if ( func( *it ) != 0 )
-			*it = c;
-		++it;
-	}
-	return ( str );
-}
-
-std::string &
-del_multipl_sp( std::string & str, int ( *func )( int ) )
-{
-	std::string::iterator it;
-	bool prev_sp;
-
-	it = str.begin();
-	prev_sp = (bool) func( *it );
-	while ( it != str.end() )
-	{
-		if ( prev_sp == true && func( *it ) != 0 )
-		{
-			it = str.erase( it );
-			prev_sp = (bool) func( *it );
-		}
-		else
-		{
-			prev_sp = (bool) func( *it );
-			++it;
-		}
-	}
-	return ( str );
-}
-
-std::string &
-normalize ( std::string & line )
-{
-	line = trim_comments( line, "#" );
-	line = trim_f( line, &std::isspace );
-	line = replace_f( line, &std::isspace, ' ' );
-	line = del_multipl_sp( line, &std::isspace );
-	return ( line );
-}
-
 
 int
 set_allow_methods( Server & instance, std::string & arg )
@@ -431,7 +335,7 @@ set_allow_methods( Server & instance, std::string & arg )
 	std::istringstream iss( arg );
 	std::string word;
 
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"allow_methods\"" );
@@ -459,7 +363,7 @@ set_allow_methods( Server & instance, std::string & arg )
 int
 set_autoindex( Server & instance, std::string & arg )
 {
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	else if ( arg == "off" )
@@ -475,7 +379,7 @@ int
 set_cgi_param ( Server & instance, std::string & arg )
 {
 	//TODO: what if a path has spaces ???
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
@@ -488,7 +392,7 @@ int
 set_cgi_pass ( Server & instance, std::string & arg )
 {
 	//TODO: what if a path has spaces ???
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
@@ -504,7 +408,7 @@ set_client_body ( Server & instance, std::string & arg )
 	std::size_t n = 0;
 	int alpha = 0;
 
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"client_body\"" );
@@ -537,7 +441,7 @@ set_error_page ( Server & instance, std::string & arg )
 	std::string::iterator it;
 	std::string num, page;
 
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() || how_many_words( arg ) != 2 )
 	{
 		ERROR( "invalid number of arguments in \"error_page\"" );
@@ -564,7 +468,7 @@ set_index ( Server & instance, std::string & arg )
 	std::istringstream iss( arg );
 	std::string word;
 
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"index\"" );
@@ -587,7 +491,7 @@ set_listen( Server & instance, std::string & arg )
 	std::string ip, port;
 	int ecode;
 
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"listen\"" );
@@ -636,7 +540,7 @@ set_listen( Server & instance, std::string & arg )
 int
 set_root ( Server & instance, std::string & arg )
 {
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"root\"" );
@@ -651,7 +555,7 @@ set_server_name ( Server & instance, std::string & arg )
 	std::istringstream iss( arg );
 	std::string word;
 
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"server_name\"" );

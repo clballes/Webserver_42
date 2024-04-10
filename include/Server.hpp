@@ -15,6 +15,10 @@
 #include "ServerConf.hpp"
 #include "HTTP.hpp"
 
+#ifdef ALLOW_FORBIDDEN
+#include <arpa/inet.h>
+#endif
+
 class Server: public IEvent
 {
 	public:
@@ -42,7 +46,6 @@ class Server: public IEvent
 		ServerConf			_conf;
 		
 		void register_read_socket ( void ) const;
-		int receive_request ( int64_t );
 
 };
 

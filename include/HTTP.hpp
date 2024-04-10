@@ -12,10 +12,12 @@
 #include <map>
 #include "IEvent.hpp"
 #include "Server.hpp"
+#include "CGI.hpp"
 #include "define.hpp"
 #include "debug.hpp"
-#include "CGI.hpp"
-
+#include "string.hpp"
+#include "file.hpp"
+#include "HTTP_status_codes.hpp"
 
 typedef std::map< std::string, std::string > t_headers;
 
@@ -56,13 +58,9 @@ class HTTP: public IEvent
 		int request_recv ( int64_t );
 		int request_send ( void );
 
-		static std::string & urlencode ( std::string & );
-		static std::string & urldecode ( std::string & );
 		static int load_file ( HTTP &, std::string );
 		int put_file( void );
 		void generateHTML(); // aico sera per el CGI
-
-		void perform ( void );
 
 		static int n_methods;
 		static std::size_t n_longest_method;

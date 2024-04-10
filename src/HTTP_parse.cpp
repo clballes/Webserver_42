@@ -5,17 +5,12 @@
 
 #include "HTTP.hpp"
 
-bool is_regular_file( const std::string & filename );
-std::string & trim_comments ( std::string & str, const char * comment_type );
-std::string & trim_f( std::string & str, int ( *func )( int ) );
-
 int
 HTTP::parse ( void )
 {
 	std::string::size_type  start, pos;
 	std::string             line;
 
-	LOG( "call HTTP::parse()" );
 	start = 0;
 	pos = this->_buffer_recv.find_first_of( LF, 0 );
 	while ( pos != std::string::npos )
@@ -24,41 +19,27 @@ HTTP::parse ( void )
 		if ( start == 0 )
 		{
 			if ( parse_start_line( line ) == EXIT_FAILURE )
-			{
-				LOG( "START_LINE" );
 				return ( EXIT_FAILURE );
-			}
 		}
 		else if ( std::isgraph( line.at( 0 ) ) != 0 )
 		{
 			if ( parse_field_line( line ) == EXIT_FAILURE )
-			{
-				LOG( "TT" );
 				return ( EXIT_FAILURE );
-			}
 		}
 		else if ( ( pos - start ) != 1 )
-		{
-			LOG( "HERE" );
 			return ( EXIT_FAILURE );
-		}
 		start = pos + 1;
 		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
 	}
-	
 	//adding request body for POST petitions
-	int delimiter = this->_buffer_recv.find("\r\n\r\n");
+	int delimiter = this->_buffer_recv.find( "\r\n\r\n" );
 	int len  = this->_buffer_recv.length();
-
 	// OTHER PETITIONS EXCEPT POST
-	if (delimiter + 5 == len )
-	{
-		return (EXIT_SUCCESS);
-	}
+	if ( delimiter + 5 == len )
+		return ( EXIT_SUCCESS );
 	else
-	{
-		this->_request.body = this->_buffer_recv.substr(delimiter + 4);
-	}
+		this->_request.body = this->_buffer_recv.substr( delimiter + 4 );
+	
 	return ( EXIT_SUCCESS );
 }
 
@@ -74,8 +55,6 @@ HTTP::parse_field_line ( std::string & line )
 	std::string field_name, field_value;
 	std::string::size_type pos, len;
 
-	//LOG( "call HTTP::parse_field_line()" );
-	//LOG_BUFFER( line.c_str() );
 	len = line.length();
 	pos = line.find_first_of( ":" );
 	// TODO
@@ -105,8 +84,6 @@ static int parse_http_version ( t_request &, std::string & );
 int
 HTTP::parse_start_line( std::string & line )
 {
-	//LOG( "call HTTP::parse_start_line()" );
-	//LOG_BUFFER( line.c_str() );
 	this->_status_code = parse_method( this->_request, line );
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
@@ -132,7 +109,6 @@ parse_method( t_request & request, std::string & line )
 	std::string             value;
 	int                     iterator;
 
-	//LOG( "call parse_method()" );
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
@@ -154,34 +130,22 @@ parse_method( t_request & request, std::string & line )
 int
 parse_target( t_request & request, std::string & line )
 {
-	LOG( "call parse_target()" << request.target);
 	std::string::size_type  pos;
 
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
-
-	HTTP::urldecode( request.target );
-	// line = HTTP::urldecode( line );
 	std::string p_string = line.substr( 0, pos );
-	if (p_string.length() < request.target.length())
-	{
+	if ( p_string.length() < request.target.length() )
 		return ( FORBIDDEN );
-	}
-	else if (line.compare(0,request.target.length() - 1, request.target))
-	{
-		request.target.append( line.substr( request.target.length(), pos - request.target.length()  ));
-	}
+	else if ( line.compare( 0, request.target.length() - 1, request.target ) )
+		request.target.append( line.substr( request.target.length(),
+					pos - request.target.length() ) );
 	else
-	{
-		request.target.append( line.substr( 0, pos ));
-	}
-	
-	LOG( " AFTER PARSING TARGET; request.target: \"" << request.target << "\"" );
-
+		request.target.append( line.substr( 0, pos ) );
+	urldecode( request.target );
 	return ( EXIT_SUCCESS );
 }
-
 
 int
 parse_http_version ( t_request & request, std::string & line )
@@ -189,7 +153,6 @@ parse_http_version ( t_request & request, std::string & line )
 	std::string::size_type  pos;
 	std::string             value;
 
-	//LOG( "call parse_http_version()" );
 	pos = line.find_first_of( CR, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );

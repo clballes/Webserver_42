@@ -7,7 +7,7 @@
 #include <sstream>
 #include <dirent.h>
 #include <sys/stat.h>
-
+#include "file.hpp"
 
 /*
  * From RFC9112:
@@ -20,20 +20,6 @@
  * path within the origin-form of request-target.
  */
 
-bool
-is_reg_file( const std::string & filename );
-
-bool
-is_reg_file( const std::string & filename )
-{
-	struct stat file_info;
-
-	DEBUG( filename.c_str() );
-    if ( stat( filename.c_str(), &file_info ) != 0 )
-        return ( false );
-    return ( S_ISREG( file_info.st_mode ) );
-};
-
 int
 HTTP::autoindex ( HTTP & http )
 {
@@ -44,20 +30,14 @@ HTTP::autoindex ( HTTP & http )
 	// http._request.target is where the client asks
 	// whilst directory_name is the translated location
 	// on the server.
-	LOG( "call HTTP::autoindex()"  );
 	directory_name = http._request.target;
-
 	directory = opendir( directory_name.c_str() );
-
 	if ( directory == NULL )
 	{
-		std::cerr << directory_name << ": " << strerror( errno );
-		std::cerr << std::endl;
+		WARN( directory_name << ": " << strerror( errno ) );
 		return ( NOT_FOUND );
 	}
-
 	// HTML init content tags ( html, head, title, body ).
-
 	page.append( "<!DOCTYPE html>" );
 	page.append( "<head>" );
 	page.append( "<title>" );
@@ -80,7 +60,6 @@ HTTP::autoindex ( HTTP & http )
 	page.append("<thead>" );
 	page.append( "<tr class=\"header\" ><th tabindex=\"0\" role=\"button\">Name</th></tr></thead>" );
 	page.append( "<tbody>" );
-
 	for ( struct dirent *ent = readdir( directory );
 			ent != 0x0; ent = readdir( directory ) )
 	{
@@ -90,7 +69,7 @@ HTTP::autoindex ( HTTP & http )
 			page.append("<td data-value=\"");
 			page.append(ent->d_name);
 			page.append("\">");
-			if (!is_reg_file(ent->d_name)) {
+			if (!is_regular_file(ent->d_name)) {
 				page.append("<img src=\"/Users/clballes/Desktop/web42/tools/dir_icon.png\" alt=\"Directory Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
 			} else {
 				page.append("<img src=\"/Users/clballes/Desktop/web42/tools/file_icon.png\" alt=\"File Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
@@ -109,15 +88,10 @@ HTTP::autoindex ( HTTP & http )
 			page.append("</tr>");
 		}
 	}
-	
 	// HTML end tags
-
 	page.append( "</body>" );
 	page.append( "</html>" );
-
     closedir( directory );
-
 	http._message_body.append( page.c_str() );
-
 	return ( OK );
 }

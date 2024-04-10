@@ -1,26 +1,12 @@
 - [ ] excludes ?options from URI
 - [ ] proper log system
-- [ ] finish getoptions()
-- [ ] if not REUSE_SOCKET, loop timer to retry bind
 - [ ] send connection: close header
-- [ ] allow_methods -> flags (Server)
 - [ ] Tests: request headers
 - [ ] Clear unused / properly reorder included headers!
 - [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
-- [ ] proper decorde_url
-- [ ] encode_url
-- [ ] mime types
-- [x] load file function
-- [x] temp decode_url
-- [x] http Server & from Client
-- [x] HTTP::http_get: translate target += root
-- [x] parse headers
-- [x] std::map for headers
-- [x] Deal with `keep-alive' clients
-- [x] Move Server::kq to IEvent::kq
-- [x] Each client has it's own HTTP instance
-- [x] Find out why binded addresses keep binded for some seconds after cntrl+D
-
-## CLARA
+- [ ] proper decorde_url / encode_url
+- [ ] proper parse 
+- [ ] Methods: CGI a part, get,post,etc...
+- [ ] CGI: Location: getters that match request.target
 - [ ] acabar CGI
 - [ ] gaurrades es he fet en el http gettarget i getCGIpass

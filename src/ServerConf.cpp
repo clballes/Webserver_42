@@ -79,7 +79,7 @@ ServerConf::getErrorPage ( int errnum )
 int
 ServerConf::setFlag ( int flag, bool enable )
 {
-	DEBUG( std::boolalpha << enable << " " << std::hex << flag << std::dec );
+	//DEBUG( std::boolalpha << enable << " " << std::hex << flag << std::dec );
 	if ( enable == true )
 		this->_flags |= flag;
 	else
@@ -90,7 +90,7 @@ ServerConf::setFlag ( int flag, bool enable )
 int
 ServerConf::setClientMaxBodySize ( std::size_t size )
 {
-	DEBUG( std::dec << size );
+	//DEBUG( std::dec << size );
 	this->_client_max_body_size = size;
 	return ( EXIT_SUCCESS );
 }
@@ -101,7 +101,7 @@ ServerConf::setCGIparam ( std::string & arg )
 	//TODO: check if multiple params ( which should be invalid )
 	//TODO: check arg is valid
 	//return ( EXIT_FAILURE );
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	this->_cgi_param = arg;
 	return ( EXIT_SUCCESS );
 }
@@ -111,7 +111,7 @@ ServerConf::setCGIpass ( std::string & arg )
 {
 	//TODO: check arg is valid
 	//return ( EXIT_FAILURE );
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	this->_cgi_pass = arg;
 	return ( EXIT_SUCCESS );
 }
@@ -121,7 +121,7 @@ ServerConf::setRoot ( std::string & arg )
 {
 	//TODO: check arg is valid
 	//return ( EXIT_FAILURE );
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	this->_root = arg;
 	while ( this->_root.back() == '/' )
 		this->_root.erase( this->_root.length() - 1, 1 );
@@ -133,8 +133,7 @@ ServerConf::setServerName ( std::string & arg )
 {
 	//TODO: check values
 	//return ( EXIT_FAILURE );
-	
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	if ( ! isalpha( arg[0] ) )
@@ -153,7 +152,7 @@ ServerConf::setIndex ( std::string & arg )
 {
 	//TODO: check value
 	//return ( EXIT_FAILURE );
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( std::find( this->_index.begin(),
 				this->_index.end(), arg ) == this->_index.end() )
 		this->_index.push_back( arg );
@@ -165,7 +164,7 @@ ServerConf::setErrorPage ( int n, std::string & path )
 {
 	//TODO: check values
 	//return ( EXIT_FAILURE );
-	DEBUG( n << " " << path );
+	//DEBUG( n << " " << path );
 	if ( n < 400 || n > 555 )
 		return ( EXIT_FAILURE );
 	this->_error_page[n] = path;

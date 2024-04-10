@@ -36,7 +36,6 @@ get_method_longest_len ( t_http_method * ptr )
 			n = strlen( ptr->method );
 		++ptr;
 	}
-
 	return ( n );
 }
 
@@ -46,17 +45,14 @@ HTTP::HTTP ( Server & server_instance ):
 {
 	this->cgi_ptr = NULL;
 	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
-	//this->_request.target = this->_server.getConf().getRoot();
 	this->_socket_fd = ::accept( this->_server.getSocketFD(),
-			(struct sockaddr *) &this->_address,
-			&this->_address_len );
-	if ( this->_socket_fd == -1 )
+			(struct sockaddr *) &this->_address, &this->_address_len );
+	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
+			F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1 )
 	{
-		ERROR( "client is not OK" );
-		//this->good = false;
+		ERROR( "HTTP: error creating new client" );
 		return ;
 	}
-	// TODO: fcntl()
 	DEBUG( this->_socket_fd );
 	this->register_recv();
 	return ;
@@ -64,7 +60,8 @@ HTTP::HTTP ( Server & server_instance ):
 
 HTTP::~HTTP ( void )
 {
-	DEBUG ( this->_socket_fd );
+	DEBUG( this->_socket_fd );
+	close( this->_socket_fd );
 	return ;
 }
 
@@ -84,7 +81,7 @@ HTTP::register_recv ( void )
 {
 	struct kevent ev;
 
-	DEBUG( "fd=" << this->_socket_fd );
+	DEBUG( this->_socket_fd );
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
@@ -121,14 +118,28 @@ HTTP::request_recv ( int64_t data )
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 	if ( n == 0 )
 	{
-		LOG( "client closed connection (fd=" << this->_socket_fd << ")" );
+		INFO( "Client closed connection (fd=" << this->_socket_fd << ")" );
 		delete this;
 		return ( EXIT_FAILURE );
 	}
-	std::clog << "recv ";
 	LOG_BUFFER( this->_buffer_recv.c_str() );
 	// Do HTTP method, compose message.
-	this->perform();
+	if ( this->parse() == EXIT_FAILURE )
+		WARN( "Something went wrong while parsing HTTP recv" );
+	this->_buffer_recv.clear();
+	if ( this->_request.method == 0x0 )
+		this->_status_code = INTERNAL_SERVER_ERROR;
+	//TODO: location
+	// fn()
+	else
+	{
+		// Do HTTP method GET/POST...
+		// Each method sets _status_code, _headers, ...
+		this->_request.method->method_func( * this );
+	}
+	// Generic response composition based on _status_code.
+	HTTP::compose_response( *this );
+	this->_request.target.clear();
 	// Finally send _buffer_send.
 	// Consider setting send() as an event.
 	this->request_send();
@@ -139,8 +150,6 @@ int
 HTTP::request_send ( void )
 {
 	DEBUG( this->_socket_fd );
-	std::clog << "send ";
-	LOG_BUFFER( (char *) this->_buffer_send.c_str() );
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
@@ -148,28 +157,6 @@ HTTP::request_send ( void )
 	this->_buffer_send.clear();
 	return ( EXIT_SUCCESS );
 }
-
-void
-HTTP::perform ( void )
-{
-	LOG( "call HTTP::perform" );
-	if ( this->parse() == EXIT_FAILURE )
-		LOG( " KO" );
-	this->_buffer_recv.clear();
-	if ( this->_request.method == 0x0 )
-		this->_status_code = INTERNAL_SERVER_ERROR;
-	else
-	{
-		// Do HTTP method GET/POST...
-		// Each method sets _status_code, _headers, ...
-		this->_request.method->method_func( * this );
-	}
-	// Generic response composition based on _status_code.
-	HTTP::compose_response( *this );
-	this->_request.target.clear();
-	return ;
-}
-
 
 int
 HTTP::compose_response ( HTTP & http )
@@ -206,7 +193,7 @@ HTTP::load_file( HTTP & http, std::string target )
 	std::ifstream file;
 	std::ifstream::pos_type pos;
 
-	LOG( "call HTTP::load_file()" );
+	DEBUG( target.c_str() );
 	file.open( target, std::ios::in | std::ios::binary | std::ios::ate );
 	if ( file.good() == true && file.eof() == false )
 	{
@@ -218,19 +205,22 @@ HTTP::load_file( HTTP & http, std::string target )
 	}
 	if ( file.good() == false )
 	{
-		LOG( "!file errored" );
+		WARN( target << ": " << ::strerror( errno ) );
 		return ( FORBIDDEN );
 	}
 	return ( OK );
 }
 
-//getters
-std::string HTTP::getTarget( void )
+// Getters
+
+std::string
+HTTP::getTarget( void )
 {
-	return this->_request.target;
+	return ( this->_request.target );
 }
 
-std::string HTTP::getCGIpass( void )
+std::string
+HTTP::getCGIpass( void )
 {
-	return this->_server.getConf().getCGIpass();
+	return ( this->_server.getConf().getCGIpass() );
 }
