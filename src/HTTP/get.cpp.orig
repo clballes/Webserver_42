@@ -14,8 +14,23 @@
 int
 HTTP::http_get ( HTTP & http )
 {
+<<<<<<< HEAD
+	std::string target;
+	bool file_is_regular;
+
+=======
+>>>>>>> origin/clara_cgi
 	LOG( "call HTTP::http_get()" );
+
 	LOG( " target: " << http._request.target << " status code: " << http._status_code);
+
+<<<<<<< HEAD
+	file_is_regular = is_regular_file( target );
+
+	// Try find `target'
+	//
+=======
+>>>>>>> origin/clara_cgi
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
 	if ( http._status_code >= 300) {
@@ -23,7 +38,12 @@ HTTP::http_get ( HTTP & http )
 		(void) HTTP::load_file( http, http._server._error_page[http._status_code] );
 		return (EXIT_FAILURE);
 	}
+	
+<<<<<<< HEAD
+	if ( file_is_regular == true )
+=======
 	if ( is_regular_file( http._request.target ) == true )
+>>>>>>> origin/clara_cgi
 	{
 		http._status_code = HTTP::load_file( http, http._request.target );
 	}
@@ -37,6 +57,13 @@ HTTP::http_get ( HTTP & http )
 
 	if ( http._server._cgi_pass.length() != 0 )
 	{
+<<<<<<< HEAD
+		http.execute();
+	}
+	else
+	{
+	}
+=======
 		LOG( " Executing Cgi" );
 		CGI *cgi_ptr = new CGI( http );
 		if (cgi_ptr->execute() == EXIT_FAILURE)
@@ -48,6 +75,7 @@ HTTP::http_get ( HTTP & http )
 	{
 		// no content status code
 	}	
+>>>>>>> origin/clara_cgi
 
 	// implement loop fashion
 

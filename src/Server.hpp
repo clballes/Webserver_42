@@ -35,7 +35,9 @@ class Server: public IEvent
 		typedef std::vector< Server * >:: const_iterator const_iterator;
 		typedef std::vector< Server * >:: iterator iterator;
 
-		friend class Client;
+		friend class Client; // o 
+		// o fer un getCGI pass: std::string const & getCGI() const = {}
+		friend class CGI;
 		friend class HTTP;
 		friend class CGI;
 		friend std::ostream & operator << ( std::ostream &, const Server & );

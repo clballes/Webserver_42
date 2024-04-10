@@ -175,12 +175,12 @@ ServerConf::set_server_name ( ServerConf & conf, const char * arg )
 	return ( EXIT_SUCCESS );
 }
 
-int
-ServerConf::set_error_page ( ServerConf & conf, const char * arg )
+int ServerConf::set_error_page(ServerConf &conf, const char *arg)
 {
-	if ( error_missingvalues( arg ) == EXIT_FAILURE )
-		return ( EXIT_FAILURE );
-	
+	LOG("call set_error_page()");
+
+    if (error_missingvalues(arg) == EXIT_FAILURE)
+        return EXIT_FAILURE;
 	// LOG( "call set_error_page()" );
 
   	std::string argStr( arg );
@@ -200,7 +200,8 @@ ServerConf::set_error_page ( ServerConf & conf, const char * arg )
 				if ( arg[i + 1] == '/' )
 				{
 					uri = argStr.substr( i + 1, argStr.length() );
-					conf._error_page[number] = uri;
+					std::string uri_complet = DEFAULT_ERROR_DIR + uri;
+					conf._error_page[number] = uri_complet;
 					return ( EXIT_SUCCESS );
 				}
 				else
@@ -210,7 +211,6 @@ ServerConf::set_error_page ( ServerConf & conf, const char * arg )
 		else
 			return ( EXIT_FAILURE );
     }
-
 	return ( EXIT_SUCCESS );
 }
 

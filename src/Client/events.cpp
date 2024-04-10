@@ -21,6 +21,25 @@ Client::dispatch ( struct kevent & ev )
 }
 
 int
+Client::request_send ( void )
+{
+	LOG( "call Client::request_send() (fd=" << this->_socket_fd << ")"  );
+
+	std::clog << "send ";
+	LOG_BUFFER( (char *) this->_buffer_send.c_str() );
+
+	::send( this->_socket_fd,
+			this->_buffer_send.c_str(),
+			this->_buffer_send.length(),
+			0x0 );
+
+	this->_buffer_send.clear();
+
+	return ( EXIT_SUCCESS );
+}
+
+
+int
 Client::register_recv ( void )
 {
 	struct kevent ev;
@@ -83,7 +102,8 @@ Client::request_recv ( int64_t data )
 	std::clog << "recv ";
 	LOG_BUFFER( this->_buffer_recv.c_str() );
 
-	// Do HTTP method, compose message.
+	// Do HTTP method
+	// compose message.
 
 	this->perform();
 
@@ -91,24 +111,6 @@ Client::request_recv ( int64_t data )
 	// Consider setting send() as an event.
 
 	this->request_send();
-
-	return ( EXIT_SUCCESS );
-}
-
-int
-Client::request_send ( void )
-{
-	LOG( "call Client::request_send() (fd=" << this->_socket_fd << ")"  );
-
-	std::clog << "send ";
-	LOG_BUFFER( (char *) this->_buffer_send.c_str() );
-
-	::send( this->_socket_fd,
-			this->_buffer_send.c_str(),
-			this->_buffer_send.length(),
-			0x0 );
-
-	this->_buffer_send.clear();
 
 	return ( EXIT_SUCCESS );
 }

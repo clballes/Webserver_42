@@ -42,7 +42,13 @@ HTTP::compose_response ( HTTP & http )
 
 	http._buffer_send.append( std::to_string( http._status_code ) );
 	http._buffer_send.append( " \r\n" );
+<<<<<<< HEAD
+	
 	// TODO: replace to_string(); it's not c++98.
+	//http._response_headers["content-type"] = "text/html";
+=======
+
+>>>>>>> origin/clara_cgi
 	http._response_headers["content-length"] = std::to_string( http._message_body.size() );
 
 	// Add response headers, if any.

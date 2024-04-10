@@ -34,4 +34,10 @@ class CGI : public IEvent
 		pid_t _cgi_pid;
 };
 
+#include "HTTP.hpp"
+
+<<<<<<< HEAD
 #endif /* CGI.hpp */
+=======
+#endif /* CGI.hpp */
+>>>>>>> origin/clara_cgi

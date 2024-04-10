@@ -9,6 +9,20 @@
 #define READ 0
 #define WRITE 1
 
+
+// void
+// Client::dispatch ( struct kevent & ev )
+// {
+// 	LOG( "call Client::dispatch() (fd=" << ev.ident << ")" );
+
+// 	if ( ev.flags & EVFILT_READ )
+// 		this->request_recv( ev.data );
+// 	else if ( ev.flags & EVFILT_WRITE )
+// 		this->request_send();
+
+// 	return ;
+// }
+
 void
 CGI::dispatch ( struct kevent & ev )
 {
@@ -50,10 +64,23 @@ CGI::execute ( void )
 
 	LOG( "call CGI::execute()" );
 
+<<<<<<< HEAD
+	// TODO: should come from http.target
+	std::string target;
+	
+	target.append( this->_http._server._root );
+	target.append( this->_http._request.target );
+
+    fdopen = open( target.c_str(), O_RDONLY );
+    if ( fdopen == -1 )
+	{
+        std::cerr << target << " ";
+=======
     fdopen = open( this->_http._request.target.c_str(), O_RDONLY );
-	if ( fdopen == -1 )
+    if ( fdopen == -1 )
 	{
         std::cerr << this->_http._request.target << " ";
+>>>>>>> origin/clara_cgi
 		std::cerr << ::strerror( errno );
 		std::cerr << std::endl;
 		return ( EXIT_FAILURE );
@@ -65,20 +92,67 @@ CGI::execute ( void )
 		return ( EXIT_FAILURE );
     }
 
-    this->_cgi_pid = fork();
-	if ( this->_cgi_pid == -1 )
+<<<<<<< HEAD
+    pid = fork();
+	if ( pid == -1 )
     {
         std::cerr << "fork: ";
 		std::cerr << ::strerror( errno );
 		std::cerr << std::endl;
+		
 		// TODO: should not exit
+        
 		return ( EXIT_FAILURE );
     }
+=======
+    this->_cgi_pid = fork();
+>>>>>>> origin/clara_cgi
+
+	if ( this->_cgi_pid == -1 )
+    {
+<<<<<<< HEAD
+        close( pipefd[READ] );
+        
+		dup2( pipefd[WRITE], STDOUT_FILENO );
+        dup2( fdopen, STDIN_FILENO );
+
+		close( pipefd[WRITE] );
+
+        execve( this->_http._server._cgi_pass.c_str(), NULL, this->_env );
+        
+		std::cerr << "exec: ";
+=======
+        std::cerr << "fork: ";
+>>>>>>> origin/clara_cgi
+		std::cerr << ::strerror( errno );
+		std::cerr << std::endl;
+		
+		// TODO: should not exit
+        
+		return ( EXIT_FAILURE );
+    }
+<<<<<<< HEAD
+
+    close( pipefd[WRITE] );
+    
+	std::clog << "waitpid: " << waitpid( pid, NULL, 0 );
+	std::clog << std::endl;
+   
+	std::string line;
+	
+	while ( read( pipefd[READ], (void*)line.data(), line.capacity() ) > 0 )
+	{
+		//std::clog << "buff ";
+		//LOG_BUFFER( line.c_str() );
+		this->_http._message_body.append( line.c_str() );
+	}
+=======
 
     if ( this->_cgi_pid == 0 )
     {
 		
         close( pipefd[READ] );
+        
 		dup2( pipefd[WRITE], STDOUT_FILENO );
         dup2( fdopen, STDIN_FILENO );
 
@@ -98,9 +172,11 @@ CGI::execute ( void )
     
 	// register the process in kevent
 	this->register_process();
-	// std::clog << "waitpid: " << waitpid( this->_cgi_pid, NULL, 0 ) << "\n";
+	// std::clog << "waitpid: " << waitpid( this->_cgi_pid, NULL, 0 );
+	std::clog << std::endl;
    
 	std::string line;
+	// std::string line;
 	char buffer[1024]; // Buffer to read into
 
 	// Read from the pipe until there's no more data
@@ -111,6 +187,14 @@ CGI::execute ( void )
 	}
 	std::clog << "Contents of line: " << line << std::endl;
 
+	// while ( read( pipefd[READ], (void*)line.data(), line.capacity() ) > 0 )
+	// {
+	// 	//std::clog << "buff ";
+	// 	//LOG_BUFFER( line.c_str() );
+	// 	this->_http._message_body.append( line.c_str() );
+	// }
+>>>>>>> origin/clara_cgi
+	
 	close( pipefd[READ] );
 
 	return ( EXIT_SUCCESS );

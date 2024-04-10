@@ -64,6 +64,7 @@ main ( int argc, char * const * argv )
 	
 	LOG( conf_filename << ": closed OK" );
 
+
 	// Initialize n Server instances based on the configuration file.
 	// new `Server's in Server::servers will have to be FREEd.
 
@@ -78,6 +79,7 @@ main ( int argc, char * const * argv )
 		}
 
 	}
+	// exit(1);
 
 	ServerConf::clear();
 	Server::servers.shrink_to_fit();

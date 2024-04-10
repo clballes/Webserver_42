@@ -18,7 +18,6 @@ HTTP::load_file( HTTP & http, std::string & target )
 	if ( file.good() == true && file.eof() == false )
 	{
 		// TODO: sanity checks
-		
 		pos = file.tellg();
 		file.seekg( 0, std::ios::beg );
 
@@ -28,6 +27,7 @@ HTTP::load_file( HTTP & http, std::string & target )
 	
 	if ( file.good() == false )
 	{
+		std::cout << target << std::endl;
 		LOG( "!file errored" );
 		return ( FORBIDDEN );
 	}

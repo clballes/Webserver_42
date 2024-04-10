@@ -43,6 +43,7 @@ typedef struct s_request
 	t_http_method * method;
 	std::string target;
 	std::string query;
+	std::string body;
 	std::string fragments;
 	std::string body;
 	int http_version;
@@ -69,6 +70,10 @@ class HTTP
 		static int load_file ( HTTP &, std::string & );
 
 		friend class CGI;
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/clara_cgi
 	protected:
 
 		Client &                _client;

@@ -30,7 +30,9 @@ HTTP::parse_start_line( std::string & line )
 
 	this->_status_code = parse_target( this->_request, line );
 	if ( this->_status_code != EXIT_SUCCESS )
+	{
 		return ( EXIT_FAILURE );
+	}
 	else
 		line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
 
@@ -79,21 +81,30 @@ parse_method( t_request & request, std::string & line )
 int
 parse_target( t_request & request, std::string & line )
 {
+	LOG( "call parse_target()" << request.target);
 	std::string::size_type  pos;
 
-	//LOG( "call parse_target()" );
-
 	pos = line.find_first_of( SP, 0 );
-	
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
 
-	request.target = line.substr( 0, pos );
-	LOG( " request.target: \"" << request.target << "\"" );
-
-	// TODO: decode url
 	HTTP::urldecode( request.target );
-	LOG( " request.target: \"" << request.target << "\"" );
+	// line = HTTP::urldecode( line );
+	std::string p_string = line.substr( 0, pos );
+	if (p_string.length() < request.target.length())
+	{
+		return ( FORBIDDEN );
+	}
+	else if (line.compare(0,request.target.length() - 1, request.target))
+	{
+		request.target.append( line.substr( request.target.length(), pos - request.target.length()  ));
+	}
+	else
+	{
+		request.target.append( line.substr( 0, pos ));
+	}
+	
+	LOG( " AFTER PARSING TARGET; request.target: \"" << request.target << "\"" );
 
 	return ( EXIT_SUCCESS );
 }
