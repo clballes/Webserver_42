@@ -50,15 +50,20 @@ HTTP::parse ( void )
 	int delimiter = this->_buffer_recv.find("\r\n\r\n");
 	int len  = this->_buffer_recv.length();
 
+		std::cout << "LOGLOGLOGLOG 3" << std::endl;
 	// OTHER PETITIONS EXCEPT POST
 	if (delimiter + 5 == len )
 	{
+		std::cout << "LOGLOGLOGLOG 1" << std::endl;
+
 		return (EXIT_SUCCESS);
 	}
 	else
 	{
+		std::cout << "LOGLOGLOGLOG 2"  << std::endl;
 		this->_request.body = this->_buffer_recv.substr(delimiter + 4);
 	}
+
 	return ( EXIT_SUCCESS );
 }
 
@@ -161,8 +166,7 @@ parse_target( t_request & request, std::string & line )
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
 
-	HTTP::urldecode( request.target );
-	// line = HTTP::urldecode( line );
+	std::cout << "url decoded is " << request.target << std::endl;
 	std::string p_string = line.substr( 0, pos );
 	if (p_string.length() < request.target.length())
 	{
@@ -177,8 +181,8 @@ parse_target( t_request & request, std::string & line )
 		request.target.append( line.substr( 0, pos ));
 	}
 	
+	HTTP::urldecode( request.target );
 	LOG( " AFTER PARSING TARGET; request.target: \"" << request.target << "\"" );
-
 	return ( EXIT_SUCCESS );
 }
 
