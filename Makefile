@@ -6,7 +6,7 @@
 NAME			:=	webserv
 
 SRC_DIR			:=	src
-INC_DIR         :=  inc
+INC_DIR         :=  include
 BUILD_DIR		:=	build
 
 CC				:=	c++
@@ -15,7 +15,6 @@ CPPFLAGS		+=	-I$(INC_DIR)
 CPPFLAGS		+=	-g -fsanitize='address,undefined'
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 CXXFLAGS		+=	-DREUSE_SOCKET -DALLOW_FORBIDDEN
-SILENCE_LOGS	?=	false
 
 SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/Controller.cpp \
