@@ -268,16 +268,8 @@ Controller::setup_defaults ( void )
 {
 	Controller::iterator it = this->_instances.begin();
 	std::string value;
-
-	while ( it != this->_instances.end() )
-	{
-		if ( it->getConf().getIndex().empty() == true )
-		{
-			value.assign( "index.html" );
-			it->getConf().setIndex( value );
-		}
-		++it;
-	}
+	(void) it;
+	//TODO
 	return ;
 }
 
@@ -365,13 +357,13 @@ set_allow_methods( Server & instance, std::string & arg )
 	while ( iss >> word )
 	{
 		if ( word == "GET" )
-			instance.getConf().setFlag( METHOD_GET, true );
+			instance.setFlag( METHOD_GET, true );
 		else if ( word == "PUT" )
-			instance.getConf().setFlag( METHOD_PUT, true );
+			instance.setFlag( METHOD_PUT, true );
 		else if ( word == "POST" )
-			instance.getConf().setFlag( METHOD_POST, true );
+			instance.setFlag( METHOD_POST, true );
 		else if ( word == "HEAD" )
-			instance.getConf().setFlag( METHOD_HEAD, true );
+			instance.setFlag( METHOD_HEAD, true );
 		else
 		{
 			ERROR( "invalid method \"" << word << "\"" );
@@ -388,9 +380,9 @@ set_autoindex( Server & instance, std::string & arg )
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	else if ( arg == "off" )
-		return ( instance.getConf().setFlag( F_AUTOINDEX, false ) );
+		return ( instance.setFlag( F_AUTOINDEX, false ) );
 	else if ( arg == "on" )
-		return ( instance.getConf().setFlag( F_AUTOINDEX, true ) );
+		return ( instance.setFlag( F_AUTOINDEX, true ) );
 	else
 		ERROR( "not a valid value for \"autoindex\"" );
 	return ( EXIT_FAILURE );
@@ -406,7 +398,7 @@ set_cgi_param ( Server & instance, std::string & arg )
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance.getConf().setCGIparam( arg ) );
+	return ( instance.setCGIparam( arg ) );
 }
 
 int
@@ -419,7 +411,7 @@ set_cgi_pass ( Server & instance, std::string & arg )
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance.getConf().setCGIpass( arg ) );
+	return ( instance.setCGIpass( arg ) );
 }
 
 int
@@ -451,7 +443,7 @@ set_client_body ( Server & instance, std::string & arg )
     n = static_cast<std::size_t>( std::atoi( arg.c_str() ) );
 	if ( alpha == 'M' || alpha == 'm' )
 		n *= 1000;
-	return ( instance.getConf().setClientMaxBodySize( n ) );
+	return ( instance.setClientMaxBodySize( n ) );
 }
 
 int
@@ -478,7 +470,7 @@ set_error_page ( Server & instance, std::string & arg )
 		}
 	}
 	iss >> page;
-	if ( instance.getConf().setErrorPage( std::atoi( num.c_str() ), page ) )
+	if ( instance.setErrorPage( std::atoi( num.c_str() ), page ) )
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
@@ -497,7 +489,7 @@ set_index ( Server & instance, std::string & arg )
 	}
 	while ( iss >> word )
 	{
-		if ( instance.getConf().setIndex( word ) == EXIT_FAILURE )
+		if ( instance.setIndex( word ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
@@ -567,7 +559,7 @@ set_root ( Server & instance, std::string & arg )
 		ERROR( "invalid number of arguments in \"root\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance.getConf().setRoot( arg ) );
+	return ( instance.setRoot( arg ) );
 }
 
 int
@@ -584,7 +576,7 @@ set_server_name ( Server & instance, std::string & arg )
 	}
 	while ( iss >> word )
 	{
-		if ( instance.getConf().setServerName( word ) )
+		if ( instance.setServerName( word ) )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );

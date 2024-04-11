@@ -9,7 +9,7 @@ int
 HTTP::http_head ( HTTP & http )
 {
 	DEBUG( "" );
-	if (http._server.getConf().getCGIpass().length() != 0 )
+	if (http._server.getCGIpass().length() != 0 )
 	{}
 	else
 	{}
@@ -26,22 +26,22 @@ HTTP::http_get ( HTTP & http )
 	// and autoindex is on try accessing dir.
 	if ( http._status_code >= 300 )
 	{
-		LOG( http._server.getConf().getErrorPage( http._status_code) );
-		(void) HTTP::load_file( http, http._server.getConf().getErrorPage( http._status_code ) );
+		LOG( http._server.getErrorPage( http._status_code) );
+		(void) HTTP::load_file( http, http._server.getErrorPage( http._status_code ) );
 		return ( EXIT_FAILURE );
 	}
 	if ( is_regular_file( http._request.target ) == true )
 	{
 		http._status_code = HTTP::load_file( http, http._request.target );
 	}
-	else if ( http._server.getConf().getFlags() & F_AUTOINDEX ) // las server._flags crec q es aixo pero nose 
+	else if ( http._server.getFlags() & F_AUTOINDEX ) // las server._flags crec q es aixo pero nose 
 	{
 		http._status_code = HTTP::autoindex( http );
 	}
 	else
 		http._status_code = INTERNAL_SERVER_ERROR;
 
-	if ( http._server.getConf().getCGIpass().length() != 0 )
+	if ( http._server.getCGIpass().length() != 0 )
 	{
 		http.cgi_ptr = new CGI( http );
 		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
@@ -119,10 +119,10 @@ HTTP::http_post ( HTTP & http )
 	DEBUG( "" );
 	if ( http._status_code == INTERNAL_SERVER_ERROR )
 	{
-		LOG( http._server.getConf().getErrorPage(500) );
-		(void) HTTP::load_file( http, http._server.getConf().getErrorPage(500) );
+		LOG( http._server.getErrorPage(500) );
+		(void) HTTP::load_file( http, http._server.getErrorPage(500) );
 	}
-	if ( http._server.getConf().getCGIpass().length() != 0 )
+	if ( http._server.getCGIpass().length() != 0 )
 	{
 		LOG( " Executing Cgi" );
 		CGI *cgi_ptr = new CGI( http );
@@ -188,13 +188,13 @@ HTTP::http_delete ( HTTP & http )
 		else
 		{
 			http._status_code = 403;
-			HTTP::load_file( http, http._server.getConf().getErrorPage( 403 ) );
+			HTTP::load_file( http, http._server.getErrorPage( 403 ) );
 		}
 	}
 	else
 	{
 		http._status_code = 404;
-		HTTP::load_file( http, http._server.getConf().getErrorPage( 404 ) );
+		HTTP::load_file( http, http._server.getErrorPage( 404 ) );
 	}
 	return ( EXIT_SUCCESS );
 }

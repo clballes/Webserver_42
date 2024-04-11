@@ -382,5 +382,5 @@ HTTP::getTarget( void )
 std::string
 HTTP::getCGIpass( void )
 {
-	return ( this->_server.getConf().getCGIpass() );
+	return ( this->_server.getCGIpass() );
 }
