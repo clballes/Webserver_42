@@ -66,9 +66,9 @@ Controller::load ( std::string & filename )
 	if ( file.good() == false && file.eof() != true )
 		return ( EXIT_FAILURE );
 	trim_f( this->_buffer, &std::isspace );
-	//DEBUG( this->_buffer.c_str() );
 	file.close();
-	setup_instances();
+	if ( setup_instances() == EXIT_FAILURE )
+		this->_good = false;
 	return ( EXIT_SUCCESS );
 }
 
@@ -297,7 +297,7 @@ Controller::event_loop ( void )
 	// so as to finish connections and end the program gracefully.
 	//::signal( SIGINT, &graceful_stop );
 	//::signal( SIGQUIT, &graceful_stop );
-	DEBUG( IEvent::kq );
+	DEBUG( "kq=" << IEvent::kq );
 	while ( this->good() )
 	{
 		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, 0 );
@@ -310,12 +310,11 @@ Controller::event_loop ( void )
 		}
 		else if ( n_events == 0 )
 			continue ;
-		LOG( "(ev=" << ev.ident << ")" );
+		DEBUG( "ev=" << ev.ident );
 		instance = static_cast< IEvent * >( ev.udata );
 		instance->dispatch( ev );
 		// consider EVFILT_SIGNAL
 	}
-	LOG( "close kq (fd=" << IEvent::kq << ")" );
 	close( IEvent::kq );
 	return ( EXIT_SUCCESS );
 }

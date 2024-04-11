@@ -21,6 +21,7 @@ main ( int argc, char * const * argv )
 		return ( EXIT_FAILURE );
 
 	controller.load( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] );
-
+	if ( controller.good() == false )
+		return ( EXIT_FAILURE );
 	return ( controller.start() );
 }
