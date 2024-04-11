@@ -69,6 +69,7 @@ Controller::load ( std::string & filename )
 	file.close();
 	if ( setup_instances() == EXIT_FAILURE )
 		this->_good = false;
+	setup_defaults();
 	return ( EXIT_SUCCESS );
 }
 
@@ -262,6 +263,24 @@ Controller::setup_instances ( void )
 	return ( EXIT_SUCCESS );
 }
 
+void
+Controller::setup_defaults ( void )
+{
+	Controller::iterator it = this->_instances.begin();
+	std::string value;
+
+	while ( it != this->_instances.end() )
+	{
+		if ( it->getConf().getIndex().empty() == true )
+		{
+			value.assign( "index.html" );
+			it->getConf().setIndex( value );
+		}
+		++it;
+	}
+	return ;
+}
+
 int
 Controller::start ( void )
 {
@@ -279,6 +298,9 @@ Controller::start ( void )
 			ERROR( PROGRAM_NAME << ": faulty server (" << it->id() << ")" );
 			return ( EXIT_FAILURE );
 		}
+		#ifdef DEBUG
+		it->log_conf();
+		#endif
 		if ( it->start() == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}

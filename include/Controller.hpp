@@ -82,6 +82,7 @@ class Controller
 		static t_conf_opts		_opts[];
 
 		int setup_instances ( void ) ;
+		void setup_defaults ( void ) ;
 
 };
 
