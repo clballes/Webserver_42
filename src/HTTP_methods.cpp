@@ -20,8 +20,8 @@ HTTP::http_head ( HTTP & http )
 int
 HTTP::http_get ( HTTP & http )
 {
-	DEBUG( "target: " << http._request.target );
-	DEBUG( "status code: " << http._status_code );
+	DEBUG( http._request.target );
+	DEBUG( "status_code=" << http._status_code );
 	// If file is not accessible
 	// and autoindex is on try accessing dir.
 	if ( http._status_code >= 300 )

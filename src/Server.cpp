@@ -93,7 +93,7 @@ Server::dispatch ( struct kevent & ev )
 {
 	HTTP * client;
 
-	DEBUG( ev.ident );
+	DEBUG( "ev=" << ev.ident );
 	client = new HTTP( *this );
 	(void) ev;	
 	return ;
@@ -105,7 +105,7 @@ Server::register_read_socket ( void ) const
 	struct kevent ev;
 	//static struct timespec ev_timeout;
 
-	DEBUG( this->_socket_fd );
+	DEBUG( "fd=" << this->_socket_fd );
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )

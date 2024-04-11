@@ -68,7 +68,7 @@ HTTP::~HTTP ( void )
 void
 HTTP::dispatch ( struct kevent & ev )
 {
-	DEBUG ( ev.ident );
+	DEBUG ( "ev=" << ev.ident );
 	if ( ev.flags & EVFILT_READ )
 		this->request_recv( ev.data );
 	else if ( ev.flags & EVFILT_WRITE )
@@ -113,7 +113,7 @@ HTTP::request_recv ( int64_t data )
 {
 	ssize_t n;
 
-	DEBUG( this->_socket_fd );
+	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );
 	this->_buffer_recv.resize( data + 1 );
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 	if ( n == 0 )
@@ -149,7 +149,9 @@ HTTP::request_recv ( int64_t data )
 int
 HTTP::request_send ( void )
 {
-	DEBUG( this->_socket_fd );
+	DEBUG( "fd=" << this->_socket_fd
+			<< " bytes=" << this->_buffer_send.length() );
+	//LOG_BUFFER( this->_buffer_send.c_str() );
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
@@ -161,7 +163,7 @@ HTTP::request_send ( void )
 int
 HTTP::compose_response ( HTTP & http )
 {
-	LOG( "call HTTP::compose_response()" );
+	DEBUG( "" );
 	// status-line
 	http._buffer_send.append( "HTTP/1.1 " );
 	// TODO replace to_string()
