@@ -22,7 +22,6 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/ServerConf.cpp \
 					$(SRC_DIR)/HTTP.cpp \
 					$(SRC_DIR)/HTTP_methods.cpp \
-					$(SRC_DIR)/HTTP_parse.cpp \
 					$(SRC_DIR)/CGI.cpp \
 					$(SRC_DIR)/string.cpp \
 					$(SRC_DIR)/file.cpp \
