@@ -129,11 +129,27 @@ int
 Server::setListen( struct sockaddr_in & address )
 {
 	std::memcpy( &this->_address, &address, sizeof( address ) );
+	/*
 	#ifdef ALLOW_FORBIDDEN
 	char str[INET_ADDRSTRLEN];
 	inet_ntop( AF_INET, &this->_address.sin_addr.s_addr, str, INET_ADDRSTRLEN );
-	//DEBUG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
+	DEBUG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
 	#endif
+	*/
 	(void) _sockaddr_len;
 	return ( EXIT_SUCCESS );
+}
+
+void
+Server::log_conf ( void ) 
+{
+	LOG( "Server fd=" << this->_socket_fd );
+	#ifdef ALLOW_FORBIDDEN
+	char str[INET_ADDRSTRLEN];
+	inet_ntop( AF_INET, &this->_address.sin_addr.s_addr, str, INET_ADDRSTRLEN );
+	LOG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
+	#endif
+	LOG( "good=" << std::boolalpha << this->good() );
+	this->_conf.log_conf();
+	return ;
 }

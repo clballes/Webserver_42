@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include "debug.hpp"
+#include "define.hpp"
 
 class ServerConf
 {
@@ -37,6 +38,8 @@ class ServerConf
 		int setServerName ( std::string & );
 		int setIndex ( std::string & );
 		int setErrorPage ( int, std::string & );
+
+		void log_conf ( void );
 
 	private:
 

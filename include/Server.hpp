@@ -36,6 +36,7 @@ class Server: public IEvent
 		int getSocketFD ( void ) const;
 
 		int setListen( struct sockaddr_in & );
+		void log_conf ( void );
 
 	private:
 

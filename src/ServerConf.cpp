@@ -170,3 +170,24 @@ ServerConf::setErrorPage ( int n, std::string & path )
 	this->_error_page[n] = path;
 	return ( EXIT_SUCCESS );
 }
+
+void
+ServerConf::log_conf ( void )
+{
+	LOG( "root=" << this->getRoot() );
+	LOG( "autoindex=" << std::boolalpha << this->getFlag( F_AUTOINDEX ) );
+	LOG( "GET=" << std::boolalpha << this->getFlag( METHOD_GET ) );
+	LOG( "POST=" << std::boolalpha << this->getFlag( METHOD_POST ) );
+	LOG( "PUT=" << std::boolalpha << this->getFlag( METHOD_PUT ) );
+	LOG( "DELETE=" << std::boolalpha << this->getFlag( METHOD_DELETE ) );
+	LOG( "HEAD=" << std::boolalpha << this->getFlag( METHOD_HEAD ) );
+	LOG( "cgi_param=" << this->_cgi_param );
+	LOG( "cgi_pass=" << this->_cgi_pass );
+	for ( std::vector< std::string >::iterator it = this->_server_name.begin();
+			it != this->_server_name.end(); ++it )
+		LOG( "server_name=" << *it );
+	for ( std::vector< std::string >::iterator it = this->_index.begin();
+			it != this->_index.end(); ++it )
+		LOG( "index=" << *it );
+	return ;
+}
