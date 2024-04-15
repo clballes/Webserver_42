@@ -117,9 +117,9 @@ Server::register_read_socket ( void ) const
 
 
 t_location &
-Server::getRoute ( std::string & location )
+Server::getRoute ( std::string & location ) const
 {
-	t_route_map::iterator it;
+	t_route_map::const_iterator it;
 
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
@@ -128,18 +128,18 @@ Server::getRoute ( std::string & location )
 		if ( it->first.compare( location ) == 0 )
 		{
 			std::cout << " OK\n";
-			return ( it->second );
+			return ( (t_location &) it->second );
 		}
 		std::cout << "\n";
 		++it;
 	}
-	return ( getDefaultRoute() );
+	return ( (t_location &) getDefaultRoute() );
 }
 
 t_location &
-Server::getDefaultRoute ( void )
+Server::getDefaultRoute ( void ) const
 {
-	t_route_map::iterator it;
+	t_route_map::const_iterator it;
 
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
@@ -150,7 +150,7 @@ Server::getDefaultRoute ( void )
 	}
 	if ( it == this->_routes.end() )
 		it = this->_routes.begin();
-	return ( it->second );
+	return ( (t_location &) it->second );
 }
 
 int
@@ -228,18 +228,11 @@ Server::setRoute ( std::string & location )
 int
 Server::setFlag ( int flag, bool enable, std::string location )
 {
-	std::vector< t_location >::iterator it;
-
 	DEBUG( location.c_str() );
-	/*
-	it = this->findLocation( location );
-	if ( it == this->_routes.end() )
-		it = this->setLocation( location );
-	*/
 	if ( enable == true )
-		it->flags |= flag;
+		getRoute( location ).flags |= flag;
 	else
-		it->flags ^= flag;
+		getRoute( location ).flags ^= flag;
 	return ( EXIT_SUCCESS );
 }
 
@@ -254,29 +247,26 @@ Server::setClientMaxBodySize ( std::size_t size )
 int
 Server::setCGIparam ( std::string & arg, std::string location )
 {
-	std::vector< t_location >::iterator it;
-
-	it = this->findLocation( location );
-	if ( it == this->_routes.end() )
-		it = this->setLocation( location );
+	(void) arg;
+	(void) location;
 	//TODO: check if multiple params ( which should be invalid )
 	//TODO: check arg is valid
-	it->cgi_param = arg;
+	//it->cgi_param = arg;
 	return ( EXIT_SUCCESS );
 }
 
 int
 Server::setCGIpass ( std::string & arg, std::string location )
 {
-	std::vector< t_location >::iterator it;
-
-	it = this->findLocation( location );
-	if ( it == this->_routes.end() )
-		it = this->setLocation( location );
+	(void) arg;
+	(void) location;
+	//it = this->findLocation( location );
+	//if ( it == this->_routes.end() )
+	//	it = this->setLocation( location );
 	//TODO: check arg is valid
 	//return ( EXIT_FAILURE );
 	//DEBUG( arg.c_str() );
-	it->cgi_pass = arg;
+	//it->cgi_pass = arg;
 	return ( EXIT_SUCCESS );
 }
 
@@ -298,17 +288,16 @@ Server::setListen( struct sockaddr_in & address )
 int
 Server::setRoot ( std::string & arg, std::string location )
 {
-	std::vector< t_location >::iterator it;
-
-	it = this->findLocation( location );
-	if ( it == this->_routes.end() )
-		it = this->setLocation( location );
+	(void) arg;
+	(void) location;
 	//TODO: check arg is valid
 	//return ( EXIT_FAILURE );
 	//DEBUG( arg.c_str() );
+	/*
 	it->root = arg;
 	while ( it->root.back() == '/' )
 		it->root.erase( it->root.length() - 1, 1 );
+	*/
 	return ( EXIT_SUCCESS );
 }
 
@@ -334,17 +323,16 @@ Server::setServerName ( std::string & arg )
 int
 Server::setIndex ( std::string & arg, std::string location )
 {
-	std::vector< t_location >::iterator it;
-
-	it = this->findLocation( location );
-	if ( it == this->_routes.end() )
-		it = this->setLocation( location );
+	(void) arg;
+	(void) location;
 	//TODO: check value
 	//return ( EXIT_FAILURE );
 	//DEBUG( arg.c_str() );
+	/*
 	if ( std::find( it->index.begin(),
 				it->index.end(), arg ) == it->index.end() )
 		it->index.push_back( arg );
+	*/
 	return ( EXIT_SUCCESS );
 }
 
@@ -364,28 +352,33 @@ void
 Server::log_conf ( void ) 
 {
 	LOG( "Server fd=" << this->_socket_fd );
+	LOG( "good=" << std::boolalpha << this->good() );
 	#ifdef ALLOW_FORBIDDEN
 	char str[INET_ADDRSTRLEN];
-	inet_ntop( AF_INET, &this->_address.sin_addr.s_addr, str, INET_ADDRSTRLEN );
+	inet_ntop( AF_INET,
+			&this->_address.sin_addr.s_addr,
+			str,
+			INET_ADDRSTRLEN );
 	LOG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
 	#endif
-	LOG( "good=" << std::boolalpha << this->good() );
-	LOG( "root=" << this->getRoot() );
-	LOG( "autoindex=" << std::boolalpha << this->getFlag( F_AUTOINDEX ) );
-	LOG( "GET=" << std::boolalpha << this->getFlag( METHOD_GET ) );
-	LOG( "POST=" << std::boolalpha << this->getFlag( METHOD_POST ) );
-	LOG( "PUT=" << std::boolalpha << this->getFlag( METHOD_PUT ) );
-	LOG( "DELETE=" << std::boolalpha << this->getFlag( METHOD_DELETE ) );
-	LOG( "HEAD=" << std::boolalpha << this->getFlag( METHOD_HEAD ) );
-	LOG( "cgi_param=" << this->getCGIparam() );
-	LOG( "cgi_pass=" << this->getCGIpass() );
 	for ( std::vector< std::string >::iterator it = this->_server_name.begin();
 			it != this->_server_name.end(); ++it )
 		LOG( "server_name=" << *it );
-	/*
-	for ( std::vector< std::string >::iterator it = this->_index.begin();
-			it != this->_index.end(); ++it )
-		LOG( "index=" << *it );
-	*/
+	for ( std::map< int, std::string >::iterator it = this->_error_pages.begin();
+			it != this->_error_pages.end(); ++it )
+		LOG( "error_page=" << it->first << "=" << it->second );
+	LOG( "client_max_body=" << this->_client_max_body_size );
+	for ( t_route_map::iterator it = this->_routes.begin();
+			it != this->_routes.end(); ++it )
+	{
+		LOG( "root=" << it->second.root );
+		LOG( "isDefault=" << it->second.isDefault );
+		LOG( "flags=" << it->second.flags );
+		LOG( "cgi_pass=" << it->second.cgi_pass );
+		LOG( "cgi_param=" << it->second.cgi_param );
+		for ( std::vector< std::string >::iterator index_it = it->second.index.begin();
+				index_it != it->second.index.end(); ++it )
+			LOG( "index=" << *index_it );
+	}
 	return ;
 }

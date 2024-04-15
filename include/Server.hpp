@@ -64,8 +64,8 @@ class Server: public IEvent
 		t_vector::const_iterator getServerNames ( void ) const;
 		t_vector::const_iterator getIndex ( std::string = "" ) const;
 		const std::string & getErrorPage ( int );
-		t_location & getRoute ( std::string & );
-		t_location & getDefaultRoute ( void );
+		t_location & getRoute ( std::string & ) const;
+		t_location & getDefaultRoute ( void ) const;
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
