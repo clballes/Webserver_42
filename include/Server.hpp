@@ -33,8 +33,13 @@ struct s_location
 
 };
 
+template <class T> struct longer : std::binary_function <T,T,bool> {
+  bool operator() (const T& x, const T& y) const {return x.length()>y.length();}
+};
+
 typedef struct s_location t_location;
 typedef std::vector< std::string > t_vector;
+typedef std::map< std::string, t_location, longer< std::string > > t_route_map;
 
 class Server: public IEvent
 {
@@ -59,6 +64,8 @@ class Server: public IEvent
 		t_vector::const_iterator getServerNames ( void ) const;
 		t_vector::const_iterator getIndex ( std::string = "" ) const;
 		const std::string & getErrorPage ( int );
+		t_location & getRoute ( std::string & );
+		t_location & getDefaultRoute ( void );
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
@@ -69,8 +76,7 @@ class Server: public IEvent
 		int setServerName ( std::string & );
 		int setIndex ( std::string &, std::string = "" );
 		int setErrorPage ( int, std::string & );
-		std::vector< t_location >::iterator setLocation ( std::string = "" );
-
+		int setRoute ( std::string & );
 
 		void log_conf ( void );
 
@@ -83,11 +89,9 @@ class Server: public IEvent
 		std::vector< std::string >			_server_name;
 		std::size_t							_client_max_body_size;
 		std::map< int, std::string >		_error_pages;
-		std::vector< t_location >			_routes;
+		t_route_map							_routes;
 
 		void register_read_socket ( void ) const;
-		const t_location & getLocation ( std::string = "" ) const;
-		std::vector< t_location >::iterator findLocation ( std::string = "" );
 
 };
 

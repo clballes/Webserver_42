@@ -10,6 +10,8 @@ Server::Server ( void ): _good( true ), _socket_fd( 0 ) // TODO: _flags( 0 )
 	//DEBUG ( "" );
 	//TODO: find out why cannot bind if socket is created in constructor
 	//instead of start();
+	// Set a default route
+	this->_routes[""].isDefault = true;
 	return ;
 }
 
@@ -113,56 +115,42 @@ Server::register_read_socket ( void ) const
 	return ;
 }
 
-// getLocation will try to match `location'
-// else it will return the default server
-// else it will return the last server
-// TODO: _routes vector will have to have been sorted at some point std::sort	
 
-const t_location &
-Server::getLocation ( std::string location ) const
+t_location &
+Server::getRoute ( std::string & location )
 {
-	std::vector< t_location >::const_iterator it, def;
+	t_route_map::iterator it;
 
 	it = this->_routes.begin();
-	def = this->_routes.end();
 	while ( it != this->_routes.end() )
 	{
-		if ( location.compare( 0, it->root.length(), it->root ) == 0 )
+		std::cout << "will compare (" << it->first << " with " << location << ")";
+		if ( it->first.compare( location ) == 0 )
 		{
-			LOG( "return=" << &(*it) );
-			return ( *it );
+			std::cout << " OK\n";
+			return ( it->second );
 		}
-		if ( it->isDefault == true )
-			def = it;
+		std::cout << "\n";
 		++it;
 	}
-	if ( def != this->_routes.end() )
-	{
-		LOG( "return=" << &(*def) );
-		return ( *def );
-	}
-	return ( this->_routes.back() );
+	return ( getDefaultRoute() );
 }
 
-std::vector< t_location >::iterator
-Server::findLocation ( std::string location )
+t_location &
+Server::getDefaultRoute ( void )
 {
-	std::vector< t_location >::iterator it;
+	t_route_map::iterator it;
 
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		DEBUG( "location=" << location << location.length() );
-		DEBUG( "root=" << it->root << it->root.length() );
-		DEBUG( "current=" << &(*it) );
-		if ( location.empty() && it->root.empty() )
-			break ;
-		if ( location.compare( 0, it->root.length(), it->root ) == 0 )
+		if ( it->second.isDefault == true )
 			break ;
 		++it;
 	}
-	DEBUG( "returning" << &(*it) );
-	return ( it );
+	if ( it == this->_routes.end() )
+		it = this->_routes.begin();
+	return ( it->second );
 }
 
 int
@@ -174,7 +162,7 @@ Server::getSocketFD ( void ) const
 bool
 Server::getFlag ( int mask, std::string location ) const
 {
-	if ( getLocation( location ).flags & mask )
+	if ( getRoute( location ).flags & mask )
 		return ( true );
 	return ( false );
 }
@@ -182,7 +170,7 @@ Server::getFlag ( int mask, std::string location ) const
 std::size_t
 Server::getFlags ( std::string location ) const
 {
-	return ( getLocation( location ).flags );
+	return ( getRoute( location ).flags );
 }
 
 std::size_t
@@ -194,20 +182,20 @@ Server::getClientMaxBodySize ( void ) const
 const std::string &
 Server::getCGIparam ( std::string location ) const
 {
-	return ( getLocation( location ).cgi_param );
+	return ( getRoute( location ).cgi_param );
 }
 
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
-	return ( getLocation( location ).cgi_pass );
+	return ( getRoute( location ).cgi_pass );
 }
 
 const std::string &
 Server::getRoot ( std::string location ) const
 {
-	DEBUG( getLocation( location ).root.c_str() );
-	return ( getLocation( location ).root );
+	DEBUG( getRoute( location ).root.c_str() );
+	return ( getRoute( location ).root );
 }
 
 // TODO: consider returning a const iterator instead
@@ -220,7 +208,7 @@ Server::getServerNames ( void ) const
 t_vector::const_iterator
 Server::getIndex ( std::string location ) const
 {
-	return ( getLocation( location ).index.begin() );
+	return ( getRoute( location ).index.begin() );
 }
 
 const std::string &
@@ -229,20 +217,12 @@ Server::getErrorPage ( int errnum )
 	return ( this->_error_pages[errnum] );
 }
 
-std::vector< t_location >::iterator
-Server::setLocation ( std::string location )
+int
+Server::setRoute ( std::string & location )
 {
-	std::vector< t_location >::iterator it;
-
-	DEBUG( location.c_str() );
-	it = findLocation( location );
-	if ( it != this->_routes.end() )
-		return ( it );
-	DEBUG( "created new=" << location.c_str() );
-	this->_routes.resize( this->_routes.size() + 1 );
-	it = this->_routes.end() - 1;
-	it->root = location;
-	return ( it );
+	if ( this->_routes.find( location ) == this->_routes.end() )
+		(void) this->_routes[location];
+	return ( EXIT_SUCCESS );
 }
 
 int
@@ -251,9 +231,11 @@ Server::setFlag ( int flag, bool enable, std::string location )
 	std::vector< t_location >::iterator it;
 
 	DEBUG( location.c_str() );
+	/*
 	it = this->findLocation( location );
 	if ( it == this->_routes.end() )
 		it = this->setLocation( location );
+	*/
 	if ( enable == true )
 		it->flags |= flag;
 	else
