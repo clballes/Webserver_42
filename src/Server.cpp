@@ -124,7 +124,6 @@ Server::getRoute ( std::string & location ) const
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		std::cout << "will compare (" << it->first << " with " << location << ")";
 		if ( it->first.compare( location ) == 0 )
 		{
 			std::cout << " OK\n";
