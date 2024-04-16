@@ -16,8 +16,7 @@ CPPFLAGS		+=	-g -fsanitize='address,undefined'
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 CXXFLAGS		+=	-DREUSE_SOCKET -DALLOW_FORBIDDEN
 
-SRC_FILES		:=	$(SRC_DIR)/test.cpp \
-					$(SRC_DIR)/Controller.cpp \
+SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/Router.cpp \
 					$(SRC_DIR)/Connection.cpp \
 					$(SRC_DIR)/Server.cpp \

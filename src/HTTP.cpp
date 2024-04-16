@@ -165,7 +165,7 @@ HTTP::request_send ( void )
 int
 HTTP::compose_response ( HTTP & http )
 {
-	DEBUG( "" );
+	DEBUG( http._status_code );
 	// status-line
 	http._buffer_send.append( "HTTP/1.1 " );
 	// TODO replace to_string()
@@ -241,6 +241,9 @@ HTTP::parse ( void )
 		start = pos + 1;
 		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
 	}
+	// TODO: duplicate/reiterative
+	// TODO: remove port (:xxx ? )
+	this->_request.host.assign( this->_request_headers["host"] );
 	//adding request body for POST petitions
 	int delimiter = this->_buffer_recv.find( "\r\n\r\n" );
 	int len  = this->_buffer_recv.length();
@@ -279,8 +282,6 @@ HTTP::parse_field_line ( std::string & line )
 	strtolower( field_name );
 	this->_request_headers.insert( this->_request_headers.end(),
 			std::pair< std::string, std::string> ( field_name, field_value ) );
-	// TODO: duplicate/reiterative
-	this->_request.host.assign( this->_request_headers["host"] );
 	return ( EXIT_SUCCESS );
 }
 

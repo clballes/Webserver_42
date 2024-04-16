@@ -287,7 +287,7 @@ Controller::start ( void )
 	{
 		if ( it->good() == false )
 		{
-			ERROR( PROGRAM_NAME << ": faulty server (" << it->id() << ")" );
+			ERROR( PROGRAM_NAME << ": faulty server" );
 			return ( EXIT_FAILURE );
 		}
 		#ifdef DEBUG

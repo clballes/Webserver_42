@@ -5,7 +5,7 @@
 
 #include "Server.hpp"
 
-Server::Server ( void ): _good( true ), _socket_fd( 0 ) // TODO: _flags( 0 )
+Server::Server ( void ): _good( true ) // TODO: _flags( 0 )
 {
 	//DEBUG ( "" );
 	//TODO: find out why cannot bind if socket is created in constructor
@@ -17,8 +17,6 @@ Server::Server ( void ): _good( true ), _socket_fd( 0 ) // TODO: _flags( 0 )
 
 Server::~Server ( void )
 {
-	if ( this->_socket_fd != 0 )
-		close( this->_socket_fd );
 	return ;
 }
 
@@ -27,94 +25,6 @@ Server::good ( void ) const
 {
 	return ( this->_good );
 }
-
-int
-Server::id ( void ) const
-{
-	return ( this->_socket_fd );
-}
-
-int
-Server::start ( void )
-{
-	// Create socket ( server's )
-	this->_socket_fd = ::socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
-			F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1 )
-	{
-		ERROR( "socket: " << ::strerror( errno ) );
-		this->_good = false;
-		return ( EXIT_FAILURE );
-	}
-	#ifdef REUSE_SOCKET
-	int enable = 1;
-	if ( setsockopt( this->_socket_fd, SOL_SOCKET, SO_REUSEADDR,
-				&enable, sizeof( enable ) ) == -1
-			|| setsockopt( this->_socket_fd, SOL_SOCKET, SO_REUSEPORT,
-				&enable, sizeof( enable ) ) == -1 )
-	{
-		ERROR( "socket: " << ::strerror( errno ) );
-		this->_good = false;
-		return ( EXIT_FAILURE );
-	}
-	#endif
-	// Bind server's address to newly created socket.
-	if ( ::bind( this->_socket_fd, (struct sockaddr *) &this->_address,
-				sizeof( this->_address ) ) == -1 )
-	{
-		ERROR( "bind: " << ::strerror( errno )
-				<< " (fd=" << this->_socket_fd << ")" );
-		return ( EXIT_FAILURE );
-	}
-	// Start listening on server's address through binded socket.
-	if ( ::listen( this->_socket_fd, 0x0 ) == -1 )
-	{
-		ERROR( "listen: " << ::strerror( errno )
-				<< " (fd=" << this->_socket_fd << ")" );
-		return ( EXIT_FAILURE );
-	}
-	#ifdef ALLOW_FORBIDDEN
-	#include <arpa/inet.h>
-	char str[INET_ADDRSTRLEN];
-	inet_ntop( AF_INET, &this->_address.sin_addr.s_addr, str, INET_ADDRSTRLEN );
-	DEBUG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
-	#endif
-	//TODO:
-	this->register_read_socket();
-	return ( EXIT_SUCCESS );
-}
-
-int
-Server::stop ( void )
-{
-	return ( EXIT_SUCCESS );
-}
-
-void
-Server::dispatch ( struct kevent & ev )
-{
-	//HTTP * client;
-
-	DEBUG( "ev=" << ev.ident );
-	//client = new HTTP( *this );
-	(void) ev;	
-	return ;
-}
-
-void
-Server::register_read_socket ( void ) const
-{
-	struct kevent ev;
-	//static struct timespec ev_timeout;
-
-	DEBUG( "fd=" << this->_socket_fd );
-	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
-			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
-	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
-		std::cerr << "kevent: " << ::strerror( errno ) << std::endl;
-	return ;
-}
-
 
 t_location &
 Server::getRoute ( std::string & location ) const
@@ -150,12 +60,6 @@ Server::getDefaultRoute ( void ) const
 	if ( it == this->_routes.end() )
 		it = this->_routes.begin();
 	return ( (t_location &) it->second );
-}
-
-int
-Server::getSocketFD ( void ) const
-{
-	return ( this->_socket_fd );
 }
 
 bool
@@ -272,7 +176,8 @@ Server::setCGIpass ( std::string & arg, std::string location )
 int
 Server::setListen( struct sockaddr_in & address )
 {
-	std::memcpy( &this->_address, &address, sizeof( address ) );
+	(void) address;
+	//std::memcpy( &this->_address, &address, sizeof( address ) );
 	/*
 	#ifdef ALLOW_FORBIDDEN
 	char str[INET_ADDRSTRLEN];
@@ -280,7 +185,6 @@ Server::setListen( struct sockaddr_in & address )
 	DEBUG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
 	#endif
 	*/
-	(void) _sockaddr_len;
 	return ( EXIT_SUCCESS );
 }
 
@@ -350,16 +254,8 @@ Server::setErrorPage ( int n, std::string & path )
 void
 Server::log_conf ( void ) 
 {
-	LOG( "Server fd=" << this->_socket_fd );
+	LOG( "Server" );
 	LOG( "good=" << std::boolalpha << this->good() );
-	#ifdef ALLOW_FORBIDDEN
-	char str[INET_ADDRSTRLEN];
-	inet_ntop( AF_INET,
-			&this->_address.sin_addr.s_addr,
-			str,
-			INET_ADDRSTRLEN );
-	LOG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
-	#endif
 	for ( std::vector< std::string >::iterator it = this->_server_name.begin();
 			it != this->_server_name.end(); ++it )
 		LOG( "server_name=" << *it );

@@ -7,6 +7,7 @@
 #define _SERVER_HPP_
 
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string>
@@ -17,10 +18,6 @@
 #include "define.hpp"
 #include "IEvent.hpp"
 #include "HTTP.hpp"
-
-#ifdef ALLOW_FORBIDDEN
-#include <arpa/inet.h>
-#endif
 
 struct s_location
 {
@@ -33,15 +30,19 @@ struct s_location
 
 };
 
-template <class T> struct longer : std::binary_function <T,T,bool> {
-  bool operator() (const T& x, const T& y) const {return x.length()>y.length();}
+template <class T> struct longer : std::binary_function <T,T,bool>
+{
+	bool operator() (const T& x, const T& y) const
+	{
+		return x.length()>y.length();
+	}
 };
 
 typedef struct s_location t_location;
 typedef std::vector< std::string > t_vector;
 typedef std::map< std::string, t_location, longer< std::string > > t_route_map;
 
-class Server: public IEvent
+class Server
 {
 	public:
 
@@ -49,12 +50,8 @@ class Server: public IEvent
 		~Server ( void );
 		
 		bool good ( void ) const;
-		int id ( void ) const;
-		int start ( void );
-		int stop ( void );
-		void dispatch ( struct kevent & ev );
-
-		int getSocketFD ( void ) const;
+		void log_conf ( void );
+		
 		bool getFlag ( int, std::string = "" ) const;
 		std::size_t getFlags ( std::string = "" ) const;
 		std::size_t getClientMaxBodySize ( void ) const;
@@ -78,20 +75,13 @@ class Server: public IEvent
 		int setErrorPage ( int, std::string & );
 		int setRoute ( std::string & );
 
-		void log_conf ( void );
-
 	private:
 	
 		bool								_good;
-		int									_socket_fd;
-		unsigned							_sockaddr_len;
-		struct sockaddr_in					_address;
 		std::vector< std::string >			_server_name;
 		std::size_t							_client_max_body_size;
 		std::map< int, std::string >		_error_pages;
 		t_route_map							_routes;
-
-		void register_read_socket ( void ) const;
 
 };
 
