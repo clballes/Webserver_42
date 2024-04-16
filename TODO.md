@@ -8,6 +8,5 @@
 - [ ] proper parse 
 - [ ] Methods: CGI a part, get,post,etc...
 - [ ] CGI: Location: getters that match request.target
-- [ ] acabar CGI
 - [ ] set DEFAULTS
 - [ ] gaurrades es he fet en el http gettarget i getCGIpass
