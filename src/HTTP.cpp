@@ -128,10 +128,7 @@ HTTP::request_recv ( int64_t data )
 	if ( this->parse() == EXIT_FAILURE )
 		WARN( "Something went wrong while parsing HTTP recv" );
 	this->_buffer_recv.clear();
-
-	this->_request.host = "example.org";
 	this->_server = this->_router.getServer( this->_request.host );
-
 	if ( this->_request.method == nullptr || this->_server == nullptr )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	//TODO: location
@@ -252,7 +249,6 @@ HTTP::parse ( void )
 		return ( EXIT_SUCCESS );
 	else
 		this->_request.body = this->_buffer_recv.substr( delimiter + 4 );
-
 	return ( EXIT_SUCCESS );
 }
 
@@ -280,8 +276,11 @@ HTTP::parse_field_line ( std::string & line )
 		return ( EXIT_FAILURE );
 	field_value = line.substr( pos, len - pos );
 	trim_f( field_value, &std::isspace );
+	strtolower( field_name );
 	this->_request_headers.insert( this->_request_headers.end(),
 			std::pair< std::string, std::string> ( field_name, field_value ) );
+	// TODO: duplicate/reiterative
+	this->_request.host.assign( this->_request_headers["host"] );
 	return ( EXIT_SUCCESS );
 }
 

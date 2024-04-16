@@ -16,3 +16,5 @@ std::string & del_multipl_sp( std::string &, int ( *func )( int ) );
 
 std::string & urlencode ( std::string & url );
 std::string & urldecode ( std::string & url );
+
+std::string & strtolower ( std::string & );

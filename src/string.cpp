@@ -108,3 +108,18 @@ urldecode ( std::string & url )
 	}
 	return ( url );
 }
+
+std::string &
+strtolower ( std::string & str )
+{
+	std::string::iterator it;
+
+	it = str.begin();
+	while ( it != str.end() )
+	{
+		if ( std::isupper( *it ) != 0 )
+			*it = std::tolower( *it );
+		++it;
+	}
+	return ( str );
+}

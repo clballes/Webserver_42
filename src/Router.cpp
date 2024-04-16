@@ -113,7 +113,7 @@ Router::good ( void ) const
 Server *
 Router::getServer ( std::string & server_name )
 {
-	(void) server_name;
+	DEBUG( server_name );
 	if ( this->_servers.empty() )
 		return ( nullptr );
 	return ( &this->_servers[0] );
