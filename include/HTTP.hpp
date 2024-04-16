@@ -11,6 +11,7 @@
 #include <fstream>
 #include <map>
 #include "IEvent.hpp"
+#include "Router.hpp"
 #include "Server.hpp"
 #include "CGI.hpp"
 #include "define.hpp"
@@ -35,6 +36,7 @@ typedef struct s_http_method
 typedef struct s_request
 {
 	t_http_method * method;
+	std::string host;
 	std::string target;
 	std::string query;
 	std::string body;
@@ -43,13 +45,14 @@ typedef struct s_request
 
 } t_request;
 
+class Router;
 class Server;
 
 class HTTP: public IEvent
 {
 	public:
 
-		HTTP ( Server & );
+		HTTP ( Router &, int );
 		~HTTP ( void );
 
 		void dispatch ( struct kevent & );
@@ -74,7 +77,8 @@ class HTTP: public IEvent
 		int						_socket_fd;
 		unsigned				_address_len;
 		struct sockaddr_in		_address;
-		Server &                _server;
+		Router &				_router;
+		Server *                _server;
 		CGI *cgi_ptr;			//LIBERAR MEMORIA
 
 		t_headers _request_headers;

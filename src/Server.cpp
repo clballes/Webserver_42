@@ -93,10 +93,10 @@ Server::stop ( void )
 void
 Server::dispatch ( struct kevent & ev )
 {
-	HTTP * client;
+	//HTTP * client;
 
 	DEBUG( "ev=" << ev.ident );
-	client = new HTTP( *this );
+	//client = new HTTP( *this );
 	(void) ev;	
 	return ;
 }

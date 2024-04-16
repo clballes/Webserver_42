@@ -39,13 +39,14 @@ get_method_longest_len ( t_http_method * ptr )
 	return ( n );
 }
 
-HTTP::HTTP ( Server & server_instance ):
+HTTP::HTTP ( Router & router_instance, int fd ):
 	_socket_fd( 0 ),
-	_server( server_instance )
+	_router( router_instance ),
+	_server( nullptr )
 {
 	this->cgi_ptr = NULL;
 	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
-	this->_socket_fd = ::accept( this->_server.getSocketFD(),
+	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
 			F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1 )
@@ -127,7 +128,11 @@ HTTP::request_recv ( int64_t data )
 	if ( this->parse() == EXIT_FAILURE )
 		WARN( "Something went wrong while parsing HTTP recv" );
 	this->_buffer_recv.clear();
-	if ( this->_request.method == 0x0 )
+
+	this->_request.host = "example.org";
+	this->_server = this->_router.getServer( this->_request.host );
+
+	if ( this->_request.method == nullptr || this->_server == nullptr )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	//TODO: location
 	// fn()
@@ -382,5 +387,5 @@ HTTP::getTarget( void )
 std::string
 HTTP::getCGIpass( void )
 {
-	return ( this->_server.getCGIpass() );
+	return ( this->_server->getCGIpass() );
 }
