@@ -6,37 +6,14 @@
 #include <iostream>
 #include "define.hpp"
 #include "debug.hpp"
-#include "Controller.hpp"
 #include "IEvent.hpp"
-
-#include <sys/socket.h>		/* socket,
-							   accept,
-							   listen,
-							   send,
-							   recv,
-							   bind,
-							   connect,
-							   getaddrinfo,
-							   freeaddinfo,
-							   setsockopt,
-							   gettsockname */
-#include <sys/types.h>		/* common for
-							   gai_strerror,
-							   kqueue,
-							   connect,
-							   getaddrinfo,
-							   freeaddrinfo,
-							   read */
-#include <netdb.h>			/* common for
-							   gai_strerror,
-							   getaddrinfo,
-							   freeaddrinfo,
-							   getprotobynumber */
+#include "Controller.hpp"
 #include "Router.hpp"
 
 int
 IEvent::kq = 0;
 
+/*
 int
 main ( void )
 {
@@ -69,19 +46,27 @@ main ( void )
 
 	return ( 0 );
 }
+*/
 
-/*
 int
 main ( int argc, char * const * argv )
 {
-	Controller controller;
+	Router router;
 	
 	if ( argc > 2 )
 		return ( EXIT_FAILURE );
 
-	controller.load( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] );
-	if ( controller.good() == false )
-		return ( EXIT_FAILURE );
-	return ( controller.start() );
+	(void) argv;
+	//if ( parse( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] ) == EXIT_FAILURE )
+	//	return ( EXIT_FAILURE );
+
+	//router.load( configuration_object_from_parse );
+	return ( router.listen() );
 }
-*/
+
+int
+parse ( )
+{
+	return ( EXIT_SUCCESS );
+}
+
