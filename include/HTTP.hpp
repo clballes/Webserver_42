@@ -42,7 +42,6 @@ typedef struct s_request
 	std::string body;
 	std::string fragments;
 	int http_version;
-
 } t_request;
 
 class Router;
@@ -64,13 +63,17 @@ class HTTP: public IEvent
 		static int load_file ( HTTP &, std::string );
 		int put_file( void );
 		void generateHTML(); // aico sera per el CGI
+		int check_index();
 
 		static int n_methods;
 		static std::size_t n_longest_method;
 		static t_http_method methods[];
+		// getters for CGI
+		t_request getRequest( void );
+		t_headers getHeaders( void );
 
-		std::string getTarget( void );
 		std::string getCGIpass( void );
+		void	setMessageBody( std::string& );
 
 	private:
 
@@ -91,6 +94,7 @@ class HTTP: public IEvent
 		bool _keep_alive; //?
 
 		int parse ( void );
+		void read_response(HTTP & );
 		int parse_start_line ( std::string & );
 		int parse_field_line ( std::string & );
 		static int http_get ( HTTP & );
@@ -100,7 +104,6 @@ class HTTP: public IEvent
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP & );
-
 };
 
 #endif /* !_HTTP_HPP_ */

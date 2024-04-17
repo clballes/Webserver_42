@@ -14,3 +14,7 @@ is_regular_file( const std::string & filename )
         return ( false );
     return ( S_ISREG( file_info.st_mode ) );
 }
+
+bool routeExists(const std::string& route) {
+    return access(route.c_str(), 0) == 0;
+}
