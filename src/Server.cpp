@@ -8,7 +8,7 @@
 Server::Server ( void ): _good( true )
 {
 	DEBUG ( "" );
-	this->_routes[""].setDefault();
+	//this->_routes[""].setDefault();
 	return ;
 }
 

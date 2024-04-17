@@ -176,6 +176,8 @@ Router::parse( std::string & buffer )
 		directive_name = get_word( directive, " \f\n\r\t\v;{}" );
 		if ( validate_directive( directive, this->_opts ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
+		DEBUG( directive );
+		DEBUG( directive_name );
 		if ( context.empty() && directive == "}" )
 		{
 			ERROR( "error: context: }" );
@@ -186,8 +188,11 @@ Router::parse( std::string & buffer )
 			context.push( directive_name );
 			if ( context.top() == "server" )
 			{
-				this->_servers.resize( this->_servers.size() + 1 );
-				current_server = &this->_servers.back();
+				LOG( this->_servers.size() );
+				this->_servers.push_back( Server() );
+				//this->_servers.resize( this->_servers.size() + 1 );
+				Server & tmp = this->_servers.at( this->_servers.size() - 1 );
+				current_server = &tmp;
 			}
 			else if ( context.top() == "location" )
 			{
@@ -200,11 +205,13 @@ Router::parse( std::string & buffer )
 					ERROR( "unnamed \"location\"." );
 					return ( EXIT_FAILURE );
 				}
+				(void) current_route;
 				// TODO: check only one argument
-				if ( current_route == nullptr )
-					current_route = &current_server->getDefaultRoute();
-				else
-					current_route = &current_server->getRoute( directive_value );
+				//if ( current_route == nullptr )
+				//	current_route = &current_server->getDefaultRoute();
+				//else
+				//	current_route = &current_server->getRoute( directive_value );
+				directive_value.clear();
 			}
 			continue ;
 		}
@@ -215,14 +222,19 @@ Router::parse( std::string & buffer )
 		}
 		else if ( context.top() == "server" )
 		{
-			directive_value = directive.substr( directive_name.length(),
-					directive.find_first_of( ";" ) );
+			directive_value = directive.substr( directive_name.length() );
+			//		directive.find_first_of( ";" ) - directive_name.length() );
+			if ( directive_value.empty() == false && directive_value.back() == ';' )
+				directive_value.erase( directive_value.length() - 1, 1 );
 			trim_f( directive_value, &std::isspace );
-			directive_value.erase( directive_value.length() - 1, 1 );
+			LOG( "directive=" << directive );
+			LOG( "directive_name=" << directive_name );
+			LOG( "directive_value=" << directive_value );
 			if ( get_option( directive_name,
 						this->_opts )->set_func( current_server,
 							directive_value ) )
-				return ( EXIT_FAILURE );
+			{}//return ( EXIT_FAILURE );
+			directive_value.clear();
 		}
 		else if ( context.top() == "location" )
 		{
@@ -459,7 +471,7 @@ set_client_body ( void * ptr, std::string & arg )
 int
 set_error_page ( void * ptr, std::string & arg )
 {
-	Server * instance = (Server *) ptr;
+	Server * instance = static_cast< Server * >( ptr );
 	//TODO: expects 2 arguments only
 	std::istringstream iss( arg );
 	std::string::iterator it;
@@ -509,7 +521,7 @@ set_listen( void * ptr, std::string & arg )
 	std::istringstream iss( arg );
 	std::string ip, port;
 	int ecode;
-	Server * instance = (Server *) ptr;
+	Server * instance = static_cast< Server * >( ptr );
    
 	DEBUG( arg );
 	if ( instance == nullptr )
@@ -581,7 +593,7 @@ set_server_name ( void * ptr, std::string & arg )
 {
 	std::istringstream iss( arg );
 	std::string word;
-	Server * instance = (Server *) ptr;
+	Server * instance = static_cast< Server * >( ptr );
    
 	DEBUG( arg );
 	if ( instance == nullptr )
