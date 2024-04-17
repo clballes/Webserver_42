@@ -225,10 +225,6 @@ Server::setErrorPage ( int n, std::string & path )
 {
 	LOG("call set_error_page()");
 
-    // if (error_missingvalues(arg) == EXIT_FAILURE)
-    //     return EXIT_FAILURE;
-	// LOG( "call set_error_page()" );
-
   	std::string pathStr( path );
   	std::string uri;
 	int number;
@@ -246,8 +242,8 @@ Server::setErrorPage ( int n, std::string & path )
 				if ( path[i + 1] == '/' )
 				{
 					uri = pathStr.substr( i + 1, pathStr.length() );
-					// std::string uri_complet = DEFAULT_ERROR_DIR + uri;
-					// this->_error_pages[number] = uri_complet;
+					std::string uri_complet = DEFAULT_ERROR_DIR + uri;
+					this->_error_pages[number] = uri_complet;
 					return ( EXIT_SUCCESS );
 				}
 				else
