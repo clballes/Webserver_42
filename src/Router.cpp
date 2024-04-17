@@ -54,6 +54,7 @@ how_many_options_are_there ( const t_conf_opts * opts )
 t_conf_opts *
 get_option ( std::string & opt_name, const t_conf_opts * opts )
 {
+	DEBUG( opt_name );
 	const std::size_t	opts_len = how_many_options_are_there( opts );
 	std::size_t			i;
 
@@ -149,7 +150,6 @@ Router::load ( std::string filename )
 	}
 	trim_f( buffer, &std::isspace );
 	file.close();
-	LOG( buffer.c_str() );
 	if ( parse( buffer ) == EXIT_FAILURE )
 	{
 		this->_good = false;
@@ -163,8 +163,8 @@ Router::parse( std::string & buffer )
 {
 	std::stack< std::string >	context;
 	std::string					directive, directive_name, directive_value;
+	std::string					location;
 	std::size_t					directive_len, position = 0;
-	Server *					current_server = nullptr;
 	Location *					current_route = nullptr;
 
 	while ( position < buffer.length() )
@@ -188,11 +188,9 @@ Router::parse( std::string & buffer )
 			context.push( directive_name );
 			if ( context.top() == "server" )
 			{
-				LOG( this->_servers.size() );
-				this->_servers.push_back( Server() );
 				//this->_servers.resize( this->_servers.size() + 1 );
-				Server & tmp = this->_servers.at( this->_servers.size() - 1 );
-				current_server = &tmp;
+				this->_servers.push_back( Server() );
+				//current_server = &this->_servers.back();
 			}
 			else if ( context.top() == "location" )
 			{
@@ -227,13 +225,9 @@ Router::parse( std::string & buffer )
 			if ( directive_value.empty() == false && directive_value.back() == ';' )
 				directive_value.erase( directive_value.length() - 1, 1 );
 			trim_f( directive_value, &std::isspace );
-			LOG( "directive=" << directive );
-			LOG( "directive_name=" << directive_name );
-			LOG( "directive_value=" << directive_value );
-			if ( get_option( directive_name,
-						this->_opts )->set_func( current_server,
-							directive_value ) )
-			{}//return ( EXIT_FAILURE );
+			t_conf_opts * opt = get_option( directive_name, this->_opts );
+			if ( opt->set_func( this->_servers.back(), directive_value, location ) )
+				return ( EXIT_FAILURE );
 			directive_value.clear();
 		}
 		else if ( context.top() == "location" )
@@ -345,17 +339,15 @@ Router::setConnection ( const struct sockaddr_in & address,
 }
 
 int
-set_allow_methods( void * ptr, std::string & arg )
+set_allow_methods( Server & instance, std::string & arg, std::string location )
 {
 	//TODO: implement t_methods from HTTP
 	//TODO: return EXIT_FAILURE if setFlag returns EXIT_FAILURE
 	std::istringstream iss( arg );
 	std::string word;
-	Location * instance = (Location *) ptr;
-
+	
+	(void) location;
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"allow_methods\"" );
@@ -364,13 +356,13 @@ set_allow_methods( void * ptr, std::string & arg )
 	while ( iss >> word )
 	{
 		if ( word == "GET" )
-			instance->setFlag( METHOD_GET, true );
+			instance.setFlag( METHOD_GET, true, location );
 		else if ( word == "PUT" )
-			instance->setFlag( METHOD_PUT, true );
+			instance.setFlag( METHOD_PUT, true, location );
 		else if ( word == "POST" )
-			instance->setFlag( METHOD_POST, true );
+			instance.setFlag( METHOD_POST, true, location );
 		else if ( word == "HEAD" )
-			instance->setFlag( METHOD_HEAD, true );
+			instance.setFlag( METHOD_HEAD, true, location );
 		else
 		{
 			ERROR( "invalid method \"" << word << "\"" );
@@ -381,69 +373,56 @@ set_allow_methods( void * ptr, std::string & arg )
 }
 
 int
-set_autoindex( void * ptr, std::string & arg )
+set_autoindex( Server & instance, std::string & arg, std::string location )
 {
-	Location * instance = (Location *) ptr;
-	
+	(void) location;
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	else if ( arg == "off" )
-		return ( instance->setFlag( F_AUTOINDEX, false ) );
+		return ( instance.setFlag( F_AUTOINDEX, false ) );
 	else if ( arg == "on" )
-		return ( instance->setFlag( F_AUTOINDEX, true ) );
+		return ( instance.setFlag( F_AUTOINDEX, true ) );
 	else
 		ERROR( "not a valid value for \"autoindex\"" );
 	return ( EXIT_FAILURE );
 }
 
 int
-set_cgi_param ( void * ptr, std::string & arg )
+set_cgi_param ( Server & instance, std::string & arg, std::string location )
 {
-	Location * instance = (Location *) ptr;
-
+	(void) location;
 	//TODO: what if a path has spaces ???
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance->setCGIparam( arg ) );
+	return ( instance.setCGIparam( arg ) );
 }
 
 int
-set_cgi_pass ( void * ptr, std::string & arg )
-{
-	Location * instance = (Location *) ptr;
-
+set_cgi_pass ( Server & instance, std::string & arg, std::string location )
+{(void) location;
 	//TODO: what if a path has spaces ???
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance->setCGIpass( arg ) );
+	return ( instance.setCGIpass( arg ) );
 }
 
 int
-set_client_body ( void * ptr, std::string & arg )
-{
+set_client_body ( Server & instance, std::string & arg, std::string location )
+{(void) location;
 	//TODO: multiply value for 'M, m, K, k'
-	Server * instance = (Server *) ptr;
 	std::size_t n = 0;
 	int alpha = 0;
 
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"client_body\"" );
@@ -465,21 +444,18 @@ set_client_body ( void * ptr, std::string & arg )
     n = static_cast<std::size_t>( std::atoi( arg.c_str() ) );
 	if ( alpha == 'M' || alpha == 'm' )
 		n *= 1000;
-	return ( instance->setClientMaxBodySize( n ) );
+	return ( instance.setClientMaxBodySize( n ) );
 }
 
 int
-set_error_page ( void * ptr, std::string & arg )
-{
-	Server * instance = static_cast< Server * >( ptr );
+set_error_page ( Server & instance, std::string & arg, std::string location )
+{(void) location;
 	//TODO: expects 2 arguments only
 	std::istringstream iss( arg );
 	std::string::iterator it;
 	std::string num, page;
 
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() || how_many_words( arg ) != 2 )
 	{
 		ERROR( "invalid number of arguments in \"error_page\"" );
@@ -495,37 +471,31 @@ set_error_page ( void * ptr, std::string & arg )
 		}
 	}
 	iss >> page;
-	if ( instance->setErrorPage( std::atoi( num.c_str() ), page ) )
+	if ( instance.setErrorPage( std::atoi( num.c_str() ), page ) )
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
 
 
 int
-set_index ( void * ptr, std::string & arg )
-{
-	Location * instance = (Location *) ptr;
-   
+set_index ( Server & instance, std::string & arg, std::string location )
+{(void) location;
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	(void) arg;
+	(void) instance;
 	return ( 0 );
 };
 
 int
-set_listen( void * ptr, std::string & arg )
-{
+set_listen( Server & instance, std::string & arg, std::string location )
+{(void) location;
 	struct sockaddr_in * address = nullptr;
 	struct addrinfo hints, * result, * rp;
 	std::istringstream iss( arg );
 	std::string ip, port;
 	int ecode;
-	Server * instance = static_cast< Server * >( ptr );
    
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"listen\"" );
@@ -564,7 +534,7 @@ set_listen( void * ptr, std::string & arg )
 	}
 	if ( address == nullptr )
 		return ( EXIT_FAILURE );
-	ecode = instance->setListen( *address );
+	ecode = instance.setListen( *address );
 	freeaddrinfo( result );
 	if ( ecode == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
@@ -572,32 +542,25 @@ set_listen( void * ptr, std::string & arg )
 }
 
 int
-set_root ( void * ptr, std::string & arg )
-{
-	Location * instance = (Location *) ptr;
-   
+set_root ( Server & instance, std::string & arg, std::string location )
+{(void) location;
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"root\"" );
 		return ( EXIT_FAILURE );
 	}
-	instance->setRoot( arg );
+	instance.setRoot( arg );
 	return ( EXIT_SUCCESS );
 }
 
 int
-set_server_name ( void * ptr, std::string & arg )
-{
+set_server_name ( Server & instance, std::string & arg, std::string location )
+{(void) location;
 	std::istringstream iss( arg );
 	std::string word;
-	Server * instance = static_cast< Server * >( ptr );
    
 	DEBUG( arg );
-	if ( instance == nullptr )
-		return ( EXIT_FAILURE );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"server_name\"" );
@@ -605,7 +568,7 @@ set_server_name ( void * ptr, std::string & arg )
 	}
 	while ( iss >> word )
 	{
-		if ( instance->setServerName( word ) )
+		if ( instance.setServerName( word ) )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );

@@ -33,6 +33,8 @@ class Server
 	public:
 
 		Server ( void );
+		Server ( const Server & );
+		Server& operator= ( const Server & );
 		~Server ( void );
 		
 		bool good ( void ) const;

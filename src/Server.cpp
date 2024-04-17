@@ -8,8 +8,21 @@
 Server::Server ( void ): _good( true )
 {
 	DEBUG ( "" );
-	//this->_routes[""].setDefault();
+	this->_routes[""].setDefault();
 	return ;
+}
+
+Server::Server ( const Server & instance )
+{
+	(void) instance;
+	return ;
+}
+
+Server &
+Server::operator= ( const Server & instance )
+{
+	(void) instance;
+	return ( *this );
 }
 
 Server::~Server ( void )
