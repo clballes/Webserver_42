@@ -8,7 +8,14 @@
 Server::Server ( void ): _good( true )
 {
 	DEBUG ( "" );
-	//this->_routes[""].setDefault();
+	this->_error_pages[400] = "src/err_pages/400.html";
+	this->_error_pages[403] = "src/err_pages/403.html";
+	this->_error_pages[404] = "src/err_pages/404html";
+	this->_error_pages[405] = "src/err_pages/405.html";
+	this->_error_pages[410] = "src/err_pages/410.html";
+	this->_error_pages[413] = "src/err_pages/413.html";
+	this->_error_pages[500] = "src/err_pages/500.html";
+	this->_routes[""].setDefault();
 	return ;
 }
 
@@ -28,7 +35,7 @@ Server::getRoute ( std::string & location ) const
 {
 	t_route_map::const_iterator it;
 
-	DEBUG( "" );
+	DEBUG( " ********************* PETES????? RATA" );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -44,7 +51,7 @@ Server::getDefaultRoute ( void ) const
 {
 	t_route_map::const_iterator it;
 
-	DEBUG( "" );
+	DEBUG( "********************* aixo esciurssssssss?????" );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -216,10 +223,61 @@ Server::setIndex ( std::string & arg, std::string location )
 int
 Server::setErrorPage ( int n, std::string & path )
 {
+	LOG("call set_error_page()");
+
+    // if (error_missingvalues(arg) == EXIT_FAILURE)
+    //     return EXIT_FAILURE;
+	// LOG( "call set_error_page()" );
+
+  	std::string pathStr( path );
+  	std::string uri;
+	int number;
+
+    for ( std::size_t i = 0; i <= pathStr.length(); i++ )
+	{
+		if ( std::isdigit( path[i] ) )
+		{
+			if ( path[i + 1] == 32 )
+			{
+				std::string numberStr = pathStr.substr( 0, i + 1 );
+				number = std::atoi( numberStr.c_str() );
+				i++;
+
+				if ( path[i + 1] == '/' )
+				{
+					uri = pathStr.substr( i + 1, pathStr.length() );
+					// std::string uri_complet = DEFAULT_ERROR_DIR + uri;
+					// this->_error_pages[number] = uri_complet;
+					return ( EXIT_SUCCESS );
+				}
+				else
+					return ( EXIT_FAILURE );
+			}
+		}
+		else
+			return ( EXIT_FAILURE );
+    }
+	return ( EXIT_SUCCESS );
+
+
+
+
+
 	//TODO: check values
 	if ( n < 400 || n > 555 )
 		return ( EXIT_FAILURE );
+	std::cout << " //////////////////////////// NO ET RALLSI AQUI PORFA"<< "INT N: "<< n << " path : " << path << std::endl;
+
+	
+	// std::map<int, std::string>::iterator it = _error_pages.begin();
+    // std::map<int, std::string>::iterator it2 = _error_pages.end();
+    
+    // for (; it != it2; ++it) {
+    //     std::cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
+    // }
 	this->_error_pages[n] = path;
+	std::cout << " //////////////////////////// NO ET RALLSI AQUI PORFA"<< "INT N: "<< n << " path : " << path << std::endl;
+
 	return ( EXIT_SUCCESS );
 }
 

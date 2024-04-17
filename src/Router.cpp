@@ -180,22 +180,30 @@ Router::parse( std::string & buffer )
 		DEBUG( directive_name );
 		if ( context.empty() && directive == "}" )
 		{
+				std::cout << "A1" << std::endl;
+
 			ERROR( "error: context: }" );
 			return ( EXIT_FAILURE );
 		}
 		else if ( directive.back() == '{' )
 		{
+				std::cout << "A2" << std::endl;
+
 			context.push( directive_name );
 			if ( context.top() == "server" )
 			{
-				LOG( this->_servers.size() );
+				// current_server = nullptr;
+				std::cout << "A3" << std::endl;
+				LOG( " -------------------- SERVER SIZE" << this->_servers.size() );
 				this->_servers.push_back( Server() );
-				//this->_servers.resize( this->_servers.size() + 1 );
-				Server & tmp = this->_servers.at( this->_servers.size() - 1 );
-				current_server = &tmp;
+				current_server = &this->_servers.back();
+				LOG( "pointer_server=" << current_server );
+
 			}
 			else if ( context.top() == "location" )
 			{
+				std::cout << "A6" << std::endl;
+
 				directive_value = directive.substr( directive_name.length()	);
 				directive_value = directive_value.substr( 0,
 						directive_value.find_first_of( "{}" ) );
@@ -213,15 +221,21 @@ Router::parse( std::string & buffer )
 				//	current_route = &current_server->getRoute( directive_value );
 				directive_value.clear();
 			}
+				std::cout << "A7" << std::endl;
+
 			continue ;
 		}
 		else if ( directive == "}" )
 		{
+				std::cout << "A8" << std::endl;
+
 			context.pop();
 			continue ;
 		}
 		else if ( context.top() == "server" )
 		{
+				std::cout << "A9" << std::endl;
+
 			directive_value = directive.substr( directive_name.length() );
 			//		directive.find_first_of( ";" ) - directive_name.length() );
 			if ( directive_value.empty() == false && directive_value.back() == ';' )
@@ -230,6 +244,8 @@ Router::parse( std::string & buffer )
 			LOG( "directive=" << directive );
 			LOG( "directive_name=" << directive_name );
 			LOG( "directive_value=" << directive_value );
+			LOG( "pointer_server=" << current_server );
+			// Server *tmp = current_server;
 			if ( get_option( directive_name,
 						this->_opts )->set_func( current_server,
 							directive_value ) )
