@@ -364,52 +364,140 @@ Router::getServer ( std::string & server_name )
 }
 
 int
-set_allow_methods ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_allow_methods( Server & instance, std::string & arg )
+{
+	//TODO: implement t_methods from HTTP
+	//TODO: return EXIT_FAILURE if setFlag returns EXIT_FAILURE
+	std::istringstream iss( arg );
+	std::string word;
+
+	//DEBUG( arg.c_str() );
+	if ( arg.empty() )
+	{
+		ERROR( "invalid number of arguments in \"allow_methods\"" );
+		return ( EXIT_FAILURE );
+	}
+	while ( iss >> word )
+	{
+		if ( word == "GET" )
+			instance.setFlag( METHOD_GET, true );
+		else if ( word == "PUT" )
+			instance.setFlag( METHOD_PUT, true );
+		else if ( word == "POST" )
+			instance.setFlag( METHOD_POST, true );
+		else if ( word == "HEAD" )
+			instance.setFlag( METHOD_HEAD, true );
+		else
+		{
+			ERROR( "invalid method \"" << word << "\"" );
+			return ( EXIT_FAILURE );
+		}
+	}
+	return ( EXIT_SUCCESS );
+}
 
 int
-set_autoindex ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_autoindex( Server & instance, std::string & arg )
+{
+	//DEBUG( arg.c_str() );
+	if ( arg.empty() )
+		return ( EXIT_FAILURE );
+	else if ( arg == "off" )
+		return ( instance.setFlag( F_AUTOINDEX, false ) );
+	else if ( arg == "on" )
+		return ( instance.setFlag( F_AUTOINDEX, true ) );
+	else
+		ERROR( "not a valid value for \"autoindex\"" );
+	return ( EXIT_FAILURE );
+}
 
 int
-set_cgi_param ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_cgi_param ( Server & instance, std::string & arg )
+{
+	//TODO: what if a path has spaces ???
+	//DEBUG( arg.c_str() );
+	if ( arg.empty() || arg.find( " " ) != std::string::npos )
+	{
+		ERROR( "invalid number of arguments in \"cgi_pass\"" );
+		return ( EXIT_FAILURE );
+	}
+	return ( instance.setCGIparam( arg ) );
+}
 
 int
-set_cgi_pass ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_cgi_pass ( Server & instance, std::string & arg )
+{
+	//TODO: what if a path has spaces ???
+	//DEBUG( arg.c_str() );
+	if ( arg.empty() || arg.find( " " ) != std::string::npos )
+	{
+		ERROR( "invalid number of arguments in \"cgi_pass\"" );
+		return ( EXIT_FAILURE );
+	}
+	return ( instance.setCGIpass( arg ) );
+}
 
 int
-set_client_body ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_client_body ( Server & instance, std::string & arg )
+{
+	//TODO: multiply value for 'M, m, K, k'
+	std::size_t n = 0;
+	int alpha = 0;
+
+	//DEBUG( arg.c_str() );
+	if ( arg.empty() || arg.find( " " ) != std::string::npos )
+	{
+		ERROR( "invalid number of arguments in \"client_body\"" );
+		return ( EXIT_FAILURE );
+	}
+    for ( std::size_t i = 0; i < arg.length(); i++ )
+    {
+        if ( ! isdigit( arg[i] )
+				&& arg[i] != 'm' && arg[i] != 'M'
+				&& arg[i] != 'k' && arg[i] != 'K' )
+			return ( EXIT_FAILURE );
+		if ( isalpha( arg[i] ) )
+			alpha = arg[i];
+		if ( alpha != 0 && i != arg.length() - 1 )
+			return ( EXIT_FAILURE );
+    }
+	if ( alpha != 0 )
+		arg.erase( arg.length() - 1, 1 );
+    n = static_cast<std::size_t>( std::atoi( arg.c_str() ) );
+	if ( alpha == 'M' || alpha == 'm' )
+		n *= 1000;
+	return ( instance.setClientMaxBodySize( n ) );
+}
 
 int
-set_error_page ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_error_page ( Server & instance, std::string & arg )
+{
+	//TODO: expects 2 arguments only
+	std::istringstream iss( arg );
+	std::string::iterator it;
+	std::string num, page;
+
+	//DEBUG( arg.c_str() );
+	if ( arg.empty() || how_many_words( arg ) != 2 )
+	{
+		ERROR( "invalid number of arguments in \"error_page\"" );
+		return ( EXIT_FAILURE );
+	}
+	iss >> num;
+	for ( std::string::iterator it = num.begin(); it != num.end(); ++it )
+	{
+		if ( std::isdigit( *it ) == 0 )
+		{
+			ERROR( "invalid argument in \"error_page\"" );
+			return ( EXIT_FAILURE );
+		}
+	}
+	iss >> page;
+	if ( instance.setErrorPage( std::atoi( num.c_str() ), page ) )
+		return ( EXIT_FAILURE );
+	return ( EXIT_SUCCESS );
+}
+
 
 int
 set_index ( Server & server, std::string & value )
@@ -428,7 +516,7 @@ set_listen( Server & instance, std::string & arg )
 	std::string ip, port;
 	int ecode;
 
-	DEBUG( arg.c_str() );
+	//DEBUG( arg.c_str() );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"listen\"" );
@@ -472,20 +560,36 @@ set_listen( Server & instance, std::string & arg )
 	if ( ecode == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
-};
+}
 
 int
-set_root ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_root ( Server & instance, std::string & arg )
+{
+	//DEBUG( arg.c_str() );
+	if ( arg.empty() || arg.find( " " ) != std::string::npos )
+	{
+		ERROR( "invalid number of arguments in \"root\"" );
+		return ( EXIT_FAILURE );
+	}
+	return ( instance.setRoot( arg ) );
+}
 
 int
-set_server_name ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
-	return ( 0 );
-};
+set_server_name ( Server & instance, std::string & arg )
+{
+	std::istringstream iss( arg );
+	std::string word;
+
+	DEBUG( arg.c_str() );
+	if ( arg.empty() )
+	{
+		ERROR( "invalid number of arguments in \"server_name\"" );
+		return ( EXIT_FAILURE );
+	}
+	while ( iss >> word )
+	{
+		if ( instance.setServerName( word ) )
+			return ( EXIT_FAILURE );
+	}
+	return ( EXIT_SUCCESS );
+}
