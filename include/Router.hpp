@@ -15,7 +15,25 @@
 #include "Connection.hpp"
 #include "HTTP.hpp"
 #include "Server.hpp"
+#include "file.hpp"
+#include "string.hpp"
 #include "debug.hpp"
+
+#define CONTEXT			0
+#define DIRECTIVE		1
+#define no	false
+#define yes	true
+
+typedef struct s_conf_opts
+{
+	int				type;
+	const char *	identifier;
+	bool			duplicate;
+	const char *	nest;
+	int ( *set_func )( void );
+	//int ( *set_func )( Server &, std::string & );
+
+}					t_conf_opts;
 
 /*
  * class Router (TCP)
@@ -37,6 +55,7 @@ class Router: public IEvent
 		
 		int listen ( void );
 		bool good ( void ) const;
+		int load ( std::string );
 		void dispatch ( struct kevent & event );
 
 		int setConnection ( struct sockaddr_in & ip_address,
@@ -52,9 +71,21 @@ class Router: public IEvent
 		bool						_good;
 		std::vector< Connection >	_connections;
 		std::vector< Server >		_servers;
-		std::string					_buffer_recv;
+		static t_conf_opts			_opts[];
 
 		int register_read_socket ( Connection & ) const;
+		int parse ( std::string & );
 };
+
+int set_allow_methods ( void ) ;
+int set_autoindex ( void ) ;
+int set_cgi_param ( void ) ;
+int set_cgi_pass ( void ) ;
+int set_client_body ( void ) ;
+int set_error_page ( void ) ;
+int set_index ( void ) ;
+int set_listen( void ) ;
+int set_root ( void ) ;
+int set_server_name ( void ) ;
 
 #endif /* !_ROUTER_HPP_ */

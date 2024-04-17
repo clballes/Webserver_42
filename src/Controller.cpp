@@ -25,13 +25,6 @@ Controller::_opts[] =
 
 Controller::Controller ( void ): _good( true )
 {
-	// Create a new kernel event queue.
-	IEvent::kq = ::kqueue();
-	if ( IEvent::kq == -1 )
-	{
-		ERROR( PROGRAM_NAME << ": kqueue: " << ::strerror( errno ) );
-		this->_good = false;
-	}
 	return ;
 }
 
@@ -44,44 +37,6 @@ bool
 Controller::good ( void ) const
 {
 	return ( this->_good );
-}
-
-int
-Controller::load ( std::string & filename )
-{
-	std::size_t   line_nb;
-	std::string   line;
-	std::ifstream file;
-
-	DEBUG( filename.c_str() );
-	file.open( filename );
-	line_nb = 0;
-	while ( file.good() == true && file.eof() == false )
-	{
-		std::getline( file, line );
-		if ( normalize( line ).empty() == false )
-			this->_buffer.append( line ).append( " " );
-		++line_nb;
-	}
-	if ( file.good() == false && file.eof() != true )
-		return ( EXIT_FAILURE );
-	trim_f( this->_buffer, &std::isspace );
-	file.close();
-	if ( setup_instances() == EXIT_FAILURE )
-		this->_good = false;
-	setup_defaults();
-	return ( EXIT_SUCCESS );
-}
-
-int
-Controller::load ( const char * conf_filename )
-{
-	std::string filename;
-
-	if ( conf_filename == 0x0 )
-		return ( EXIT_FAILURE );
-	filename.assign( conf_filename );
-	return ( this->load( filename ) );
 }
 
 std::size_t
@@ -115,68 +70,149 @@ how_many_words( std::string & str )
 	return ( n );
 }
 
-std::size_t
-get_directive_length ( std::string & buffer, std::size_t position )
+std::string
+get_word( std::string & str )
 {
-	std::size_t len;
+	std::string word;
 
-	len = 0;
-	while ( position < buffer.length()
-			&& std::isspace( buffer[position] ) )
-	{
-		++len;
+	if ( str.find_first_of( " \f\n\r\t\v;{}" ) != std::string::npos )
+		word.assign( str.substr( 0, str.find_first_of( " \f\n\r\t\v;{}" ) ) );
+	return ( word );
+}
+
+std::size_t
+get_directive_length( std::string & buffer, std::size_t position )
+{
+	const std::size_t init_position = position;
+
+	while ( position < buffer.length() && std::isspace( buffer[position] ) )
 		++position;
-	}
 	while ( position < buffer.length() )
 	{
-		if ( buffer[position] == '{'
-				|| buffer[position] == '}'
-				|| buffer[position] == ';' )
+		if ( buffer[position] == '}' )
 		{
-			++len;
+			if ( position - init_position == 0 )
+				++position;
+			break ;
+		}
+		if ( buffer[position] == ';' || buffer[position] == '{' )
+		{
 			++position;
 			break ;
 		}
-		++len;
 		++position;
 	}
-	while ( position < buffer.length()
-			&& std::isspace( buffer[position] ) )
-	{
-		++len;
+	while ( position < buffer.length() && std::isspace( buffer[position] ) )
 		++position;
-	}
-	return ( len != 0 ? len : 1 );
+	return ( position - init_position );
 }
 
 int
-validate_directive( std::string & directive, const t_conf_opts * opts,
-		bool log )
+validate_directive( std::string & directive, const t_conf_opts * opts )
 {
-	const std::size_t opts_len = how_many_options_are_there( opts );
-	std::string word;
-	std::size_t i;
+	const std::size_t	opts_len = how_many_options_are_there( opts );
+	std::string			word;
+	std::size_t			i;
 
 	i = 0;
-	word = directive.substr( 0, directive.find_first_of( " \f\n\r\t\v{};" ) );
+	if ( directive == "}" )
+		return ( EXIT_SUCCESS );
+	word = directive.substr( 0, directive.find_first_of( " \f\n\r\t\v;{}" ) );
 	while ( i < opts_len && word.compare( opts[i].identifier ) != 0 )
 		++i;
-	if ( i == opts_len && log == true )
+	if ( i == opts_len )
 	{
-		ERROR( "unknown directive \"" << word.c_str() << "\"" );
+		ERROR( "unknown directive \"" << word << "\"" );
 		return ( EXIT_FAILURE );
 	}
-	if ( opts[i].type == DIRECTIVE && directive.back() != ';' && log == true )
+	if ( opts[i].type == DIRECTIVE && directive.back() != ';' )
 	{
 		ERROR( "directive \"" << opts[i].identifier << "\" "
-				<< "is not terminated by \";\"" );
+				<< "is not terminated with \";\"" );
+		return ( EXIT_FAILURE );
+	}
+	if ( opts[i].type == CONTEXT && directive.back() != '{' )
+	{
+		ERROR( "context \"" << opts[i].identifier << "\" "
+				<< "is not terminated with \"{\"" );
 		return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
 }
 
-#include <stack>
+int
+Controller::load ( std::string filename )
+{
+	std::string   line;
+	std::ifstream file;
 
+	DEBUG( filename.c_str() );
+	if ( is_regular_file( filename ) == false )
+	{
+		ERROR( filename << ": Is a directory" );
+		return ( EXIT_FAILURE );
+	}
+	file.open( filename );
+	while ( file.good() == true && file.eof() == false )
+	{
+		std::getline( file, line );
+		if ( normalize( line ).empty() == false )
+			this->_buffer.append( line ).append( " " );
+	}
+	if ( file.good() == false && file.eof() != true )
+	{
+		ERROR( filename << ": " << strerror( errno ) );
+		return ( EXIT_FAILURE );
+	}
+	trim_f( this->_buffer, &std::isspace );
+	file.close();
+	LOG( this->_buffer.c_str() );
+	if ( parse() == EXIT_FAILURE )
+	{
+		this->_good = false;
+		return ( EXIT_FAILURE );
+	}
+	return ( EXIT_SUCCESS );
+}
+
+int
+Controller::parse( void )
+{
+	std::stack< std::string >	context;
+	std::string					directive;
+	std::size_t					position, directive_len;
+
+	position = 0;
+	while ( position < this->_buffer.length() )
+	{
+		directive_len = get_directive_length( this->_buffer, position );
+		directive = this->_buffer.substr( position, directive_len );
+		position += directive_len;
+		trim_f( directive, &std::isspace );
+		if ( validate_directive( directive, this->_opts ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+		if ( context.empty() && directive == "}" )
+		{
+			ERROR( "error: context: }" );
+			return ( EXIT_FAILURE );
+		}
+		else if ( directive.back() == '{' )
+		{
+			context.push( get_word( directive ) );
+			continue ;
+		}
+		else if ( directive == "}" )
+		{
+			context.pop();
+			continue ;
+		}
+		// hardcoded section
+		if 
+	}
+	return ( EXIT_SUCCESS );
+}
+
+/*
 int
 Controller::setup_instances ( void )
 {
@@ -184,8 +220,9 @@ Controller::setup_instances ( void )
 	std::size_t pos, directive_len, i;
 	std::string	directive, word, argument;
 	std::stack< std::string > context;
-	Server * current_instance;
+	Server * current_instance = nullptr;
 
+	(void) current_instance;
 	pos = 0;
 	context.push( "main" );
 	while ( pos < this->_buffer.length() )
@@ -212,8 +249,8 @@ Controller::setup_instances ( void )
 			context.push( word );
 			if ( word == "server" )
 			{
-				this->_instances.resize( this->_instances.size() + 1 );
-				current_instance = &this->_instances.back();
+				//this->_instances.resize( this->_instances.size() + 1 );
+				//current_instance = &this->_instances.back();
 			}
 			else if ( word == "location" )
 			{
@@ -240,8 +277,8 @@ Controller::setup_instances ( void )
 			if ( arg.back() == ';' )
 				arg.erase( arg.length() -1, 1 );
 			trim_f( arg, &std::isspace );
-			if ( Controller::_opts[i].set_func( *current_instance, arg ) )
-				return ( EXIT_FAILURE );
+			//if ( Controller::_opts[i].set_func( *current_instance, arg ) )
+			//	return ( EXIT_FAILURE );
 
 		}
 		else if ( context.top() == "location" )
@@ -262,83 +299,7 @@ Controller::setup_instances ( void )
 	}
 	return ( EXIT_SUCCESS );
 }
-
-void
-Controller::setup_defaults ( void )
-{
-	Controller::iterator it = this->_instances.begin();
-	std::string value;
-	(void) it;
-	//TODO
-	return ;
-}
-
-int
-Controller::start ( void )
-{
-	if ( this->good() == false )
-	{
-		ERROR( PROGRAM_NAME << ": faulty controller" );
-		return ( EXIT_FAILURE );
-	}
-	this->_instances.shrink_to_fit();
-	for ( Controller::iterator it = this->_instances.begin();
-			it != this->_instances.end(); ++it )
-	{
-		if ( it->good() == false )
-		{
-			ERROR( PROGRAM_NAME << ": faulty server" );
-			return ( EXIT_FAILURE );
-		}
-		#ifdef DEBUG
-		it->log_conf();
-		#endif
-		if ( it->start() == EXIT_FAILURE )
-			return ( EXIT_FAILURE );
-	}
-	return ( event_loop() );
-}
-
-int
-Controller::event_loop ( void )
-{
-	int n_events = 1;
-	struct kevent ev;
-	IEvent * instance;
-
-	// TODO: graceful_stop()
-	// Configure SIGINT ( signal interrupt )
-	// so as to finish connections and end the program gracefully.
-	//::signal( SIGINT, &graceful_stop );
-	//::signal( SIGQUIT, &graceful_stop );
-	DEBUG( "kq=" << IEvent::kq );
-	while ( this->good() )
-	{
-		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, 0 );
-		if ( this->good() == false )
-			return ( EXIT_FAILURE );
-		if ( n_events == -1 )
-		{
-			ERROR( "kevent: " << ::strerror( errno ) );
-			break ;
-		}
-		else if ( n_events == 0 )
-			continue ;
-		DEBUG( "ev=" << ev.ident );
-		instance = static_cast< IEvent * >( ev.udata );
-		instance->dispatch( ev );
-		// consider EVFILT_SIGNAL
-	}
-	close( IEvent::kq );
-	return ( EXIT_SUCCESS );
-}
-
-const std::vector< Server > &
-Controller::getInstances ( void ) const
-{
-	//DEBUG( this );
-	return ( this->_instances );
-}
+*/
 
 int
 set_allow_methods( Server & instance, std::string & arg )
