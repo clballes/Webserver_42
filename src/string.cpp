@@ -123,3 +123,33 @@ strtolower ( std::string & str )
 	}
 	return ( str );
 }
+
+std::size_t
+how_many_words ( std::string & str )
+{
+	std::string::iterator it;
+	std::size_t n = 1;
+
+	if ( str.empty() )
+		return ( 0 );
+	it = str.begin();
+	while ( it != str.end() )
+	{
+		if ( std::isspace( *it )
+				&& it != str.begin()
+				&& std::isspace( *( it - 1 ) ) == 0)
+			++n;
+		++it;
+	}
+	return ( n );
+}
+
+std::string
+get_word ( std::string & str, std::string delimiter )
+{
+	std::string word;
+
+	if ( str.find_first_of( delimiter ) != std::string::npos )
+		word.assign( str.substr( 0, str.find_first_of( delimiter ) ) );
+	return ( word );
+}

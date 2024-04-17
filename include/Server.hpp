@@ -14,21 +14,11 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include "debug.hpp"
-#include "define.hpp"
+
 #include "IEvent.hpp"
-#include "HTTP.hpp"
-
-struct s_location
-{
-	std::size_t					flags;
-	std::string					cgi_param;
-	std::string					cgi_pass;
-	std::string					root;
-	bool						isDefault;
-	std::vector< std::string >	index;
-
-};
+#include "Location.hpp"
+#include "define.hpp"
+#include "debug.hpp"
 
 template <class T> struct longer : std::binary_function <T,T,bool>
 {
@@ -37,10 +27,6 @@ template <class T> struct longer : std::binary_function <T,T,bool>
 		return x.length()>y.length();
 	}
 };
-
-typedef struct s_location t_location;
-typedef std::vector< std::string > t_vector;
-typedef std::map< std::string, t_location, longer< std::string > > t_route_map;
 
 class Server
 {
@@ -51,19 +37,21 @@ class Server
 		
 		bool good ( void ) const;
 		void log_conf ( void );
-		
+	
 		bool getFlag ( int, std::string = "" ) const;
 		std::size_t getFlags ( std::string = "" ) const;
 		std::size_t getClientMaxBodySize ( void ) const;
 		const std::string & getCGIparam ( std::string = "" ) const ;
 		const std::string & getCGIpass ( std::string = "" ) const;
 		const std::string & getRoot ( std::string = "" ) const;
-		t_vector::const_iterator getServerNames ( void ) const;
-		t_vector::const_iterator getIndex ( std::string = "" ) const;
+		std::vector< std::string > & getServerNames ( void ) const;
+		std::vector< std::string > & getIndex ( std::string = "" ) const;
 		const std::string & getErrorPage ( int );
-		t_location & getRoute ( std::string & ) const;
-		t_location & getDefaultRoute ( void ) const;
+		Location & getRoute ( std::string & ) const;
+		Location & getDefaultRoute ( void ) const;
 		const struct sockaddr_in & getListen ( void ) const;
+		in_addr_t getHost ( void ) const;
+		in_port_t getPort ( void ) const;
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
@@ -76,6 +64,8 @@ class Server
 		int setErrorPage ( int, std::string & );
 		int setRoute ( std::string & );
 
+		typedef std::map< std::string,
+				Location, longer< std::string > > t_route_map;
 	private:
 	
 		bool								_good;

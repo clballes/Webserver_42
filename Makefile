@@ -20,6 +20,7 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/Router.cpp \
 					$(SRC_DIR)/Connection.cpp \
 					$(SRC_DIR)/Server.cpp \
+					$(SRC_DIR)/Location.cpp \
 					$(SRC_DIR)/HTTP.cpp \
 					$(SRC_DIR)/CGI.cpp \
 					$(SRC_DIR)/string.cpp \

@@ -5,7 +5,7 @@
 
 #include "Location.hpp"
 
-Location::Location ( void ): _isDefault( false )
+Location::Location ( void ): _flags( 0 ), _isDefault( false )
 {
 	DEBUG( "" );
 	return ;

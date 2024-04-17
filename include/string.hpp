@@ -18,3 +18,6 @@ std::string & urlencode ( std::string & url );
 std::string & urldecode ( std::string & url );
 
 std::string & strtolower ( std::string & );
+
+std::size_t how_many_words ( std::string & );
+std::string get_word ( std::string &, std::string delimiter );

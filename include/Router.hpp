@@ -54,7 +54,7 @@ typedef struct s_conf_opts
 	const char *	identifier;
 	bool			duplicate;
 	const char *	nest;
-	int ( *set_func )( Server &, std::string & );
+	int ( *set_func )( void *, std::string & );
 
 }					t_conf_opts;
 
@@ -96,15 +96,15 @@ class Router: public IEvent
 				int protocol = IPPROTO_TCP );
 };
 
-int set_allow_methods ( Server &, std::string & );
-int set_autoindex ( Server &, std::string & );
-int set_cgi_param ( Server &, std::string & );
-int set_cgi_pass ( Server &, std::string & );
-int set_client_body ( Server &, std::string & );
-int set_error_page ( Server &, std::string & );
-int set_index ( Server &, std::string & );
-int set_listen( Server &, std::string & );
-int set_root ( Server &, std::string & );
-int set_server_name ( Server &, std::string & );
+int set_allow_methods ( void *, std::string & );
+int set_autoindex ( void *, std::string & );
+int set_cgi_param ( void *, std::string & );
+int set_cgi_pass ( void *, std::string & );
+int set_client_body ( void *, std::string & );
+int set_error_page ( void *, std::string & );
+int set_index ( void *, std::string & );
+int set_listen( void *, std::string & );
+int set_root ( void *, std::string & );
+int set_server_name ( void *, std::string & );
 
 #endif /* !_ROUTER_HPP_ */

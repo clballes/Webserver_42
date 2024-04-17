@@ -51,36 +51,6 @@ how_many_options_are_there ( const t_conf_opts * opts )
 	return ( n );
 }
 
-std::size_t
-how_many_words ( std::string & str )
-{
-	std::string::iterator it;
-	std::size_t n = 1;
-
-	if ( str.empty() )
-		return ( 0 );
-	it = str.begin();
-	while ( it != str.end() )
-	{
-		if ( std::isspace( *it )
-				&& it != str.begin()
-				&& std::isspace( *( it - 1 ) ) == 0)
-			++n;
-		++it;
-	}
-	return ( n );
-}
-
-std::string
-get_word ( std::string & str )
-{
-	std::string word;
-
-	if ( str.find_first_of( " \f\n\r\t\v;{}" ) != std::string::npos )
-		word.assign( str.substr( 0, str.find_first_of( " \f\n\r\t\v;{}" ) ) );
-	return ( word );
-}
-
 t_conf_opts *
 get_option ( std::string & opt_name, const t_conf_opts * opts )
 {
@@ -154,51 +124,6 @@ validate_directive ( std::string & directive, const t_conf_opts * opts )
 }
 
 int
-Router::listen ( void )
-{
-	int n_events = 1;
-	struct kevent ev;
-	IEvent * instance;
-
-	DEBUG( IEvent::kq );
-	for ( std::vector< Server >::iterator i = this->_servers.begin();
-			i != this->_servers.end(); ++i )
-	{
-		if ( this->setConnection( i->getListen() ) == EXIT_FAILURE )
-			return ( EXIT_FAILURE );
-	}
-	if ( this->_connections.empty() )
-	{
-		INFO( PROGRAM_NAME << ": there are no connections to listen to." );
-		return ( EXIT_SUCCESS );
-	}
-	for ( std::vector< Connection >::iterator i = this->_connections.begin();
-			i != this->_connections.end(); ++i )
-	{
-		if ( this->register_read_socket( *i ) == EXIT_FAILURE )
-			return ( EXIT_FAILURE );
-	}
-	// TODO: graceful_stop(), SIGINT
-	while ( this->good() )
-	{
-		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, 0 );
-		if ( this->good() == false )
-			return ( EXIT_FAILURE );
-		if ( n_events == -1 )
-		{
-			ERROR( "kevent: " << ::strerror( errno ) );
-			break ;
-		}
-		else if ( n_events == 0 )
-			continue ;
-		instance = static_cast< IEvent * >( ev.udata );
-		instance->dispatch( ev );
-		// TODO: consider EVFILT_SIGNAL
-	}
-	return ( EXIT_SUCCESS );
-}
-
-int
 Router::load ( std::string filename )
 {
 	std::string   buffer, line;
@@ -240,7 +165,7 @@ Router::parse( std::string & buffer )
 	std::string					directive, directive_name, directive_value;
 	std::size_t					directive_len, position = 0;
 	Server *					current_server = nullptr;
-	t_location *				current_route = nullptr;
+	Location *					current_route = nullptr;
 
 	while ( position < buffer.length() )
 	{
@@ -248,7 +173,7 @@ Router::parse( std::string & buffer )
 		directive = buffer.substr( position, directive_len );
 		position += directive_len;
 		trim_f( directive, &std::isspace );
-		directive_name = get_word( directive );
+		directive_name = get_word( directive, " \f\n\r\t\v;{}" );
 		if ( validate_directive( directive, this->_opts ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 		if ( context.empty() && directive == "}" )
@@ -295,13 +220,58 @@ Router::parse( std::string & buffer )
 			trim_f( directive_value, &std::isspace );
 			directive_value.erase( directive_value.length() - 1, 1 );
 			if ( get_option( directive_name,
-						this->_opts )->set_func( *current_server,
+						this->_opts )->set_func( current_server,
 							directive_value ) )
 				return ( EXIT_FAILURE );
 		}
 		else if ( context.top() == "location" )
 		{
 		}
+	}
+	return ( EXIT_SUCCESS );
+}
+
+int
+Router::listen ( void )
+{
+	int n_events = 1;
+	struct kevent ev;
+	IEvent * instance;
+
+	DEBUG( IEvent::kq );
+	for ( std::vector< Server >::iterator i = this->_servers.begin();
+			i != this->_servers.end(); ++i )
+	{
+		if ( this->setConnection( i->getListen() ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+	}
+	if ( this->_connections.empty() )
+	{
+		INFO( PROGRAM_NAME << ": there are no connections to listen to." );
+		return ( EXIT_SUCCESS );
+	}
+	for ( std::vector< Connection >::iterator i = this->_connections.begin();
+			i != this->_connections.end(); ++i )
+	{
+		if ( this->register_read_socket( *i ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+	}
+	// TODO: graceful_stop(), SIGINT
+	while ( this->good() )
+	{
+		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, 0 );
+		if ( this->good() == false )
+			return ( EXIT_FAILURE );
+		if ( n_events == -1 )
+		{
+			ERROR( "kevent: " << ::strerror( errno ) );
+			break ;
+		}
+		else if ( n_events == 0 )
+			continue ;
+		instance = static_cast< IEvent * >( ev.udata );
+		instance->dispatch( ev );
+		// TODO: consider EVFILT_SIGNAL
 	}
 	return ( EXIT_SUCCESS );
 }
@@ -338,16 +308,6 @@ Router::dispatch ( struct kevent & ev )
 	return ;
 }
 
-int
-Router::setConnection ( const struct sockaddr_in & address,
-		int domain, int type, int protocol )
-{
-	DEBUG( "" );
-	this->_connections.push_back( Connection( address,
-				domain, type, protocol ) );
-	return ( EXIT_SUCCESS );
-}
-
 bool
 Router::good ( void ) const
 {
@@ -364,14 +324,26 @@ Router::getServer ( std::string & server_name )
 }
 
 int
-set_allow_methods( Server & instance, std::string & arg )
+Router::setConnection ( const struct sockaddr_in & address,
+		int domain, int type, int protocol )
+{
+	this->_connections.push_back( Connection( address,
+				domain, type, protocol ) );
+	return ( EXIT_SUCCESS );
+}
+
+int
+set_allow_methods( void * ptr, std::string & arg )
 {
 	//TODO: implement t_methods from HTTP
 	//TODO: return EXIT_FAILURE if setFlag returns EXIT_FAILURE
 	std::istringstream iss( arg );
 	std::string word;
+	Location * instance = (Location *) ptr;
 
-	//DEBUG( arg.c_str() );
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"allow_methods\"" );
@@ -380,13 +352,13 @@ set_allow_methods( Server & instance, std::string & arg )
 	while ( iss >> word )
 	{
 		if ( word == "GET" )
-			instance.setFlag( METHOD_GET, true );
+			instance->setFlag( METHOD_GET, true );
 		else if ( word == "PUT" )
-			instance.setFlag( METHOD_PUT, true );
+			instance->setFlag( METHOD_PUT, true );
 		else if ( word == "POST" )
-			instance.setFlag( METHOD_POST, true );
+			instance->setFlag( METHOD_POST, true );
 		else if ( word == "HEAD" )
-			instance.setFlag( METHOD_HEAD, true );
+			instance->setFlag( METHOD_HEAD, true );
 		else
 		{
 			ERROR( "invalid method \"" << word << "\"" );
@@ -397,54 +369,69 @@ set_allow_methods( Server & instance, std::string & arg )
 }
 
 int
-set_autoindex( Server & instance, std::string & arg )
+set_autoindex( void * ptr, std::string & arg )
 {
-	//DEBUG( arg.c_str() );
+	Location * instance = (Location *) ptr;
+	
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	else if ( arg == "off" )
-		return ( instance.setFlag( F_AUTOINDEX, false ) );
+		return ( instance->setFlag( F_AUTOINDEX, false ) );
 	else if ( arg == "on" )
-		return ( instance.setFlag( F_AUTOINDEX, true ) );
+		return ( instance->setFlag( F_AUTOINDEX, true ) );
 	else
 		ERROR( "not a valid value for \"autoindex\"" );
 	return ( EXIT_FAILURE );
 }
 
 int
-set_cgi_param ( Server & instance, std::string & arg )
+set_cgi_param ( void * ptr, std::string & arg )
 {
+	Location * instance = (Location *) ptr;
+
 	//TODO: what if a path has spaces ???
-	//DEBUG( arg.c_str() );
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance.setCGIparam( arg ) );
+	return ( instance->setCGIparam( arg ) );
 }
 
 int
-set_cgi_pass ( Server & instance, std::string & arg )
+set_cgi_pass ( void * ptr, std::string & arg )
 {
+	Location * instance = (Location *) ptr;
+
 	//TODO: what if a path has spaces ???
-	//DEBUG( arg.c_str() );
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance.setCGIpass( arg ) );
+	return ( instance->setCGIpass( arg ) );
 }
 
 int
-set_client_body ( Server & instance, std::string & arg )
+set_client_body ( void * ptr, std::string & arg )
 {
 	//TODO: multiply value for 'M, m, K, k'
+	Server * instance = (Server *) ptr;
 	std::size_t n = 0;
 	int alpha = 0;
 
-	//DEBUG( arg.c_str() );
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"client_body\"" );
@@ -466,18 +453,21 @@ set_client_body ( Server & instance, std::string & arg )
     n = static_cast<std::size_t>( std::atoi( arg.c_str() ) );
 	if ( alpha == 'M' || alpha == 'm' )
 		n *= 1000;
-	return ( instance.setClientMaxBodySize( n ) );
+	return ( instance->setClientMaxBodySize( n ) );
 }
 
 int
-set_error_page ( Server & instance, std::string & arg )
+set_error_page ( void * ptr, std::string & arg )
 {
+	Server * instance = (Server *) ptr;
 	//TODO: expects 2 arguments only
 	std::istringstream iss( arg );
 	std::string::iterator it;
 	std::string num, page;
 
-	//DEBUG( arg.c_str() );
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() || how_many_words( arg ) != 2 )
 	{
 		ERROR( "invalid number of arguments in \"error_page\"" );
@@ -493,30 +483,37 @@ set_error_page ( Server & instance, std::string & arg )
 		}
 	}
 	iss >> page;
-	if ( instance.setErrorPage( std::atoi( num.c_str() ), page ) )
+	if ( instance->setErrorPage( std::atoi( num.c_str() ), page ) )
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
 
 
 int
-set_index ( Server & server, std::string & value )
-{DEBUG( value );
-	(void) server;
-	(void) value;
+set_index ( void * ptr, std::string & arg )
+{
+	Location * instance = (Location *) ptr;
+   
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
+	(void) arg;
 	return ( 0 );
 };
 
 int
-set_listen( Server & instance, std::string & arg )
+set_listen( void * ptr, std::string & arg )
 {
 	struct sockaddr_in * address = nullptr;
 	struct addrinfo hints, * result, * rp;
 	std::istringstream iss( arg );
 	std::string ip, port;
 	int ecode;
-
-	//DEBUG( arg.c_str() );
+	Server * instance = (Server *) ptr;
+   
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"listen\"" );
@@ -555,7 +552,7 @@ set_listen( Server & instance, std::string & arg )
 	}
 	if ( address == nullptr )
 		return ( EXIT_FAILURE );
-	ecode = instance.setListen( *address );
+	ecode = instance->setListen( *address );
 	freeaddrinfo( result );
 	if ( ecode == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
@@ -563,24 +560,32 @@ set_listen( Server & instance, std::string & arg )
 }
 
 int
-set_root ( Server & instance, std::string & arg )
+set_root ( void * ptr, std::string & arg )
 {
-	//DEBUG( arg.c_str() );
+	Location * instance = (Location *) ptr;
+   
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"root\"" );
 		return ( EXIT_FAILURE );
 	}
-	return ( instance.setRoot( arg ) );
+	instance->setRoot( arg );
+	return ( EXIT_SUCCESS );
 }
 
 int
-set_server_name ( Server & instance, std::string & arg )
+set_server_name ( void * ptr, std::string & arg )
 {
 	std::istringstream iss( arg );
 	std::string word;
-
-	DEBUG( arg.c_str() );
+	Server * instance = (Server *) ptr;
+   
+	DEBUG( arg );
+	if ( instance == nullptr )
+		return ( EXIT_FAILURE );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"server_name\"" );
@@ -588,7 +593,7 @@ set_server_name ( Server & instance, std::string & arg )
 	}
 	while ( iss >> word )
 	{
-		if ( instance.setServerName( word ) )
+		if ( instance->setServerName( word ) )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
