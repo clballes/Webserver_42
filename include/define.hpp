@@ -13,6 +13,7 @@
 #define WEBSERV_VER			EXEC_NAME"/" WEBSERV_VERSION
 
 #define DEFAULT_CONF		"conf/default.conf"
+#define DEFAULT_ERROR_DIR   "www"
 
 #define F_AUTOINDEX			0x00010000 
 #define METHOD_GET			0x00001000

@@ -227,7 +227,8 @@ Router::parse( std::string & buffer )
 			trim_f( directive_value, &std::isspace );
 			t_conf_opts * opt = get_option( directive_name, this->_opts );
 			if ( opt->set_func( this->_servers.back(), directive_value, location ) )
-				return ( EXIT_FAILURE );
+			
+				//return ( EXIT_FAILURE );
 			directive_value.clear();
 		}
 		else if ( context.top() == "location" )

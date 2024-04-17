@@ -8,13 +8,14 @@
 Server::Server ( void ): _good( true )
 {
 	DEBUG ( "" );
+	this->_error_pages[400] = "src/err_pages/400.html";
+	this->_error_pages[403] = "src/err_pages/403.html";
+	this->_error_pages[404] = "src/err_pages/404html";
+	this->_error_pages[405] = "src/err_pages/405.html";
+	this->_error_pages[410] = "src/err_pages/410.html";
+	this->_error_pages[413] = "src/err_pages/413.html";
+	this->_error_pages[500] = "src/err_pages/500.html";
 	this->_routes[""].setDefault();
-	return ;
-}
-
-Server::Server ( const Server & instance )
-{
-	*this = instance;
 	return ;
 }
 
@@ -46,7 +47,6 @@ Server::getRoute ( std::string & location ) const
 {
 	t_route_map::const_iterator it;
 
-	DEBUG( "" );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -62,7 +62,6 @@ Server::getDefaultRoute ( void ) const
 {
 	t_route_map::const_iterator it;
 
-	DEBUG( "" );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -234,9 +233,11 @@ Server::setIndex ( std::string & arg, std::string location )
 int
 Server::setErrorPage ( int n, std::string & path )
 {
+	LOG("call set_error_page()");
+
 	//TODO: check values
-	if ( n < 400 || n > 555 )
-		return ( EXIT_FAILURE );
+	if ( n < 400 || n > 555 )//perq exit failulre
+		return ( EXIT_FAILURE ); 
 	this->_error_pages[n] = path;
 	return ( EXIT_SUCCESS );
 }
