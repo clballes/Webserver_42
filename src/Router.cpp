@@ -163,7 +163,7 @@ Router::parse( std::string & buffer )
 {
 	std::stack< std::string >	context;
 	std::string					directive, directive_name, directive_value;
-	std::string					location;
+	std::string					location( "" );
 	std::size_t					directive_len, position = 0;
 	Location *					current_route = nullptr;
 
@@ -380,9 +380,9 @@ set_autoindex( Server & instance, std::string & arg, std::string location )
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	else if ( arg == "off" )
-		return ( instance.setFlag( F_AUTOINDEX, false ) );
+		return ( instance.setFlag( F_AUTOINDEX, false, location ) );
 	else if ( arg == "on" )
-		return ( instance.setFlag( F_AUTOINDEX, true ) );
+		return ( instance.setFlag( F_AUTOINDEX, true, location ) );
 	else
 		ERROR( "not a valid value for \"autoindex\"" );
 	return ( EXIT_FAILURE );

@@ -14,14 +14,19 @@ Server::Server ( void ): _good( true )
 
 Server::Server ( const Server & instance )
 {
-	(void) instance;
+	*this = instance;
 	return ;
 }
 
 Server &
 Server::operator= ( const Server & instance )
 {
-	(void) instance;
+	this->_good = instance._good;
+	std::memcpy( &this->_address, &instance._address, sizeof( this->_address ) );
+	this->_server_name = instance._server_name;
+	this->_client_max_body_size = instance._client_max_body_size;
+	this->_error_pages = instance._error_pages;
+	this->_routes = instance._routes;
 	return ( *this );
 }
 
