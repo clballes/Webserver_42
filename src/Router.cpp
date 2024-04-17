@@ -52,7 +52,7 @@ how_many_options_are_there ( const t_conf_opts * opts )
 }
 
 std::size_t
-how_many_words( std::string & str )
+how_many_words ( std::string & str )
 {
 	std::string::iterator it;
 	std::size_t n = 1;
@@ -72,7 +72,7 @@ how_many_words( std::string & str )
 }
 
 std::string
-get_word( std::string & str )
+get_word ( std::string & str )
 {
 	std::string word;
 
@@ -81,8 +81,20 @@ get_word( std::string & str )
 	return ( word );
 }
 
+t_conf_opts *
+get_option ( std::string & opt_name, const t_conf_opts * opts )
+{
+	const std::size_t	opts_len = how_many_options_are_there( opts );
+	std::size_t			i;
+
+	i = 0;
+	while ( i < opts_len && opt_name.compare( opts[i].identifier ) != 0 )
+		++i;
+	return ( (t_conf_opts * ) &opts[i] );
+}
+
 std::size_t
-get_directive_length( std::string & buffer, std::size_t position )
+get_directive_length ( std::string & buffer, std::size_t position )
 {
 	const std::size_t init_position = position;
 
@@ -109,7 +121,7 @@ get_directive_length( std::string & buffer, std::size_t position )
 }
 
 int
-validate_directive( std::string & directive, const t_conf_opts * opts )
+validate_directive ( std::string & directive, const t_conf_opts * opts )
 {
 	const std::size_t	opts_len = how_many_options_are_there( opts );
 	std::string			word;
@@ -149,6 +161,12 @@ Router::listen ( void )
 	IEvent * instance;
 
 	DEBUG( IEvent::kq );
+	for ( std::vector< Server >::iterator i = this->_servers.begin();
+			i != this->_servers.end(); ++i )
+	{
+		if ( this->setConnection( i->getListen() ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+	}
 	if ( this->_connections.empty() )
 	{
 		INFO( PROGRAM_NAME << ": there are no connections to listen to." );
@@ -219,16 +237,18 @@ int
 Router::parse( std::string & buffer )
 {
 	std::stack< std::string >	context;
-	std::string					directive;
-	std::size_t					position, directive_len;
+	std::string					directive, directive_name, directive_value;
+	std::size_t					directive_len, position = 0;
+	Server *					current_server = nullptr;
+	t_location *				current_route = nullptr;
 
-	position = 0;
 	while ( position < buffer.length() )
 	{
 		directive_len = get_directive_length( buffer, position );
 		directive = buffer.substr( position, directive_len );
 		position += directive_len;
 		trim_f( directive, &std::isspace );
+		directive_name = get_word( directive );
 		if ( validate_directive( directive, this->_opts ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 		if ( context.empty() && directive == "}" )
@@ -238,7 +258,29 @@ Router::parse( std::string & buffer )
 		}
 		else if ( directive.back() == '{' )
 		{
-			context.push( get_word( directive ) );
+			context.push( directive_name );
+			if ( context.top() == "server" )
+			{
+				this->_servers.resize( this->_servers.size() + 1 );
+				current_server = &this->_servers.back();
+			}
+			else if ( context.top() == "location" )
+			{
+				directive_value = directive.substr( directive_name.length()	);
+				directive_value = directive_value.substr( 0,
+						directive_value.find_first_of( "{}" ) );
+				trim_f( directive_value, &std::isspace );
+				if ( directive_value.empty() )
+				{
+					ERROR( "unnamed \"location\"." );
+					return ( EXIT_FAILURE );
+				}
+				// TODO: check only one argument
+				if ( current_route == nullptr )
+					current_route = &current_server->getDefaultRoute();
+				else
+					current_route = &current_server->getRoute( directive_value );
+			}
 			continue ;
 		}
 		else if ( directive == "}" )
@@ -246,8 +288,20 @@ Router::parse( std::string & buffer )
 			context.pop();
 			continue ;
 		}
-		// hardcoded section
-
+		else if ( context.top() == "server" )
+		{
+			directive_value = directive.substr( directive_name.length(),
+					directive.find_first_of( ";" ) );
+			trim_f( directive_value, &std::isspace );
+			directive_value.erase( directive_value.length() - 1, 1 );
+			if ( get_option( directive_name,
+						this->_opts )->set_func( *current_server,
+							directive_value ) )
+				return ( EXIT_FAILURE );
+		}
+		else if ( context.top() == "location" )
+		{
+		}
 	}
 	return ( EXIT_SUCCESS );
 }
@@ -285,18 +339,12 @@ Router::dispatch ( struct kevent & ev )
 }
 
 int
-Router::setConnection ( struct sockaddr_in & address,
+Router::setConnection ( const struct sockaddr_in & address,
 		int domain, int type, int protocol )
 {
+	DEBUG( "" );
 	this->_connections.push_back( Connection( address,
 				domain, type, protocol ) );
-	return ( EXIT_SUCCESS );
-}
-
-int
-Router::setServer ( std::vector< std::string > & server_names )
-{
-	(void) server_names;
 	return ( EXIT_SUCCESS );
 }
 
@@ -315,13 +363,129 @@ Router::getServer ( std::string & server_name )
 	return ( &this->_servers[0] );
 }
 
-int set_allow_methods ( void ) { return ( 0 ); };
-int set_autoindex ( void ) { return ( 0 ); };
-int set_cgi_param ( void ) { return ( 0 ); };
-int set_cgi_pass ( void ) { return ( 0 ); };
-int set_client_body ( void ) { return ( 0 ); };
-int set_error_page ( void ) { return ( 0 ); };
-int set_index ( void ) { return ( 0 ); };
-int set_listen( void ) { return ( 0 ); };
-int set_root ( void ) { return ( 0 ); };
-int set_server_name ( void ) { return ( 0 ); };
+int
+set_allow_methods ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_autoindex ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_cgi_param ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_cgi_pass ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_client_body ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_error_page ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_index ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_listen( Server & instance, std::string & arg )
+{
+	struct sockaddr_in * address = nullptr;
+	struct addrinfo hints, * result, * rp;
+	std::istringstream iss( arg );
+	std::string ip, port;
+	int ecode;
+
+	DEBUG( arg.c_str() );
+	if ( arg.empty() || arg.find( " " ) != std::string::npos )
+	{
+		ERROR( "invalid number of arguments in \"listen\"" );
+		return ( EXIT_FAILURE );
+	}
+	ip.assign( "0.0.0.0" );
+	port.assign( "80" );
+	if ( arg.find( ':' ) != std::string::npos )
+	{
+		std::getline( iss, ip, ':' );
+		std::getline( iss, port );
+	}
+	else if ( arg.find( '.' ) != std::string::npos )
+		std::getline( iss, ip );
+	else
+		std::getline( iss, port );
+	std::memset( &hints, 0, sizeof( hints ) );
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+	ecode = getaddrinfo( ip.c_str(), port.c_str(), &hints, &result );
+	if ( ecode != 0 )
+	{
+		ERROR( gai_strerror( ecode ) );
+		return ( EXIT_FAILURE );
+	}
+	rp = result;
+	while ( rp != nullptr )
+	{
+		if ( rp->ai_family == AF_INET )
+		{
+			address = (struct sockaddr_in * ) rp->ai_addr;
+			break ;
+		}
+		rp = rp->ai_next;
+	}
+	if ( address == nullptr )
+		return ( EXIT_FAILURE );
+	ecode = instance.setListen( *address );
+	freeaddrinfo( result );
+	if ( ecode == EXIT_FAILURE )
+		return ( EXIT_FAILURE );
+	return ( EXIT_SUCCESS );
+};
+
+int
+set_root ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};
+
+int
+set_server_name ( Server & server, std::string & value )
+{DEBUG( value );
+	(void) server;
+	(void) value;
+	return ( 0 );
+};

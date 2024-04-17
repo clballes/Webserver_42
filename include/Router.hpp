@@ -5,7 +5,29 @@
 
 #ifndef _ROUTER_HPP_
 #define _ROUTER_HPP_
-
+#include <sys/socket.h>		/* socket,
+							   accept,
+							   listen,
+							   send,
+							   recv,
+							   bind,
+							   connect,
+							   getaddrinfo,
+							   freeaddinfo,
+							   setsockopt,
+							   gettsockname */
+#include <sys/types.h>		/* common for
+							   gai_strerror,
+							   kqueue,
+							   connect,
+							   getaddrinfo,
+							   freeaddrinfo,
+							   read */
+#include <netdb.h>			/* common for
+							   gai_strerror,
+							   getaddrinfo,
+							   freeaddrinfo,
+							   getprotobynumber */
 #include <sys/event.h>		/* kqueue, ... */
 #include <sys/time.h>		/* kqueue */
 #include <vector>
@@ -24,14 +46,15 @@
 #define no	false
 #define yes	true
 
+class Server;
+
 typedef struct s_conf_opts
 {
 	int				type;
 	const char *	identifier;
 	bool			duplicate;
 	const char *	nest;
-	int ( *set_func )( void );
-	//int ( *set_func )( Server &, std::string & );
+	int ( *set_func )( Server &, std::string & );
 
 }					t_conf_opts;
 
@@ -43,8 +66,6 @@ typedef struct s_conf_opts
  * Once a connection is received, routes it to its corresponding server.
  *
  */
-
-class Server;
 
 class Router: public IEvent
 {
@@ -58,12 +79,6 @@ class Router: public IEvent
 		int load ( std::string );
 		void dispatch ( struct kevent & event );
 
-		int setConnection ( struct sockaddr_in & ip_address,
-				int domain = AF_INET,
-				int type = SOCK_STREAM,
-				int protocol = IPPROTO_TCP );
-		int setServer ( std::vector< std::string > & server_names );
-
 		Server * getServer ( std::string & server_name );
 
 	private:
@@ -75,17 +90,21 @@ class Router: public IEvent
 
 		int register_read_socket ( Connection & ) const;
 		int parse ( std::string & );
+		int setConnection ( const struct sockaddr_in & ip_address,
+				int domain = AF_INET,
+				int type = SOCK_STREAM,
+				int protocol = IPPROTO_TCP );
 };
 
-int set_allow_methods ( void ) ;
-int set_autoindex ( void ) ;
-int set_cgi_param ( void ) ;
-int set_cgi_pass ( void ) ;
-int set_client_body ( void ) ;
-int set_error_page ( void ) ;
-int set_index ( void ) ;
-int set_listen( void ) ;
-int set_root ( void ) ;
-int set_server_name ( void ) ;
+int set_allow_methods ( Server &, std::string & );
+int set_autoindex ( Server &, std::string & );
+int set_cgi_param ( Server &, std::string & );
+int set_cgi_pass ( Server &, std::string & );
+int set_client_body ( Server &, std::string & );
+int set_error_page ( Server &, std::string & );
+int set_index ( Server &, std::string & );
+int set_listen( Server &, std::string & );
+int set_root ( Server &, std::string & );
+int set_server_name ( Server &, std::string & );
 
 #endif /* !_ROUTER_HPP_ */

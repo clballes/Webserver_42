@@ -36,7 +36,7 @@ class Connection
 	public:
 
 		Connection& operator= ( Connection & );
-		Connection ( struct sockaddr_in &,
+		Connection ( const struct sockaddr_in &,
 				int = AF_INET, int = SOCK_STREAM, int = IPPROTO_TCP );
 		~Connection ( void );
 

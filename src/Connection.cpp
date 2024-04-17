@@ -18,7 +18,7 @@ Connection::operator= ( Connection & instance )
 	return ( *this );
 }
 
-Connection::Connection ( struct sockaddr_in & address,
+Connection::Connection ( const struct sockaddr_in & address,
 		int domain, int type, int protocol ): _good( true ), _socket_fd( 0 )
 {
 	std::memcpy( &this->_address, &address, sizeof( address ) );

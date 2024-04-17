@@ -63,6 +63,7 @@ class Server
 		const std::string & getErrorPage ( int );
 		t_location & getRoute ( std::string & ) const;
 		t_location & getDefaultRoute ( void ) const;
+		const struct sockaddr_in & getListen ( void ) const;
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
@@ -78,6 +79,7 @@ class Server
 	private:
 	
 		bool								_good;
+		struct sockaddr_in					_address;
 		std::vector< std::string >			_server_name;
 		std::size_t							_client_max_body_size;
 		std::map< int, std::string >		_error_pages;

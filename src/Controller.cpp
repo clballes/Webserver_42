@@ -207,7 +207,12 @@ Controller::parse( void )
 			continue ;
 		}
 		// hardcoded section
-		if 
+		if ( get_word( directive ) == "server" )
+		{
+
+		}
+		else if ( get_word( directive ) == "location" )
+		{}
 	}
 	return ( EXIT_SUCCESS );
 }

@@ -7,7 +7,7 @@
 
 Server::Server ( void ): _good( true ) // TODO: _flags( 0 )
 {
-	//DEBUG ( "" );
+	DEBUG ( "" );
 	//TODO: find out why cannot bind if socket is created in constructor
 	//instead of start();
 	// Set a default route
@@ -35,11 +35,7 @@ Server::getRoute ( std::string & location ) const
 	while ( it != this->_routes.end() )
 	{
 		if ( it->first.compare( location ) == 0 )
-		{
-			std::cout << " OK\n";
 			return ( (t_location &) it->second );
-		}
-		std::cout << "\n";
 		++it;
 	}
 	return ( (t_location &) getDefaultRoute() );
@@ -173,18 +169,22 @@ Server::setCGIpass ( std::string & arg, std::string location )
 	return ( EXIT_SUCCESS );
 }
 
+const struct sockaddr_in &
+Server::getListen ( void ) const
+{
+	return ( this->_address );
+}
+
 int
-Server::setListen( struct sockaddr_in & address )
+Server::setListen ( struct sockaddr_in & address )
 {
 	(void) address;
-	//std::memcpy( &this->_address, &address, sizeof( address ) );
-	/*
+	std::memcpy( &this->_address, &address, sizeof( address ) );
 	#ifdef ALLOW_FORBIDDEN
 	char str[INET_ADDRSTRLEN];
 	inet_ntop( AF_INET, &this->_address.sin_addr.s_addr, str, INET_ADDRSTRLEN );
 	DEBUG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
 	#endif
-	*/
 	return ( EXIT_SUCCESS );
 }
 
