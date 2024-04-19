@@ -147,7 +147,7 @@ parse_queries( t_request & request )
     if (pos != std::string::npos)
 	{
         // Extract the query string starting from '?', nose si necessita començar x ?
-        request.query = request.target.substr(pos + 1);
+        request.query = request.target.substr(pos);
 		std::cout << "REQUEST QUERY: " << request.query  << std::endl;
 		// if queries exist, limit them in the target, target should be without the queries
 		request.target = request.target.substr(0, pos);

@@ -187,6 +187,7 @@ HTTP::request_send ( void )
 int
 HTTP::compose_response ( HTTP & http )
 {
+	//mirar aqui els errors
 	DEBUG( http._status_code );
 	DEBUG( http._socket_fd );
 	// status-line
