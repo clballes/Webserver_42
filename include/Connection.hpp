@@ -40,6 +40,7 @@ class Connection
 				int = AF_INET, int = SOCK_STREAM, int = IPPROTO_TCP );
 		~Connection ( void );
 
+		bool good ( void ) const;
 		int getSocketFD ( void ) const;
 		in_addr_t getHost ( void ) const;
 		in_port_t getPort ( void ) const;
