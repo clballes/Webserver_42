@@ -358,6 +358,7 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 		if ( it->getPort() == port && it->getHost() == host
 				&& it->hasServerName( server_name ) == true )
 			return ( *it );
+		it++;
 	}
 	return ( this->getDefaultServer() );
 }

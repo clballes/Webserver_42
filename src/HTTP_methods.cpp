@@ -34,14 +34,12 @@ HTTP::http_get ( HTTP & http )
 {
 	DEBUG( "target: " << http._request.target );
 	DEBUG( "status code: " << http._status_code );
-	// comprobacio molt nye nye
-	if ( http._server.getCGIpass().length() != 0 && http._status_code == 0)
+	if ( !http._server.getCGIpass( http._request.target ).empty() )
 	{
 	 	std::cout << " --------------------- CGI PASS ---------------------- " << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
 		http.cgi_ptr = new CGI( http );
 		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
-		http._status_code = 200; // entenc qe falta una mica de parsing del CGI
 	}
 	else if (http._status_code == 200)
 	{
