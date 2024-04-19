@@ -72,8 +72,6 @@ void
 HTTP::dispatch ( struct kevent & ev )
 {
 	DEBUG ( "ev=" << ev.ident );
-	if ( ev.flags & EVFILT_READ )
-	DEBUG( ev.ident );
 	if ( ev.filter == EVFILT_READ )
 		this->request_recv( ev.data );
 	else if ( ev.filter == EVFILT_WRITE )
@@ -274,10 +272,6 @@ t_request HTTP::getRequest( void )
 t_headers HTTP::getHeaders()
 {
 	return this->_request_headers;
-}
-Server * HTTP::getServer( void )
-{
-	return this->_server;
 }
 
 void HTTP::set_response_headers( std::string arg, std::string value )

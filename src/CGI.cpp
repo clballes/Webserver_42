@@ -62,8 +62,8 @@ void CGI::setmap()
 	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
 
 	// fer la funcio ara esta malament aixo
-	this->_envMap["SERVER_NAME"] = std::to_string(_http.getServer()->getHost());
-	this->_envMap["SERVER_PORT"] = _http.getServer()->getPort();	
+	// this->_envMap["SERVER_NAME"] = std::to_string(_http.getServer()->getHost());
+	// this->_envMap["SERVER_PORT"] = _http.getServer()->getPort();	
 }
 
 int CGI::register_process( pid_t pid)

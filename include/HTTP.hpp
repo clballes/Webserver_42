@@ -71,7 +71,6 @@ class HTTP: public IEvent
 		// getters for CGI
 		t_request getRequest( void );
 		t_headers getHeaders( void );
-		Server *getServer( void );
 
 		std::string getCGIpass( void );
 		void	set_message_body( std::string& );
