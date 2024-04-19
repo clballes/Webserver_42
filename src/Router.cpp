@@ -196,7 +196,7 @@ Router::parse( std::string & buffer )
 		directive_name = get_word( directive, " \f\n\r\t\v;{}" );
 		if ( validate_directive( directive, this->_opts ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
-		DEBUG( directive );
+		//DEBUG( directive );
 		//DEBUG( directive_name );
 		if ( context.empty() && directive == "}" )
 		{
@@ -221,8 +221,9 @@ Router::parse( std::string & buffer )
 					ERROR( "unnamed \"location\"." );
 					return ( EXIT_FAILURE );
 				}
+				location.assign( directive_value );
 				// TODO: check only one argument
-				DEBUG( "route=" << directive_value );
+				//DEBUG( "route=" << directive_value );
 				this->_servers.back().setRoute( directive_value );
 				//this->_servers.back().getRoute( directive_value );
 				directive_value.clear();
@@ -231,11 +232,13 @@ Router::parse( std::string & buffer )
 		}
 		else if ( directive == "}" )
 		{
+			location.clear();
 			context.pop();
 			continue ;
 		}
 		if ( check_context( directive_name, context.top(), this->_opts ) )
 			return ( EXIT_FAILURE );
+		DEBUG( "location=" << location );
 		directive_value = directive.substr( directive_name.length() );
 		if ( directive_value.empty() == false && directive_value.back() == ';' )
 			directive_value.erase( directive_value.length() - 1, 1 );
@@ -367,7 +370,7 @@ set_allow_methods( Server & instance, std::string & arg, std::string location )
 	std::string word;
 	
 	(void) location;
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"allow_methods\"" );
@@ -396,7 +399,7 @@ int
 set_autoindex( Server & instance, std::string & arg, std::string location )
 {
 	(void) location;
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	else if ( arg == "off" )
@@ -413,7 +416,7 @@ set_cgi_param ( Server & instance, std::string & arg, std::string location )
 {
 	(void) location;
 	//TODO: what if a path has spaces ???
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
@@ -427,7 +430,7 @@ set_cgi_pass ( Server & instance, std::string & arg, std::string location )
 {
 	(void) location;
 	//TODO: what if a path has spaces ???
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"cgi_pass\"" );
@@ -444,7 +447,7 @@ set_client_body ( Server & instance, std::string & arg, std::string location )
 	std::size_t n = 0;
 	int alpha = 0;
 
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"client_body\"" );
@@ -478,7 +481,7 @@ set_error_page ( Server & instance, std::string & arg, std::string location )
 	std::string::iterator it;
 	std::string num, page;
 
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() || how_many_words( arg ) != 2 )
 	{
 		ERROR( "invalid number of arguments in \"error_page\"" );
@@ -503,11 +506,16 @@ set_error_page ( Server & instance, std::string & arg, std::string location )
 int
 set_index ( Server & instance, std::string & arg, std::string location )
 {
-	(void) location;
-	DEBUG( arg );
-	(void) arg;
-	(void) instance;
-	return ( 0 );
+	std::istringstream iss( arg );
+	std::string word;
+
+	//TODO: check values
+	while ( iss >> word )
+	{
+		if ( instance.setIndex( word, location ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+	}
+	return ( EXIT_SUCCESS );
 };
 
 int
@@ -520,7 +528,7 @@ set_listen( Server & instance, std::string & arg, std::string location )
 	std::string ip, port;
 	int ecode;
    
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"listen\"" );
@@ -571,12 +579,13 @@ set_root ( Server & instance, std::string & arg, std::string location )
 {
 	(void) location;
 	DEBUG( arg );
+	DEBUG( "location=" << location );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"root\"" );
 		return ( EXIT_FAILURE );
 	}
-	instance.setRoot( arg );
+	instance.setRoot( arg, location );
 	return ( EXIT_SUCCESS );
 }
 
@@ -587,7 +596,7 @@ set_server_name ( Server & instance, std::string & arg, std::string location )
 	std::istringstream iss( arg );
 	std::string word;
    
-	DEBUG( arg );
+	//DEBUG( arg );
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"server_name\"" );

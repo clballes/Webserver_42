@@ -56,7 +56,7 @@ Location::getRoot ( void ) const
 std::vector< std::string > &
 Location::getIndex ( void ) const
 {
-	return ( (std::vector< std::string > &) this->_index );
+	return ( const_cast< std::vector< std::string > & >( this->_index ) );
 }
 
 bool
