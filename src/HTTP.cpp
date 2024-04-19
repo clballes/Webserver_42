@@ -141,19 +141,27 @@ HTTP::request_recv ( int64_t data )
 	//TODO: location
 	else
 	{
+		
+		// fe run open x si existeix sino return 404 o access millor
+		std::cout << "AAAAAAAAA" << std::endl;
 		if ( this->_server.getFlag( F_AUTOINDEX ) == false
 				&& is_regular_file( this->_request.target ) == false )
 		{
+			std::cout << "AAAAAAAAA1" << std::endl;
 			this->_status_code = check_index();
 			load_file( *this, this->_request.target );
+			//register_sedn
 		}
 		else if ( this->_server.getFlag( F_AUTOINDEX ) == true
 				&& is_regular_file( this->_request.target ) == false )
 		{
+			std::cout << "AAAAAAAAA2" << std::endl;
 			this->_status_code = autoindex( *this );
+			//register_send
 		}
 		else
 		{
+			std::cout << "AAAAAAAAA3" << std::endl;
 			this->_request.method->method_func( * this );
 		}
 	}
