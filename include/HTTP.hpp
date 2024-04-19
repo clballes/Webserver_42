@@ -11,11 +11,14 @@
 #include <fstream>
 #include <map>
 #include "IEvent.hpp"
+#include "Router.hpp"
 #include "Server.hpp"
+#include "CGI.hpp"
 #include "define.hpp"
 #include "debug.hpp"
-#include "CGI.hpp"
-
+#include "string.hpp"
+#include "file.hpp"
+#include "HTTP_status_codes.hpp"
 
 typedef std::map< std::string, std::string > t_headers;
 
@@ -33,21 +36,22 @@ typedef struct s_http_method
 typedef struct s_request
 {
 	t_http_method * method;
+	std::string host;
 	std::string target;
 	std::string query;
 	std::string body;
 	std::string fragments;
 	int http_version;
-
 } t_request;
 
+class Router;
 class Server;
 
 class HTTP: public IEvent
 {
 	public:
 
-		HTTP ( Server & );
+		HTTP ( Router &, int );
 		~HTTP ( void );
 
 		void dispatch ( struct kevent & );
@@ -56,27 +60,28 @@ class HTTP: public IEvent
 		int request_recv ( int64_t );
 		int request_send ( void );
 
-		static std::string & urlencode ( std::string & );
-		static std::string & urldecode ( std::string & );
 		static int load_file ( HTTP &, std::string );
 		int put_file( void );
 		void generateHTML(); // aico sera per el CGI
-
-		void perform ( void );
+		int check_index();
 
 		static int n_methods;
 		static std::size_t n_longest_method;
 		static t_http_method methods[];
+		// getters for CGI
+		t_request getRequest( void );
+		t_headers getHeaders( void );
 
-		std::string getTarget( void );
 		std::string getCGIpass( void );
+		void	setMessageBody( std::string& );
 
 	private:
 
 		int						_socket_fd;
 		unsigned				_address_len;
 		struct sockaddr_in		_address;
-		Server &                _server;
+		Router &				_router;
+		Server *                _server;
 		CGI *cgi_ptr;			//LIBERAR MEMORIA
 
 		t_headers _request_headers;
@@ -89,6 +94,7 @@ class HTTP: public IEvent
 		bool _keep_alive; //?
 
 		int parse ( void );
+		void read_response(HTTP & );
 		int parse_start_line ( std::string & );
 		int parse_field_line ( std::string & );
 		static int http_get ( HTTP & );
@@ -98,7 +104,6 @@ class HTTP: public IEvent
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP & );
-
 };
 
 #endif /* !_HTTP_HPP_ */

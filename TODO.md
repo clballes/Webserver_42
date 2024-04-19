@@ -1,0 +1,14 @@
+- [ ] excludes ?options from URI
+- [ ] proper log system
+- [ ] send connection: close header
+- [ ] Tests: request headers
+- [ ] Clear unused / properly reorder included headers!
+- [ ] Implement keepalive_disable, keepalive_request and (maybe) keepalive_timeout
+- [ ] proper decorde_url / encode_url
+- [ ] proper parse
+- [ ] Methods: CGI a part, get,post,etc...
+- [ ] CGI: Location: getters that match request.target
+- [ ] set DEFAULTS
+- [ ] gaurrades es he fet en el http gettarget i getCGIpass
+- [ ] fer query
+- [ ] fer params

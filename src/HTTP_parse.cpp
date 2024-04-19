@@ -5,17 +5,12 @@
 
 #include "HTTP.hpp"
 
-bool is_regular_file( const std::string & filename );
-std::string & trim_comments ( std::string & str, const char * comment_type );
-std::string & trim_f( std::string & str, int ( *func )( int ) );
-
 int
 HTTP::parse ( void )
 {
 	std::string::size_type  start, pos;
 	std::string             line;
 
-	LOG( "call HTTP::parse()" );
 	start = 0;
 	pos = this->_buffer_recv.find_first_of( LF, 0 );
 	while ( pos != std::string::npos )
@@ -24,47 +19,39 @@ HTTP::parse ( void )
 		if ( start == 0 )
 		{
 			if ( parse_start_line( line ) == EXIT_FAILURE )
-			{
-				LOG( "START_LINE" );
 				return ( EXIT_FAILURE );
-			}
 		}
 		else if ( std::isgraph( line.at( 0 ) ) != 0 )
 		{
 			if ( parse_field_line( line ) == EXIT_FAILURE )
-			{
-				LOG( "TT" );
 				return ( EXIT_FAILURE );
-			}
 		}
 		else if ( ( pos - start ) != 1 )
-		{
-			LOG( "HERE" );
 			return ( EXIT_FAILURE );
-		}
+
 		start = pos + 1;
 		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
 	}
-	
-	//adding request body for POST petitions
-	int delimiter = this->_buffer_recv.find("\r\n\r\n");
-	int len  = this->_buffer_recv.length();
-
-		std::cout << "LOGLOGLOGLOG 3" << std::endl;
-	// OTHER PETITIONS EXCEPT POST
-	if (delimiter + 5 == len )
+	if (strcmp(this->_request.method->method, "GET") != 0)
 	{
-		std::cout << "LOGLOGLOGLOG 1" << std::endl;
+		//adding request body for POST petitions
+		int delimiter = this->_buffer_recv.find( "\r\n\r\n" );
+		int len  = this->_buffer_recv.length();
 
-		return (EXIT_SUCCESS);
-	}
-	else
-	{
-		std::cout << "LOGLOGLOGLOG 2"  << std::endl;
-		this->_request.body = this->_buffer_recv.substr(delimiter + 4);
+		// OTHER PETITIONS EXCEPT POST
+		if (delimiter + 5 == len )
+		{
+			return (EXIT_SUCCESS);
+		}
+		else
+		{
+			this->_request.body = this->_buffer_recv.substr(delimiter + 4);
+		}
+		return ( EXIT_SUCCESS );
 	}
 
 	return ( EXIT_SUCCESS );
+
 }
 
 /* No whitespace is allowed between the field name and colon.
@@ -79,8 +66,6 @@ HTTP::parse_field_line ( std::string & line )
 	std::string field_name, field_value;
 	std::string::size_type pos, len;
 
-	//LOG( "call HTTP::parse_field_line()" );
-	//LOG_BUFFER( line.c_str() );
 	len = line.length();
 	pos = line.find_first_of( ":" );
 	// TODO
@@ -105,19 +90,20 @@ HTTP::parse_field_line ( std::string & line )
 
 static int parse_method ( t_request &, std::string & );
 static int parse_target ( t_request &, std::string & );
+static void parse_queries ( t_request &);
 static int parse_http_version ( t_request &, std::string & );
 
 int
 HTTP::parse_start_line( std::string & line )
 {
-	//LOG( "call HTTP::parse_start_line()" );
-	//LOG_BUFFER( line.c_str() );
 	this->_status_code = parse_method( this->_request, line );
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	else
 		line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
 	this->_status_code = parse_target( this->_request, line );
+	// parse if querys in url
+	parse_queries( this->_request );
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	else
@@ -137,7 +123,6 @@ parse_method( t_request & request, std::string & line )
 	std::string             value;
 	int                     iterator;
 
-	//LOG( "call parse_method()" );
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
@@ -155,11 +140,23 @@ parse_method( t_request & request, std::string & line )
 	return ( EXIT_SUCCESS );
 }
 
+void
+parse_queries( t_request & request )
+{
+	std::size_t pos = request.target.find('?');
+    if (pos != std::string::npos)
+	{
+        // Extract the query string starting from '?', nose si necessita començar x ?
+        request.query = request.target.substr(pos + 1);
+		std::cout << "REQUEST QUERY: " << request.query  << std::endl;
+		// if queries exist, limit them in the target, target should be without the queries
+		request.target = request.target.substr(0, pos);
+	}
+}
 
 int
 parse_target( t_request & request, std::string & line )
 {
-	LOG( "call parse_target()" << request.target);
 	std::string::size_type  pos;
 
 	pos = line.find_first_of( SP, 0 );
@@ -168,24 +165,20 @@ parse_target( t_request & request, std::string & line )
 
 	std::cout << "url decoded is " << request.target << std::endl;
 	std::string p_string = line.substr( 0, pos );
-	if (p_string.length() < request.target.length())
-	{
+	if ( p_string.length() < request.target.length() )
 		return ( FORBIDDEN );
-	}
-	else if (line.compare(0,request.target.length() - 1, request.target))
-	{
-		request.target.append( line.substr( request.target.length(), pos - request.target.length()  ));
-	}
+	else if ( line.compare( 0, request.target.length() - 1, request.target ) )
+		request.target.append( line.substr( request.target.length(),
+					pos - request.target.length() ) );
 	else
 	{
 		request.target.append( line.substr( 0, pos ));
 	}
 	
-	HTTP::urldecode( request.target );
+	urldecode( request.target );
 	LOG( " AFTER PARSING TARGET; request.target: \"" << request.target << "\"" );
 	return ( EXIT_SUCCESS );
 }
-
 
 int
 parse_http_version ( t_request & request, std::string & line )
@@ -193,7 +186,6 @@ parse_http_version ( t_request & request, std::string & line )
 	std::string::size_type  pos;
 	std::string             value;
 
-	//LOG( "call parse_http_version()" );
 	pos = line.find_first_of( CR, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );

@@ -6,7 +6,7 @@
 NAME			:=	webserv
 
 SRC_DIR			:=	src
-INC_DIR         :=  inc
+INC_DIR         :=  include
 BUILD_DIR		:=	build
 
 CC				:=	c++
@@ -15,18 +15,19 @@ CPPFLAGS		+=	-I$(INC_DIR)
 CPPFLAGS		+=	-g -fsanitize='address,undefined'
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 CXXFLAGS		+=	-DREUSE_SOCKET -DALLOW_FORBIDDEN
-SILENCE_LOGS	?=	false
 
 SRC_FILES		:=	$(SRC_DIR)/main.cpp \
-					$(SRC_DIR)/Controller.cpp \
+					$(SRC_DIR)/Router.cpp \
+					$(SRC_DIR)/Connection.cpp \
 					$(SRC_DIR)/Server.cpp \
-					$(SRC_DIR)/ServerConf.cpp \
-					$(SRC_DIR)/HTTP.cpp \
+					$(SRC_DIR)/Location.cpp \
 					$(SRC_DIR)/HTTP_methods.cpp \
 					$(SRC_DIR)/HTTP_parse.cpp \
+					$(SRC_DIR)/HTTP.cpp \
 					$(SRC_DIR)/CGI.cpp \
-					$(SRC_DIR)/autoindex.cpp \
-					$(SRC_DIR)/urlencode.cpp
+					$(SRC_DIR)/string.cpp \
+					$(SRC_DIR)/file.cpp \
+					$(SRC_DIR)/autoindex.cpp
 
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
@@ -40,7 +41,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ_FILES)
-	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $(OBJ_FILES) -o $(basename $@)
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) $(OBJ_FILES) -o $(basename $@)
 
 -include $(DEP_FILES)
 

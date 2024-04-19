@@ -6,8 +6,8 @@
 #include <iostream>
 #include "define.hpp"
 #include "debug.hpp"
-#include "Controller.hpp"
 #include "IEvent.hpp"
+#include "Router.hpp"
 
 int
 IEvent::kq = 0;
@@ -15,12 +15,10 @@ IEvent::kq = 0;
 int
 main ( int argc, char * const * argv )
 {
-	Controller controller;
+	Router router;
 	
 	if ( argc > 2 )
 		return ( EXIT_FAILURE );
-
-	controller.load( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] );
-
-	return ( controller.start() );
+	router.load( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] );
+	return ( router.good() == false ? EXIT_FAILURE : router.listen() );
 }
