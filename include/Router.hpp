@@ -32,6 +32,7 @@
 #include <sys/time.h>		/* kqueue */
 #include <vector>
 #include <string>
+#include <stack>
 
 #include "IEvent.hpp"
 #include "Connection.hpp"
