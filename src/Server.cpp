@@ -47,6 +47,7 @@ Server::getRoute ( std::string & location ) const
 {
 	t_route_map::const_iterator it;
 
+	DEBUG( location );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{

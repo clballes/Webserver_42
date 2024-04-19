@@ -16,8 +16,8 @@ Router::_opts[] =
 	{ DIRECTIVE, "root", no, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, "server,location", &set_index },
 	{ DIRECTIVE, "autoindex", no, "server,location", &set_autoindex },
-	{ DIRECTIVE, "cgi_pass", no, "server,location", &set_cgi_pass },
-	{ DIRECTIVE, "cgi_param", no, "server,location", &set_cgi_param },
+	{ DIRECTIVE, "cgi_pass", no, "location", &set_cgi_pass },
+	{ DIRECTIVE, "cgi_param", no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, "server", &set_error_page },
 	{ DIRECTIVE, "client_body", no, "server", &set_client_body },
 	{ 0, 0x0, 0, 0x0, 0x0 }
@@ -54,13 +54,14 @@ how_many_options_are_there ( const t_conf_opts * opts )
 t_conf_opts *
 get_option ( std::string & opt_name, const t_conf_opts * opts )
 {
-	DEBUG( opt_name );
 	const std::size_t	opts_len = how_many_options_are_there( opts );
 	std::size_t			i;
 
 	i = 0;
 	while ( i < opts_len && opt_name.compare( opts[i].identifier ) != 0 )
 		++i;
+	if ( i == opts_len )
+		return ( nullptr );
 	return ( (t_conf_opts * ) &opts[i] );
 }
 
@@ -125,6 +126,28 @@ validate_directive ( std::string & directive, const t_conf_opts * opts )
 }
 
 int
+check_context ( std::string & directive_name, std::string & context,
+		const t_conf_opts * opts )
+{
+	t_conf_opts * opt;
+	std::string valid_contexts;
+
+	DEBUG( directive_name );
+	DEBUG( context );
+	opt = get_option( directive_name, opts );
+	if ( opt == nullptr )
+		return ( EXIT_FAILURE );
+	valid_contexts.assign( opt->nest );
+	DEBUG( valid_contexts );
+	if ( valid_contexts.find( context ) == std::string::npos )
+	{
+		ERROR( "directive \"" << directive_name << "\" in wrong context" );
+		return ( EXIT_FAILURE );
+	}
+	return ( EXIT_SUCCESS );
+}
+
+int
 Router::load ( std::string filename )
 {
 	std::string   buffer, line;
@@ -165,8 +188,8 @@ Router::parse( std::string & buffer )
 	std::string					directive, directive_name, directive_value;
 	std::string					location( "" );
 	std::size_t					directive_len, position = 0;
-	Location *					current_route = nullptr;
 
+	context.push( "main" );
 	while ( position < buffer.length() )
 	{
 		directive_len = get_directive_length( buffer, position );
@@ -188,27 +211,21 @@ Router::parse( std::string & buffer )
 			context.push( directive_name );
 			if ( context.top() == "server" )
 			{
-				//this->_servers.resize( this->_servers.size() + 1 );
 				this->_servers.push_back( Server() );
-				//current_server = &this->_servers.back();
 			}
 			else if ( context.top() == "location" )
 			{
 				directive_value = directive.substr( directive_name.length()	);
 				directive_value = directive_value.substr( 0,
-						directive_value.find_first_of( "{}" ) );
+						directive_value.find_first_of( "{};" ) );
 				trim_f( directive_value, &std::isspace );
 				if ( directive_value.empty() )
 				{
 					ERROR( "unnamed \"location\"." );
 					return ( EXIT_FAILURE );
 				}
-				(void) current_route;
 				// TODO: check only one argument
-				//if ( current_route == nullptr )
-				//	current_route = &current_server->getDefaultRoute();
-				//else
-				//	current_route = &current_server->getRoute( directive_value );
+				this->_servers.back().getRoute( directive_value );
 				directive_value.clear();
 			}
 			continue ;
@@ -218,22 +235,18 @@ Router::parse( std::string & buffer )
 			context.pop();
 			continue ;
 		}
-		else if ( context.top() == "server" )
-		{
-			directive_value = directive.substr( directive_name.length() );
-			//		directive.find_first_of( ";" ) - directive_name.length() );
-			if ( directive_value.empty() == false && directive_value.back() == ';' )
-				directive_value.erase( directive_value.length() - 1, 1 );
-			trim_f( directive_value, &std::isspace );
-			t_conf_opts * opt = get_option( directive_name, this->_opts );
-			if ( opt->set_func( this->_servers.back(), directive_value, location ) )
+		if ( check_context( directive_name, context.top(), this->_opts ) )
+			return ( EXIT_FAILURE );
+		directive_value = directive.substr( directive_name.length() );
+		if ( directive_value.empty() == false && directive_value.back() == ';' )
+			directive_value.erase( directive_value.length() - 1, 1 );
+		trim_f( directive_value, &std::isspace );
+		DEBUG( directive_value );
 			
-				//return ( EXIT_FAILURE );
-			directive_value.clear();
-		}
-		else if ( context.top() == "location" )
-		{
-		}
+		t_conf_opts * opt = get_option( directive_name, this->_opts );
+		if ( opt->set_func( this->_servers.back(), directive_value, location ) )
+			return ( EXIT_FAILURE );
+		directive_value.clear();
 	}
 	return ( EXIT_SUCCESS );
 }
