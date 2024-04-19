@@ -133,8 +133,9 @@ HTTP::request_recv ( int64_t data )
 		WARN( "Something went wrong while parsing HTTP recv" );
 	
 	this->_buffer_recv.clear();	
-	this->_server = this->_router.getServer( this->_request.host );
-	if ( this->_request.method == nullptr || this->_server == nullptr )
+	// This is HOW TO GET SERVER
+	// this->_router.getServer( this->_request.host, [host], [port] );
+	if ( this->_request.method == nullptr )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	//TODO: location
 	// fn()
