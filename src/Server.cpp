@@ -154,6 +154,8 @@ Server::setRoute ( std::string & location )
 	DEBUG( location );
 	if ( this->_routes.find( location ) == this->_routes.end() )
 		(void) this->_routes[location];
+	else
+		DEBUG( "route \"" << location << "\" already exists" );
 	return ( EXIT_SUCCESS );
 }
 
@@ -234,8 +236,7 @@ Server::setIndex ( std::string & arg, std::string location )
 int
 Server::setErrorPage ( int n, std::string & path )
 {
-	LOG("call set_error_page()");
-
+	DEBUG( "" );
 	//TODO: check values
 	if ( n < 400 || n > 555 )//perq exit failulre
 		return ( EXIT_FAILURE ); 
@@ -244,28 +245,29 @@ Server::setErrorPage ( int n, std::string & path )
 }
 
 void
-Server::log_conf ( void ) 
+Server::log_conf ( void ) const 
 {
 	LOG( "Server" );
 	LOG( "good=" << std::boolalpha << this->good() );
-	for ( std::vector< std::string >::iterator it = this->_server_name.begin();
+	for ( std::vector< std::string >::const_iterator it = this->_server_name.begin();
 			it != this->_server_name.end(); ++it )
 		LOG( "server_name=" << *it );
-	for ( std::map< int, std::string >::iterator it = this->_error_pages.begin();
+	for ( std::map< int, std::string >::const_iterator it = this->_error_pages.begin();
 			it != this->_error_pages.end(); ++it )
 		LOG( "error_page=" << it->first << "=" << it->second );
 	LOG( "client_max_body=" << this->_client_max_body_size );
-	for ( t_route_map::iterator it = this->_routes.begin();
+	for ( t_route_map::const_iterator it = this->_routes.begin();
 			it != this->_routes.end(); ++it )
 	{
-		LOG( "root=" << it->second.getRoot() );
-		LOG( "isDefault=" << it->second.isDefault() );
-		LOG( "flags=" << it->second.getFlags() );
-		LOG( "cgi_pass=" << it->second.getCGIpass() );
-		LOG( "cgi_param=" << it->second.getCGIparam() );
-		for ( std::vector< std::string >::iterator index_it = it->second.getIndex().begin();
+		LOG( " Location" );
+		LOG( " root=" << it->second.getRoot() );
+		LOG( " isDefault=" << it->second.isDefault() );
+		LOG( " flags=" << std::hex << it->second.getFlags() << std::dec );
+		LOG( " cgi_pass=" << it->second.getCGIpass() );
+		LOG( " cgi_param=" << it->second.getCGIparam() );
+		for ( std::vector< std::string >::const_iterator index_it = it->second.getIndex().begin();
 				index_it != it->second.getIndex().end(); ++it )
-			LOG( "index=" << *index_it );
+			LOG( " index=" << *index_it );
 	}
 	return ;
 }

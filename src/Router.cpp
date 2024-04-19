@@ -132,13 +132,10 @@ check_context ( std::string & directive_name, std::string & context,
 	t_conf_opts * opt;
 	std::string valid_contexts;
 
-	DEBUG( directive_name );
-	DEBUG( context );
 	opt = get_option( directive_name, opts );
 	if ( opt == nullptr )
 		return ( EXIT_FAILURE );
 	valid_contexts.assign( opt->nest );
-	DEBUG( valid_contexts );
 	if ( valid_contexts.find( context ) == std::string::npos )
 	{
 		ERROR( "directive \"" << directive_name << "\" in wrong context" );
@@ -200,7 +197,7 @@ Router::parse( std::string & buffer )
 		if ( validate_directive( directive, this->_opts ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 		DEBUG( directive );
-		DEBUG( directive_name );
+		//DEBUG( directive_name );
 		if ( context.empty() && directive == "}" )
 		{
 			ERROR( "error: context: }" );
@@ -225,7 +222,9 @@ Router::parse( std::string & buffer )
 					return ( EXIT_FAILURE );
 				}
 				// TODO: check only one argument
-				this->_servers.back().getRoute( directive_value );
+				DEBUG( "route=" << directive_value );
+				this->_servers.back().setRoute( directive_value );
+				//this->_servers.back().getRoute( directive_value );
 				directive_value.clear();
 			}
 			continue ;
@@ -241,13 +240,20 @@ Router::parse( std::string & buffer )
 		if ( directive_value.empty() == false && directive_value.back() == ';' )
 			directive_value.erase( directive_value.length() - 1, 1 );
 		trim_f( directive_value, &std::isspace );
-		DEBUG( directive_value );
-			
+		//DEBUG( directive_value );
 		t_conf_opts * opt = get_option( directive_name, this->_opts );
 		if ( opt->set_func( this->_servers.back(), directive_value, location ) )
 			return ( EXIT_FAILURE );
 		directive_value.clear();
 	}
+	if ( context.size() != 1 )
+	{
+		ERROR( "context \"" << context.top() << "\" unclosed" );
+		return ( EXIT_FAILURE );
+	}
+	// log servers
+	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
+			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
 	return ( EXIT_SUCCESS );
 }
 
@@ -418,7 +424,8 @@ set_cgi_param ( Server & instance, std::string & arg, std::string location )
 
 int
 set_cgi_pass ( Server & instance, std::string & arg, std::string location )
-{(void) location;
+{
+	(void) location;
 	//TODO: what if a path has spaces ???
 	DEBUG( arg );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
@@ -431,7 +438,8 @@ set_cgi_pass ( Server & instance, std::string & arg, std::string location )
 
 int
 set_client_body ( Server & instance, std::string & arg, std::string location )
-{(void) location;
+{
+	(void) location;
 	//TODO: multiply value for 'M, m, K, k'
 	std::size_t n = 0;
 	int alpha = 0;
@@ -463,7 +471,8 @@ set_client_body ( Server & instance, std::string & arg, std::string location )
 
 int
 set_error_page ( Server & instance, std::string & arg, std::string location )
-{(void) location;
+{
+	(void) location;
 	//TODO: expects 2 arguments only
 	std::istringstream iss( arg );
 	std::string::iterator it;
@@ -493,7 +502,8 @@ set_error_page ( Server & instance, std::string & arg, std::string location )
 
 int
 set_index ( Server & instance, std::string & arg, std::string location )
-{(void) location;
+{
+	(void) location;
 	DEBUG( arg );
 	(void) arg;
 	(void) instance;
@@ -502,7 +512,8 @@ set_index ( Server & instance, std::string & arg, std::string location )
 
 int
 set_listen( Server & instance, std::string & arg, std::string location )
-{(void) location;
+{
+	(void) location;
 	struct sockaddr_in * address = nullptr;
 	struct addrinfo hints, * result, * rp;
 	std::istringstream iss( arg );
@@ -557,7 +568,8 @@ set_listen( Server & instance, std::string & arg, std::string location )
 
 int
 set_root ( Server & instance, std::string & arg, std::string location )
-{(void) location;
+{
+	(void) location;
 	DEBUG( arg );
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
@@ -570,7 +582,8 @@ set_root ( Server & instance, std::string & arg, std::string location )
 
 int
 set_server_name ( Server & instance, std::string & arg, std::string location )
-{(void) location;
+{
+	(void) location;
 	std::istringstream iss( arg );
 	std::string word;
    

@@ -38,7 +38,7 @@ class Server
 		~Server ( void );
 		
 		bool good ( void ) const;
-		void log_conf ( void );
+		void log_conf ( void ) const;
 	
 		bool getFlag ( int, std::string = "" ) const;
 		std::size_t getFlags ( std::string = "" ) const;
@@ -68,6 +68,7 @@ class Server
 
 		typedef std::map< std::string,
 				Location, longer< std::string > > t_route_map;
+
 	private:
 	
 		bool								_good;
