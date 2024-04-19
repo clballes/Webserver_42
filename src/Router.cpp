@@ -333,6 +333,8 @@ Router::dispatch ( struct kevent & ev )
 		return ;
 	}
 	client = new HTTP( *this, ev.ident );
+	// TODO: store clients somewhere to keep track of leaks
+	(void) client;
 	return ;
 }
 
