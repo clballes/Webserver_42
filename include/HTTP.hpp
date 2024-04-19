@@ -81,7 +81,7 @@ class HTTP: public IEvent
 		unsigned				_address_len;
 		struct sockaddr_in		_address;
 		Router &				_router;
-		Server *                _server;
+		Server &                _server;
 		CGI *cgi_ptr;			//LIBERAR MEMORIA
 
 		t_headers _request_headers;

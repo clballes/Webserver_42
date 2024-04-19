@@ -11,7 +11,7 @@ void HTTP::read_response(HTTP & http)
 	{
 		http._status_code = HTTP::load_file( http, http._request.target );
 	}
-	else if ( http._server->getFlag(  F_AUTOINDEX ))
+	else if ( http._server.getFlag(  F_AUTOINDEX ))
 	{
 		http._status_code = HTTP::autoindex( http );
 	}
@@ -21,7 +21,7 @@ int
 HTTP::http_head ( HTTP & http )
 {
 	DEBUG( "" );
-	if (http._server->getCGIpass().length() != 0 )
+	if (http._server.getCGIpass().length() != 0 )
 	{}
 	else
 	{}
@@ -35,7 +35,7 @@ HTTP::http_get ( HTTP & http )
 	DEBUG( "target: " << http._request.target );
 	DEBUG( "status code: " << http._status_code );
 	// comprobacio molt nye nye
-	if ( http._server->getCGIpass().length() != 0 && http._status_code == 0)
+	if ( http._server.getCGIpass().length() != 0 && http._status_code == 0)
 	{
 	 	std::cout << " --------------------- CGI PASS ---------------------- " << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
 		http.cgi_ptr = new CGI( http );
@@ -53,7 +53,7 @@ HTTP::http_get ( HTTP & http )
 	{
 	 	std::cout << " --------------------- 403 ERR CODE ---------------------- " << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
 	 // si tenim errors load error 403 del index html
-	 	std::cout << http._server->getErrorPage( http._status_code ) << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
+	 	std::cout << http._server.getErrorPage( http._status_code ) << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
 		HTTP::load_file( http, "/Users/clara/Desktop/web_server_2/www/403.html" );
 		http.register_send();
 	}
@@ -123,10 +123,10 @@ HTTP::http_post ( HTTP & http )
 	DEBUG( "" );
 	if ( http._status_code == INTERNAL_SERVER_ERROR )
 	{
-		LOG( http._server->getErrorPage(500) );
-		(void) HTTP::load_file( http, http._server->getErrorPage(500) );
+		LOG( http._server.getErrorPage(500) );
+		(void) HTTP::load_file( http, http._server.getErrorPage(500) );
 	}
-	if ( http._server->getCGIpass().length() != 0 )
+	if ( http._server.getCGIpass().length() != 0 )
 	{
 		LOG( " Executing Cgi" );
 		CGI *cgi_ptr = new CGI( http );
@@ -192,13 +192,13 @@ HTTP::http_delete ( HTTP & http )
 		else
 		{
 			http._status_code = 403;
-			HTTP::load_file( http, http._server->getErrorPage( 403 ) );
+			HTTP::load_file( http, http._server.getErrorPage( 403 ) );
 		}
 	}
 	else
 	{
 		http._status_code = 404;
-		HTTP::load_file( http, http._server->getErrorPage( 404 ) );
+		HTTP::load_file( http, http._server.getErrorPage( 404 ) );
 	}
 	return ( EXIT_SUCCESS );
 }

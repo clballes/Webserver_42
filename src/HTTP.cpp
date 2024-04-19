@@ -44,7 +44,7 @@ get_method_longest_len ( t_http_method * ptr )
 HTTP::HTTP ( Router & router_instance, int fd ):
 	_socket_fd( 0 ),
 	_router( router_instance ),
-	_server( nullptr )
+	_server( router_instance.getDefaultServer() )
 {
 	this->cgi_ptr = NULL;
 	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
@@ -113,6 +113,8 @@ HTTP::register_send ( void )
 	return ( EXIT_SUCCESS );
 }
 
+// TODO: keep list of clients in order to delete them if Control+C
+
 int
 HTTP::request_recv ( int64_t data )
 {
@@ -128,45 +130,34 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_FAILURE );
 	}
 	LOG_BUFFER( this->_buffer_recv.c_str() );
-	// Do HTTP method, compose message.
 	if ( this->parse() == EXIT_FAILURE )
-		WARN( "Something went wrong while parsing HTTP recv" );
-	
+	{
+		WARN( "Something went wrong while parsing HTTP recv" );	
+		//TODO: return failure or what ? decide...
+	}
 	this->_buffer_recv.clear();	
-	// This is HOW TO GET SERVER
-	// this->_router.getServer( this->_request.host, [host], [port] );
+	this->_server = this->_router.getServer( this->_request.host,
+			this->_address.sin_addr.s_addr, this->_address.sin_port );
 	if ( this->_request.method == nullptr )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	//TODO: location
-	// fn()
 	else
 	{
-		//revisar si es 0 o que
-		this->_status_code = 0;
-		// si autoindex es off i tenim un directori hem de donar el index.html no?
-		if (!this->_server->getFlag( F_AUTOINDEX ) && !is_regular_file( this->_request.target ))
+		if ( this->_server.getFlag( F_AUTOINDEX ) == false
+				&& is_regular_file( this->_request.target ) == false )
 		{
 			this->_status_code = check_index();
-			std::cout << " ----------------- index inside: " << this->_status_code << std::endl;
-			load_file(*this, this->_request.target);
+			load_file( *this, this->_request.target );
 		}
-			// si el autoindex esta on i tenim un directory
-		else if ( this->_server->getFlag( F_AUTOINDEX ) && !is_regular_file( this->_request.target ))
+		else if ( this->_server.getFlag( F_AUTOINDEX ) == true
+				&& is_regular_file( this->_request.target ) == false )
 		{
-			std::cout << "B" << std::endl;
 			this->_status_code = autoindex( *this );
 		}
-
-		// Do HTTP method GET/POST...
-		// Each method sets _status_code, _headers, ...
-		this->_request.method->method_func( * this );
-
-	// Generic response composition based on _status_code.
-	//HTTP::compose_response( *this );
-	//this->_request.target.clear();
-	// Finally send _buffer_send.
-	// Consider setting send() as an event.
-	//this->request_send();
+		else
+		{
+			this->_request.method->method_func( * this );
+		}
 	}
 	return ( EXIT_SUCCESS );
 }
@@ -176,7 +167,6 @@ HTTP::request_send ( void )
 {
 	DEBUG( "fd=" << this->_socket_fd
 			<< " bytes=" << this->_buffer_send.length() );
-	//LOG_BUFFER( this->_buffer_send.c_str() );
 	DEBUG( this->_socket_fd );
 	HTTP::compose_response( *this );
 	this->_request.target.clear();
@@ -245,7 +235,7 @@ HTTP::load_file( HTTP & http, std::string target )
 int 
 HTTP::check_index()
 {
-	std::vector<std::string> vec = this->_server->getIndex();
+	std::vector<std::string> vec = this->_server.getIndex();
 	for (std::vector<std::string>::const_iterator it = vec.begin(); it != vec.end(); ++it)
 	{
 		std::string tempTarget = this->_request.target; // Create a temporary target to check existence
@@ -268,7 +258,7 @@ HTTP::check_index()
 std::string
 HTTP::getCGIpass( void )
 {
-	return ( this->_server->getCGIpass() );
+	return ( this->_server.getCGIpass() );
 }
 
 void	HTTP::setMessageBody( std::string &message )
