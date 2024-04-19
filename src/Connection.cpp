@@ -63,10 +63,13 @@ Connection::Connection ( const struct sockaddr_in & address,
 
 Connection::~Connection ( void )
 {
-	//DEBUG ( this->_socket_fd );
-	//if ( this->_socket_fd != 0 && this->_good == true )
-	//	close ( this->_socket_fd );
 	return ;
+}
+
+bool
+Connection::good ( void ) const
+{
+	return ( this->_good );
 }
 
 int

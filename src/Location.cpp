@@ -7,7 +7,6 @@
 
 Location::Location ( void ): _flags( 0 ), _isDefault( false )
 {
-	DEBUG( "" );
 	return ;
 }
 
@@ -79,7 +78,6 @@ Location::setFlag ( int flag, bool enable )
 int
 Location::setCGIparam ( std::string & arg )
 {
-	DEBUG( arg );
 	// TODO: validate
 	this->_cgi_param.assign( arg );
 	return ( EXIT_SUCCESS );
@@ -88,7 +86,6 @@ Location::setCGIparam ( std::string & arg )
 int
 Location::setCGIpass ( std::string & arg )
 {
-	DEBUG( arg );
 	// TODO: validate
 	this->_cgi_pass.assign( arg );
 	return ( EXIT_SUCCESS );
@@ -97,7 +94,6 @@ Location::setCGIpass ( std::string & arg )
 int
 Location::setRoot ( std::string & arg )
 {
-	DEBUG( arg );
 	// TODO: validate
 	this->_root.assign( arg );
 	return ( EXIT_SUCCESS );
@@ -106,7 +102,6 @@ Location::setRoot ( std::string & arg )
 int
 Location::setIndex ( std::string & arg )
 {
-	DEBUG( arg );
 	// TODO: validate
 	this->_index.push_back( arg );
 	return ( EXIT_SUCCESS );
