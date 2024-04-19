@@ -57,6 +57,7 @@ get_option ( std::string & opt_name, const t_conf_opts * opts )
 	const std::size_t	opts_len = how_many_options_are_there( opts );
 	std::size_t			i;
 
+	DEBUG( opt_name );
 	i = 0;
 	while ( i < opts_len && opt_name.compare( opts[i].identifier ) != 0 )
 		++i;
@@ -198,6 +199,9 @@ Router::parse( std::string & buffer )
 			return ( EXIT_FAILURE );
 		//DEBUG( directive );
 		//DEBUG( directive_name );
+		if ( directive_name.empty() == false
+				&& check_context( directive_name, context.top(), this->_opts ) )
+			return ( EXIT_FAILURE );
 		if ( context.empty() && directive == "}" )
 		{
 			ERROR( "error: context: }" );
@@ -224,7 +228,8 @@ Router::parse( std::string & buffer )
 				location.assign( directive_value );
 				// TODO: check only one argument
 				//DEBUG( "route=" << directive_value );
-				this->_servers.back().setRoute( directive_value );
+				if ( this->_servers.back().setRoute( directive_value ) ) 
+					return ( EXIT_FAILURE );
 				//this->_servers.back().getRoute( directive_value );
 				directive_value.clear();
 			}
@@ -236,8 +241,7 @@ Router::parse( std::string & buffer )
 			context.pop();
 			continue ;
 		}
-		if ( check_context( directive_name, context.top(), this->_opts ) )
-			return ( EXIT_FAILURE );
+
 		DEBUG( "location=" << location );
 		directive_value = directive.substr( directive_name.length() );
 		if ( directive_value.empty() == false && directive_value.back() == ';' )
