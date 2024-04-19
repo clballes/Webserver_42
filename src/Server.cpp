@@ -157,9 +157,14 @@ Server::setRoute ( std::string & location )
 {
 	DEBUG( location );
 	if ( this->_routes.find( location ) == this->_routes.end() )
+	{
 		(void) this->_routes[location];
+	}
 	else
-		DEBUG( "route \"" << location << "\" already exists" );
+	{
+		ERROR( "location \"" << location << "\" already set" );
+		return ( EXIT_FAILURE );
+	}
 	return ( EXIT_SUCCESS );
 }
 
