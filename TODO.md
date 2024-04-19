@@ -9,3 +9,4 @@
 - [ ] CGI: Location: getters that match request.target
 - [ ] set DEFAULTS
 - [ ] query, params
+- [ ] server_name & server_port env del cgi

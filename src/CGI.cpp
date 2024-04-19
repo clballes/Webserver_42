@@ -8,11 +8,12 @@
 #define READ 0
 #define WRITE 1
 
-CGI::CGI ( HTTP & http ): _http( http ), _env( 0x0 ), _line("")
+CGI::CGI ( HTTP & http ): _http( http ), _env( 0x0 )
 {
 	DEBUG( "" );
 	setmap();
 	map_to_arr();
+
 	// PRINTING ENVIRONEMNT CGI
 	std::cout << "----------------- Printing char** array:" << std::endl;
     for (int i = 0; this->_env[i] != NULL; ++i) {
@@ -36,47 +37,33 @@ void CGI::setmap()
 {
 	DEBUG ("Creating the map")
 	std::map<std::string, std::string>	headers = _http.getHeaders();
-	//no ho tinc gens clar PERQUE NO LA TROBO EN EL HEADER
-	// if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
-	// 	this->_envMap["AUTH_TYPE"] = headers["Authorization"];
-	// std::cout << "********** Printing Headers:" << std::endl;
-	// std::map<std::string, std::string>::iterator iter;
-	// for (iter = headers.begin(); iter != headers.end(); ++iter) {
-	// 	std::cout << iter->first << ": " << iter->second << std::endl;
-	// }
+	if (headers.find("auth-Scheme") != headers.end() && headers["auth-Scheme"] != "")
+		this->_envMap["AUTH_TYPE"] = headers["authorization"];
 	this->_envMap["REDIRECT_STATUS"] = "200";
 	this->_envMap["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_envMap["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_envMap["SERVER_SOFTWARE"] = "Webserv/1.0";
 	this->_envMap["REQUEST_METHOD"] = _http.getRequest().method->method;
 	this->_envMap["QUERY_STRING"] = _http.getRequest().query;
-
-	//just post and put methods
-	this->_envMap["CONTENT_TYPE"] = headers["Content-Type"];
+	this->_envMap["CONTENT_TYPE"] = headers["content-Type"];
 	this->_envMap["CONTENT_LENGTH"] = std::to_string(_http.getRequest().body.length());
+	this->_envMap["REMOTE_IDENT"] = headers["authorization"];
+	this->_envMap["REMOTE_USER"] = headers["authorization"];
+	this->_envMap["SCRIPT_NAME"] = _http.getRequest().target;
+	this->_envMap["SCRIPT_FILENAME"] =  _http.getRequest().target;
+	this->_envMap["PATH_INFO"] =_http.getCGIpass();	
+	this->_envMap["PATH_TRANSLATED"] = _http.getCGIpass(); 
+	this->_envMap["REQUEST_URI"] = _http.getCGIpass() + _http.getRequest().query;
+	this->_envMap["REQUEST_URI"] = _http.getCGIpass();
+	if (headers.find("Hostname") != headers.end())
+		this->_envMap["SERVER_NAME"] = headers["hostname"];
+	else
+		this->_envMap["SERVER_NAME"] = this->_envMap["REMOTEaddr"];
+	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
 
-	// quan faig print dels headers, on estan aquests?
-	this->_envMap["REMOTE_IDENT"] = headers["Authorization"];
-	this->_envMap["REMOTE_USER"] = headers["Authorization"];
-
-	// this->_envMap["SCRIPT_NAME"] = _http.getRequest().target;
-	// this->_envMap["SCRIPT_FILENAME"] = ;
-
-	this->_envMap["PATH_INFO"] = "/Users/clballes/Desktop/web/tests/cgi_tester" ;
-	std::cout << " ---------------------- " <<  _http.getCGIpass() << std::endl;
-	std::cout << " ---------------------- " << _http.getRequest().target << std::endl;
-	
-	// this->_envMap["PATH_TRANSLATED"] = ; 
-	// this->_envMap["REQUEST_URI"] = ;
-	
-	// this->_envMap["REMOTEaddr"] = ;
-
-
-	// 	this->_envMap["SERVER_NAME"] = ;
-
-	// 	this->_env["SERVER_NAME"] = ;
-	// this->_env["SERVER_PORT"] = ;
-	
+	// fer la funcio ara esta malament aixo
+	this->_envMap["SERVER_NAME"] = std::to_string(_http.getServer()->getHost());
+	this->_envMap["SERVER_PORT"] = _http.getServer()->getPort();	
 }
 
 int CGI::register_process( pid_t pid)
@@ -154,17 +141,13 @@ CGI::dispatch ( struct kevent & ev )
 		{
 			line.append(buffer, bytesRead);
 		}
-		this->_http.setMessageBody(line);// mha denviar la string
-		LOG( "Contents of line: " << line );
+		// this->_response_cgi = line;
+		// std::cout <<  "respose is: "<< this->_response_cgi << std::endl;
+		parsing_headers( line );
 		close( _pipefd[READ] );
 		this->_http.register_send();
 	}
 	return ;
-}
-
-std::string CGI::getLine()
-{
-	return this->_line;
 }
 
 void CGI::map_to_arr()
@@ -181,4 +164,44 @@ void CGI::map_to_arr()
         ++index;
     }
     this->_env[index] = NULL;
+}
+
+void CGI::parsing_headers( std::string line)
+{
+    size_t i = 0;
+    size_t pos;
+    size_t posfinal;
+	// std::cout << << std::endl;
+    while (i < line.length())
+	{
+        pos = line.find("\r\n", i);
+		posfinal = line.find("\r\n\r\n");
+		std::cout << posfinal << std::endl;		
+        if (pos != std::string::npos) {
+            std::string str = line.substr(i, pos - i);
+            if (str.find("Content-Type:") != std::string::npos)
+			{
+				std::string value = str.substr(14, str.size());
+				this->_http.set_response_headers("content-type:", value );
+				i = pos + 2;
+            }
+            else if (str.find("Status:") != std::string::npos)
+			{
+                std::cout << "Status:" << std::atoi(str.substr(8, 4).c_str()) << std::endl;
+				this->_http.setStatusCode( std::atoi(line.substr(8, 4).c_str()) );
+				break;
+            }
+        }
+		if (posfinal != std::string::npos)
+		{
+			std::string str = line.substr(posfinal + 5, line.length());
+			std::cout << "str:" << str << std::endl;
+			this->_http.set_message_body( str );
+		}
+		else
+		{
+			std::cout << "incorrect parsing llelel" << std::endl;
+
+		} 
+}
 }

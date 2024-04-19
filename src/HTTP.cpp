@@ -270,7 +270,7 @@ HTTP::getCGIpass( void )
 	return ( this->_server->getCGIpass() );
 }
 
-void	HTTP::setMessageBody( std::string &message )
+void	HTTP::set_message_body( std::string &message )
 {
 	this->_message_body = message;
 }
@@ -283,4 +283,19 @@ t_request HTTP::getRequest( void )
 t_headers HTTP::getHeaders()
 {
 	return this->_request_headers;
+}
+Server * HTTP::getServer( void )
+{
+	return this->_server;
+}
+
+void HTTP::set_response_headers( std::string arg, std::string value )
+{
+	
+	this->_response_headers[ arg ] = value;
+}
+
+void	HTTP::setStatusCode( int value )
+{
+	this->_status_code = value;
 }
