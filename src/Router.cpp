@@ -23,6 +23,8 @@ Router::_opts[] =
 	{ 0, 0x0, 0, 0x0, 0x0 }
 };
 
+// TODO: make sure default server is configured
+// similar to default route
 Router::Router ( void ): _good( true )
 {
 	IEvent::kq = ::kqueue();
@@ -340,12 +342,29 @@ Router::good ( void ) const
 	return ( this->_good );
 }
 
+
+// TODO: make sure default server is configured
+// similar to default route
 Server &
-Router::getServer ( std::string & server_name )
+Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 {
-	// TODO: make sure default server is configured
+	std::vector< Server >::iterator it;
+	
 	DEBUG( server_name );
 	// TODO: implement server search logic host, port, server_name (header host)
+	it = this->_servers.begin();
+	while ( it != this->_servers.end() )
+	{
+		if ( it->getPort() == port && it->getHost() == host
+				&& it->hasServerName( server_name ) == true )
+			return ( *it );
+	}
+	return ( this->getDefaultServer() );
+}
+
+Server &
+Router::getDefaultServer ( void )
+{
 	return ( this->_servers[0] );
 }
 
