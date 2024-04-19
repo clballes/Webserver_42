@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include "define.hpp"
-#include "debug.hpp"
+#include "log.hpp"
 #include "IEvent.hpp"
 #include "Router.hpp"
 

@@ -18,7 +18,7 @@
 #include "IEvent.hpp"
 #include "Location.hpp"
 #include "define.hpp"
-#include "debug.hpp"
+#include "log.hpp"
 
 template <class T> struct longer : std::binary_function <T,T,bool>
 {

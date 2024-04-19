@@ -39,7 +39,7 @@
 #include "Server.hpp"
 #include "file.hpp"
 #include "string.hpp"
-#include "debug.hpp"
+#include "log.hpp"
 
 #define CONTEXT			0
 #define DIRECTIVE		1

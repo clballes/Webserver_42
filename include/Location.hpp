@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include "debug.hpp"
+#include "log.hpp"
 
 class Location
 {

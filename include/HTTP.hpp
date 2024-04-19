@@ -15,7 +15,7 @@
 #include "Server.hpp"
 #include "CGI.hpp"
 #include "define.hpp"
-#include "debug.hpp"
+#include "log.hpp"
 #include "string.hpp"
 #include "file.hpp"
 #include "HTTP_status_codes.hpp"

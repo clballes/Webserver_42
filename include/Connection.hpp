@@ -29,7 +29,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "debug.hpp"
+#include "log.hpp"
 
 class Connection
 {

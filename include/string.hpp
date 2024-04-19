@@ -6,7 +6,7 @@
 #pragma once
 
 #include <string>
-#include "debug.hpp"
+#include "log.hpp"
 
 std::string & normalize ( std::string & );
 std::string & trim_comments ( std::string &, const char * );
