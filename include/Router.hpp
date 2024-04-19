@@ -79,7 +79,7 @@ class Router: public IEvent
 		int load ( std::string );
 		void dispatch ( struct kevent & event );
 
-		Server * getServer ( std::string & server_name );
+		Server & getServer ( std::string & server_name );
 
 	private:
 	
