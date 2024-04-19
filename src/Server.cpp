@@ -53,7 +53,6 @@ Server::getRoute ( std::string & location ) const
 	{
 		if ( it->first.compare( location ) == 0 )
 		{
-			DEBUG( "ret=" << it->first );
 			return ( const_cast< Location & >( it->second ) );
 		}
 		++it;
@@ -75,7 +74,6 @@ Server::getDefaultRoute ( void ) const
 	}
 	if ( it == this->_routes.end() )
 		it = this->_routes.begin();
-	DEBUG( "ret=" << it->first );
 	return ( const_cast< Location & >( it->second ) );
 }
 
@@ -121,6 +119,22 @@ Server::getServerNames ( void ) const
 	return ( const_cast< std::vector< std::string > & >( this->_server_name ) );
 }
 
+bool
+Server::hasServerName ( std::string & name ) const
+{
+	std::vector< std::string >::const_iterator it;
+
+	it = this->_server_name.begin();
+	while ( it != this->_server_name.end() )
+	{
+		// TODO: *.example.com
+		if ( it->compare( name ) == 0 )
+			return ( true );
+		++it;
+	}
+	return ( false );
+}
+
 std::vector< std::string > &
 Server::getIndex ( std::string location ) const
 {
@@ -155,23 +169,29 @@ Server::getListen ( void ) const
 int
 Server::setRoute ( std::string & location )
 {
-	DEBUG( location );
+	DEBUG( "\"" << location << "\"" );
+	//
+	std::clog << "routes so far: ";
+	for ( t_route_map::const_iterator it = this->_routes.begin();
+			it != this->_routes.end(); ++it )
+	{
+		std::clog << it->first << " ";
+	}
+	LOG( "" );
+	//
 	if ( this->_routes.find( location ) == this->_routes.end() )
 	{
 		(void) this->_routes[location];
+		return ( EXIT_SUCCESS );
 	}
-	else
-	{
-		ERROR( "location \"" << location << "\" already set" );
-		return ( EXIT_FAILURE );
-	}
-	return ( EXIT_SUCCESS );
+	ERROR( "location \"" << location << "\" already set" );
+	return ( EXIT_FAILURE );
 }
 
 int
 Server::setFlag ( int flag, bool enable, std::string location )
 {
-	//DEBUG( flag );
+	// TODO: validate
 	return ( getRoute( location ).setFlag( flag, enable ) );
 }
 
@@ -179,7 +199,6 @@ int
 Server::setClientMaxBodySize ( std::size_t size )
 {
 	// TODO: validate
-	//DEBUG( size );
 	this->_client_max_body_size = size;
 	return ( EXIT_SUCCESS );
 }
@@ -187,14 +206,14 @@ Server::setClientMaxBodySize ( std::size_t size )
 int
 Server::setCGIparam ( std::string & arg, std::string location )
 {
-	//DEBUG( arg );
+	// TODO: validate
 	return ( this->getRoute( location ).setCGIparam( arg ) );
 }
 
 int
 Server::setCGIpass ( std::string & arg, std::string location )
 {
-	//DEBUG( arg );
+	// TODO: validate
 	return ( this->getRoute( location ).setCGIpass( arg ) );
 }
 
@@ -202,26 +221,18 @@ int
 Server::setListen ( struct sockaddr_in & address )
 {
 	std::memcpy( &this->_address, &address, sizeof( address ) );
-	#ifdef ALLOW_FORBIDDEN
-	char str[INET_ADDRSTRLEN];
-	inet_ntop( AF_INET, &this->_address.sin_addr.s_addr, str, INET_ADDRSTRLEN );
-	//DEBUG( str << ':' << std::dec << ntohs( this->_address.sin_port ) );
-	#endif
 	return ( EXIT_SUCCESS );
 }
 
 int
 Server::setRoot ( std::string & arg, std::string location )
 {
-	DEBUG( arg );
-	DEBUG( "location=" << location );
 	return ( this->getRoute( location ).setRoot( arg ) );
 }
 
 int
 Server::setServerName ( std::string & arg )
 {
-	//DEBUG( arg );
 	//TODO: check values
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
@@ -239,17 +250,17 @@ Server::setServerName ( std::string & arg )
 int
 Server::setIndex ( std::string & arg, std::string location )
 {
-	//DEBUG( arg );
 	return ( this->getRoute( location ).setIndex( arg ) );
 }
 
 int
 Server::setErrorPage ( int n, std::string & path )
 {
-	//DEBUG( "" );
-	//TODO: check values
-	if ( n < 400 || n > 555 )//perq exit failulre
-		return ( EXIT_FAILURE ); 
+	if ( n < 400 || n > 555 )
+	{
+		ERROR( "error \"" << n << "\" not contempled" );
+		return ( EXIT_FAILURE );
+	}
 	this->_error_pages[n] = path;
 	return ( EXIT_SUCCESS );
 }
@@ -257,7 +268,8 @@ Server::setErrorPage ( int n, std::string & path )
 void
 Server::log_conf ( void ) const 
 {
-	LOG( "Server" );
+	LOG( "Server 0x" << std::hex << this->getHost()
+			<< ":" << std::dec << this->getPort() );
 	LOG( "good=" << std::boolalpha << this->good() );
 	for ( std::vector< std::string >::const_iterator it = this->_server_name.begin();
 			it != this->_server_name.end(); ++it )

@@ -47,6 +47,7 @@ class Server
 		const std::string & getCGIpass ( std::string = "" ) const;
 		const std::string & getRoot ( std::string = "" ) const;
 		std::vector< std::string > & getServerNames ( void ) const;
+		bool hasServerName ( std::string & ) const;
 		std::vector< std::string > & getIndex ( std::string = "" ) const;
 		const std::string & getErrorPage ( int );
 		Location & getRoute ( std::string & ) const;
