@@ -40,6 +40,8 @@
 #include "Server.hpp"
 #include "file.hpp"
 #include "string.hpp"
+#include <cstdlib>
+#include <cstring>
 #include "log.hpp"
 
 #define CONTEXT			0

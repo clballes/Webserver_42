@@ -31,7 +31,7 @@ Router::Router ( void ): _good( true )
 	DEBUG ( IEvent::kq );
 	if ( IEvent::kq == -1 )
 	{
-		ERROR( "kqueue: " << ::strerror( errno ) );
+		ERROR( "kqueue: " << std::strerror( errno ) );
 		this->_good = false;
 	}
 	return ;
@@ -48,7 +48,7 @@ how_many_options_are_there ( const t_conf_opts * opts )
 	std::size_t n;
 
 	n = 0;
-	while ( opts != nullptr && opts[n].identifier != 0x0 )
+	while ( opts != NULL && opts[n].identifier != NULL )
 		++n;
 	return ( n );
 }
@@ -63,7 +63,7 @@ get_option ( std::string & opt_name, const t_conf_opts * opts )
 	while ( i < opts_len && opt_name.compare( opts[i].identifier ) != 0 )
 		++i;
 	if ( i == opts_len )
-		return ( nullptr );
+		return ( NULL );
 	return ( (t_conf_opts * ) &opts[i] );
 }
 
@@ -135,7 +135,7 @@ check_context ( std::string & directive_name, std::string & context,
 	std::string valid_contexts;
 
 	opt = get_option( directive_name, opts );
-	if ( opt == nullptr )
+	if ( opt == NULL )
 		return ( EXIT_FAILURE );
 	valid_contexts.assign( opt->nest );
 	if ( valid_contexts.find( context ) == std::string::npos )
@@ -167,7 +167,7 @@ Router::load ( std::string filename )
 	}
 	if ( file.good() == false && file.eof() != true )
 	{
-		ERROR( filename << ": " << strerror( errno ) );
+		ERROR( filename << ": " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
 	trim_f( buffer, &std::isspace );
@@ -292,7 +292,7 @@ Router::listen ( void )
 			return ( EXIT_FAILURE );
 		if ( n_events == -1 )
 		{
-			ERROR( "kevent: " << ::strerror( errno ) );
+			ERROR( "kevent: " << std::strerror( errno ) );
 			break ;
 		}
 		else if ( n_events == 0 )
@@ -315,7 +315,7 @@ Router::register_read_socket ( Connection & instance ) const
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void *) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
 	{
-		ERROR( "kevent: " << ::strerror( errno ) );
+		ERROR( "kevent: " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
@@ -516,7 +516,7 @@ int
 set_listen( Server & instance, std::string & arg, std::string location )
 {
 	(void) location;
-	struct sockaddr_in * address = nullptr;
+	struct sockaddr_in * address = NULL;
 	struct addrinfo hints, * result, * rp;
 	std::istringstream iss( arg );
 	std::string ip, port;
@@ -549,7 +549,7 @@ set_listen( Server & instance, std::string & arg, std::string location )
 		return ( EXIT_FAILURE );
 	}
 	rp = result;
-	while ( rp != nullptr )
+	while ( rp != NULL )
 	{
 		if ( rp->ai_family == AF_INET )
 		{
@@ -558,7 +558,7 @@ set_listen( Server & instance, std::string & arg, std::string location )
 		}
 		rp = rp->ai_next;
 	}
-	if ( address == nullptr )
+	if ( address == NULL )
 		return ( EXIT_FAILURE );
 	ecode = instance.setListen( *address );
 	freeaddrinfo( result );
