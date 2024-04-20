@@ -8,6 +8,7 @@
 #include "log.hpp"
 #include "IEvent.hpp"
 #include "Router.hpp"
+#include <cstdlib>
 
 int
 IEvent::kq = 0;
