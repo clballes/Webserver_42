@@ -10,7 +10,7 @@ Server::Server ( void ): _good( true )
 	//DEBUG ( "" );
 	this->_error_pages[400] = "src/err_pages/400.html";
 	this->_error_pages[403] = "src/err_pages/403.html";
-	this->_error_pages[404] = "src/err_pages/404html";
+	this->_error_pages[404] = "src/err_pages/404.html";
 	this->_error_pages[405] = "src/err_pages/405.html";
 	this->_error_pages[410] = "src/err_pages/410.html";
 	this->_error_pages[413] = "src/err_pages/413.html";
