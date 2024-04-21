@@ -17,30 +17,6 @@ HTTP::methods[] = {
 	{ 0, 0, 0 }
 };
 
-static int get_method_longest_len ( t_http_method * );
-
-int
-HTTP::n_methods = ( sizeof( HTTP::methods ) /
-		sizeof( *HTTP::methods ) ) - 1;
-
-std::size_t
-HTTP::n_longest_method = get_method_longest_len( &HTTP::methods[0] );
-
-static int
-get_method_longest_len ( t_http_method * ptr )
-{
-	size_t n;
-
-	n = 0;
-	while ( ptr->method != NULL )
-	{
-		if ( strlen( ptr->method ) > n )
-			n = strlen( ptr->method );
-		++ptr;
-	}
-	return ( n );
-}
-
 HTTP::HTTP ( Router & router_instance, int fd ):
 	_socket_fd( 0 ),
 	_router( router_instance ),

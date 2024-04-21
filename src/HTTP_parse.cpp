@@ -111,25 +111,29 @@ HTTP::parse_start_line( std::string & line )
 	return ( EXIT_SUCCESS );
 }
 
+static size_t how_many_methods( t_http_method * ptr );
+static size_t get_method_longest_len ( t_http_method * ptr );
+
 int
 parse_method( t_request & request, std::string & line )
 {
 	std::string::size_type  pos;
 	std::string             value;
-	int                     iterator;
+	size_t                  iterator;
 
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
 	value = line.substr( 0, pos );
-	if ( value.length() > HTTP::n_longest_method )
+	if ( value.length() > get_method_longest_len( &HTTP::methods[0] ) )
 		return ( NOT_IMPLEMENTED );
-	for ( iterator = 0; iterator < HTTP::n_methods; ++iterator )
+	for ( iterator = 0; iterator < how_many_methods( &HTTP::methods[0] );
+			++iterator )
 	{
 		if ( value.compare( HTTP::methods[iterator].method ) == 0 )
 			break ;
 	}
-	if ( iterator == HTTP::n_methods )
+	if ( iterator == how_many_methods( &HTTP::methods[0] ) )
 		return ( NOT_IMPLEMENTED );
 	request.method = &HTTP::methods[iterator];
 	return ( EXIT_SUCCESS );
@@ -211,3 +215,32 @@ parse_query( std::string & target )
  * This translates to: the fragment is not send to the server.
  *
  */
+
+static size_t
+how_many_methods( t_http_method * ptr )
+{
+	size_t n;
+
+	n = 0;
+	while ( ptr != 0x0 && ptr->method != 0x0 )
+	{
+		++n;
+		++ptr;
+	}
+	return ( n );
+}
+
+static size_t
+get_method_longest_len ( t_http_method * ptr )
+{
+	size_t n;
+
+	n = 0;
+	while ( ptr->method != NULL )
+	{
+		if ( strlen( ptr->method ) > n )
+			n = strlen( ptr->method );
+		++ptr;
+	}
+	return ( n );
+}

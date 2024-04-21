@@ -68,15 +68,13 @@ class HTTP: public IEvent
 		int put_file( void );
 		int check_index();
 
-		static int n_methods;
-		static std::size_t n_longest_method;
 		static t_http_method methods[];
 
 		t_request getRequest( void );
 		t_headers getHeaders( void );
 		std::string getCGIpass( void );
-		void	set_message_body( std::string& );
-		void	setStatusCode( int );
+		void set_message_body( std::string & );
+		void setStatusCode( int );
 		void set_response_headers( std::string arg, std::string value );
 
 	private:
@@ -88,14 +86,14 @@ class HTTP: public IEvent
 		Server &                _server;
 		CGI *cgi_ptr;			//LIBERAR MEMORIA
 
-		t_headers _request_headers;
-		t_headers _response_headers;
-		std::string _buffer_recv;
-		std::string _buffer_send;
-		std::string _message_body;
-		t_request _request;
-		int _status_code;
-		bool _keep_alive; //?
+		t_headers				_request_headers;
+		t_headers				_response_headers;
+		std::string				_buffer_recv;
+		std::string				_buffer_send;
+		std::string				_message_body;
+		t_request				_request;
+		int						_status_code;
+		bool					_keep_alive; //?
 
 		int parse ( void );
 		int parse_start_line ( std::string & );
