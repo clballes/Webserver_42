@@ -16,7 +16,6 @@ HTTP::parse ( void )
 	while ( pos != std::string::npos )
 	{
 		line = this->_buffer_recv.substr( start, pos - start );
-		LOG_BUFFER( line.c_str() );
 		if ( start == 0 )
 		{
 			if ( parse_start_line( line ) == EXIT_FAILURE )
@@ -39,7 +38,7 @@ HTTP::parse ( void )
 		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
 	}
 	// TODO: method != GET/HEAD
-	// TODO: if ( this->_request_headers["content-length"].empty() == false )
+	// TODO: byte control from "content-length"
 	// TODO: chunked request
 	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
 		this->_request.body = this->_buffer_recv.substr( pos );
@@ -194,6 +193,7 @@ HTTP::parse_field_line ( std::string & line )
 	len = line.length();
 	pos = line.find_first_of( ":" );
 	field_name = line.substr( 0, pos );
+	(void) strtolower( field_name );
 	++pos;
 	if ( pos != len )
 	{
