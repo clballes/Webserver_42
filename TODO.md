@@ -1,12 +1,8 @@
 - [ ] proper log system
 - [ ] timeout
-- [ ] send connection: close header
-- [ ] Tests: request headers
-- [ ] Clear unused / properly reorder included headers!
+- [ ] tests
 - [ ] proper decorde_url / encode_url
-- [ ] proper parse
 - [ ] Methods: CGI a part, get,post,etc...
 - [ ] CGI: Location: getters that match request.target
 - [ ] set DEFAULTS
 - [ ] query, params
-- [ ] el isregularfile
