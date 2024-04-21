@@ -146,7 +146,7 @@ HTTP::perform ( void )
 			load_file( *this, this->_request.target );
 		this->register_send();
 	}
-	else if ( this->_server.getFlag( F_AUTOINDEX ) == true
+	else if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == true
 			&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
 	{
 		this->_status_code = autoindex( *this ); //em torna 200 o 404
@@ -165,7 +165,6 @@ HTTP::request_send ( void )
 	DEBUG( "fd=" << this->_socket_fd
 			<< " bytes=" << this->_buffer_send.length() );
 	HTTP::compose_response( *this );
-	this->_request.target.clear();
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
@@ -234,16 +233,18 @@ HTTP::load_file( HTTP & http, std::string target )
 }
 
 int 
-HTTP::check_index()
+HTTP::check_index ( void )
 {
-	std::vector<std::string> vec = this->_server.getIndex();
-	for (std::vector<std::string>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+	std::vector< std::string > & vec = this->_server.getIndex();
+
+	for ( std::vector< std::string >::const_iterator it = vec.begin();
+			it != vec.end(); ++it )
 	{
 		std::string tempTarget = this->_request.target;
-		tempTarget.append(*it);
-		if (routeExists(tempTarget))
+		tempTarget.append( *it );
+		if ( routeExists( tempTarget ) )
 		{
-			this->_request.target.append(*it);
+			this->_request.target.append( *it );
 			std::cout << "route exists" << this->_request.target << std::endl;
 			return ( OK );
 		}
@@ -255,36 +256,42 @@ HTTP::check_index()
 	return ( FORBIDDEN );
 }
 
-// Getters
-std::string
-HTTP::getCGIpass( void )
+std::string &
+HTTP::getCGIpass ( void )
 {
-	return ( this->_server.getCGIpass() );
+	return ( const_cast < std::string & >
+			( this->_server.getCGIpass( this->_request.target ) ) );
 }
 
-void	HTTP::set_message_body( std::string &message )
+void
+HTTP::set_message_body ( std::string & message )
 {
 	this->_message_body = message;
+	return ;
 }
 
-t_request HTTP::getRequest( void )
+t_request &
+HTTP::getRequest ( void )
 {
-	return this->_request;
+	return ( this->_request );
 }
 
-t_headers HTTP::getHeaders()
+t_headers &
+HTTP::getHeaders ( void )
 {
-	return this->_request_headers;
+	return ( this->_request_headers );
 }
 
 void HTTP::set_response_headers( std::string arg, std::string value )
 {
 	this->_response_headers[ arg ] = value;
 	std::cout << "set: " << arg << value << std::endl;
+	return ;
 }
 
 void	HTTP::setStatusCode( int value )
 {
 	this->_status_code = value;
 	std::cout << "set sttaus code: " << this->_status_code << std::endl;
+	return ;
 }

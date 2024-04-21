@@ -8,7 +8,7 @@ int
 HTTP::http_head ( HTTP & http )
 {
 	DEBUG( "" );
-	if (http._server.getCGIpass().length() != 0 )
+	if ( http._server.getCGIpass( http._request.target ).length() != 0 )
 	{}
 	else
 	{}
@@ -41,7 +41,7 @@ HTTP::http_post ( HTTP & http )
 		LOG( http._server.getErrorPage(500) );
 		(void) HTTP::load_file( http, http._server.getErrorPage(500) );
 	}
-	if ( http._server.getCGIpass().length() != 0 )
+	if ( http._server.getCGIpass( http._request.target ).length() != 0 )
 	{
 		CGI *cgi_ptr = new CGI( http );
 		if ( cgi_ptr->execute() == EXIT_FAILURE )
