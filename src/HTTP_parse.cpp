@@ -21,62 +21,27 @@ HTTP::parse ( void )
 			if ( parse_start_line( line ) == EXIT_FAILURE )
 				return ( EXIT_FAILURE );
 		}
-		else if ( std::isgraph( line.at( 0 ) ) != 0 )
+		else if ( line.empty() == true
+				|| ( line.length() == 1 && line[0] == '\r' ) )
+		{
+			++pos;
+			break ;
+		}
+		else if ( std::isgraph( line[0] ) != 0 )
 		{
 			if ( parse_field_line( line ) == EXIT_FAILURE )
 				return ( EXIT_FAILURE );
 		}
 		else if ( ( pos - start ) != 1 )
 			return ( EXIT_FAILURE );
-
 		start = pos + 1;
 		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
 	}
-	if (strcmp(this->_request.method->method, "GET") != 0)
-	{
-		//adding request body for POST petitions
-		int delimiter = this->_buffer_recv.find( "\r\n\r\n" );
-		int len  = this->_buffer_recv.length();
-
-		// OTHER PETITIONS EXCEPT POST
-		if (delimiter + 5 == len )
-		{
-			return (EXIT_SUCCESS);
-		}
-		else
-		{
-			this->_request.body = this->_buffer_recv.substr(delimiter + 4);
-		}
-		return ( EXIT_SUCCESS );
-	}
-
-	return ( EXIT_SUCCESS );
-
-}
-
-/* No whitespace is allowed between the field name and colon.
- * A server MUST reject, with a response status code of 400 (Bad Request),
- * any received request message that contains whitespace between
- * a header field name and colon.
- */
-
-int
-HTTP::parse_field_line ( std::string & line )
-{
-	std::string field_name, field_value;
-	std::string::size_type pos, len;
-
-	len = line.length();
-	pos = line.find_first_of( ":" );
-	field_name = line.substr( 0, pos );
-	++pos;
-	if ( pos != len )
-	{
-		field_value = line.substr( pos, len - pos );
-		trim_f( field_value, &std::isspace );
-	}
-	this->_request_headers.insert( this->_request_headers.end(),
-			std::pair< std::string, std::string> ( field_name, field_value ) );
+	// TODO: method != GET/HEAD
+	// TODO: byte control from "content-length"
+	// TODO: chunked request
+	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
+		this->_request.body = this->_buffer_recv.substr( pos );
 	return ( EXIT_SUCCESS );
 }
 
@@ -213,6 +178,33 @@ parse_query( std::string & target )
  * This translates to: the fragment is not send to the server.
  *
  */
+
+/* No whitespace is allowed between the field name and colon.
+ * A server MUST reject, with a response status code of 400 (Bad Request),
+ * any received request message that contains whitespace between
+ * a header field name and colon.
+ */
+
+int
+HTTP::parse_field_line ( std::string & line )
+{
+	std::string field_name, field_value;
+	std::string::size_type pos, len;
+
+	len = line.length();
+	pos = line.find_first_of( ":" );
+	field_name = line.substr( 0, pos );
+	(void) strtolower( field_name );
+	++pos;
+	if ( pos != len )
+	{
+		field_value = line.substr( pos, len - pos );
+		trim_f( field_value, &std::isspace );
+	}
+	this->_request_headers.insert( this->_request_headers.end(),
+			std::pair< std::string, std::string> ( field_name, field_value ) );
+	return ( EXIT_SUCCESS );
+}
 
 static size_t
 how_many_methods( t_http_method * ptr )

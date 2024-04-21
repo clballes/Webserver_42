@@ -17,6 +17,7 @@
 #include "IEvent.hpp"
 #include "Router.hpp"
 #include "Server.hpp"
+#include "Connection.hpp"
 #include "CGI.hpp"
 #include "define.hpp"
 #include "log.hpp"
@@ -28,6 +29,9 @@ typedef std::map< std::string, std::string > t_headers;
 
 class HTTP;
 class CGI;
+class Router;
+class Server;
+class Connection;
 
 typedef struct s_http_method
 {
@@ -45,10 +49,8 @@ typedef struct s_request
 	std::string query;
 	std::string body;
 	int http_version;
-} t_request;
 
-class Router;
-class Server;
+} t_request;
 
 class HTTP: public IEvent
 {
@@ -83,6 +85,7 @@ class HTTP: public IEvent
 		unsigned				_address_len;
 		struct sockaddr_in		_address;
 		Router &				_router;
+		Connection &			_connection;
 		Server &                _server;
 		CGI *cgi_ptr;			//LIBERAR MEMORIA
 

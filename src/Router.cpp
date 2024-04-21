@@ -347,6 +347,20 @@ Router::good ( void ) const
 	return ( this->_good );
 }
 
+Connection &
+Router::getConnection ( int fd )
+{
+	std::vector< Connection >::const_iterator it;
+
+	it = this->_connections.begin();
+	while ( it != this->_connections.end() )
+	{
+		if ( it->getSocketFD() == fd )
+			return ( const_cast< Connection & >( *it ) );
+		++it;
+	}
+	return ( this->_connections[0] );
+}
 
 // TODO: make sure default server is configured
 // similar to default route
@@ -355,13 +369,12 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 {
 	std::vector< Server >::iterator it;
 	
-	DEBUG( server_name );
-	// TODO: implement server search logic host, port, server_name (header host)
+	DEBUG( "\"" << server_name << "\"" );
 	it = this->_servers.begin();
 	while ( it != this->_servers.end() )
 	{
-		if ( it->getPort() == port && it->getHost() == host
-				&& it->hasServerName( server_name ) == true )
+		if ( it->hasServerName( server_name ) == true
+				&& port == it->getPort() && host == it->getHost() )
 			return ( *it );
 		it++;
 	}
@@ -371,6 +384,7 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 Server &
 Router::getDefaultServer ( void )
 {
+	DEBUG( "default" );
 	return ( this->_servers[0] );
 }
 
