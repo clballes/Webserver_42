@@ -67,7 +67,6 @@ Location::isDefault ( void ) const
 int
 Location::setFlag ( int flag, bool enable )
 {
-	// TODO: validate
 	if ( enable == true )
 		this->_flags |= flag;
 	return ( EXIT_SUCCESS );

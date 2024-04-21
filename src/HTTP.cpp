@@ -116,7 +116,7 @@ HTTP::request_recv ( int64_t data )
 		WARN( "Something went wrong while parsing HTTP recv" );
 		return ( EXIT_FAILURE );
 	}
-	this->_buffer_recv.clear();
+	// this->_buffer_recv.clear();
 	
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
@@ -137,24 +137,32 @@ void HTTP::perform()
 {
 	if (can_access_file( this->_request.target ) == false)
 	{
+		std::cout << "A0" << std::endl;
+
 		this->_status_code = 404;
 	}
-	if ( this->_server.getFlag( F_AUTOINDEX ) == false
+	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target  ) == false
 			&& is_regular_file( this->_request.target ) == false )
 	{
+		std::cout << "A" << std::endl;
 		this->_status_code = check_index();
+		std::cout << this->_status_code << std::endl;
 		if (this->_status_code == 200)
 			load_file( *this, this->_request.target );
 		this->register_send();
 	}
-	else if ( this->_server.getFlag( F_AUTOINDEX ) == true
+	else if ( this->_server.getFlag( F_AUTOINDEX , this->_request.target ) == true
 			&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
 	{
+		std::cout << "A1" << std::endl;
+
 		this->_status_code = autoindex( *this ); //em torna 200 o 404
 		this->register_send();
 	}
 	else
 	{
+		std::cout << "A3" << std::endl;
+
 		this->_request.method->method_func( * this );
 	}
 }
@@ -240,9 +248,14 @@ HTTP::check_index()
 	for (std::vector<std::string>::const_iterator it = vec.begin(); it != vec.end(); ++it)
 	{
 		std::string tempTarget = this->_request.target;
+		std::cout << "temp:" << tempTarget << std::endl;
+		tempTarget.append("/");
 		tempTarget.append(*it);
+		std::cout << "temp2:" << tempTarget << std::endl;
+
 		if (routeExists(tempTarget))
 		{
+			this->_request.target.append("/");
 			this->_request.target.append(*it);
 			std::cout << "route exists" << this->_request.target << std::endl;
 			return ( OK );
