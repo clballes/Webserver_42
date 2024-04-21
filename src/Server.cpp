@@ -7,7 +7,7 @@
 
 Server::Server ( void ): _good( true )
 {
-	DEBUG ( "" );
+	//DEBUG ( "" );
 	this->_error_pages[400] = "src/err_pages/400.html";
 	this->_error_pages[403] = "src/err_pages/403.html";
 	this->_error_pages[404] = "src/err_pages/404html";
@@ -47,7 +47,7 @@ Server::getRoute ( std::string & location ) const
 {
 	t_route_map::const_iterator it;
 
-	DEBUG( "\"" << location << "\"" );
+	//DEBUG( "\"" << location << "\"" );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -269,8 +269,8 @@ void
 Server::log_conf ( void ) const 
 {
 	LOG( "Server 0x" << std::hex << this->getHost()
-			<< ":" << std::dec << this->getPort() );
-	LOG( "good=" << std::boolalpha << this->good() );
+			<< ":" << std::dec << this->getPort()
+			<< ", good=" << std::boolalpha << this->good() );
 	for ( std::vector< std::string >::const_iterator it = this->_server_name.begin();
 			it != this->_server_name.end(); ++it )
 		LOG( "server_name=" << *it );

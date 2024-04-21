@@ -73,9 +73,9 @@ HTTP::dispatch ( struct kevent & ev )
 {
 	DEBUG ( "ev=" << ev.ident );
 	if ( ev.filter == EVFILT_READ )
-		this->request_recv( ev.data );
+		(void) this->request_recv( ev.data );
 	else if ( ev.filter == EVFILT_WRITE )
-		this->request_send();
+		(void) this->request_send();
 	return ;
 }
 
@@ -119,12 +119,18 @@ HTTP::request_recv ( int64_t data )
 	ssize_t n;
 
 	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );
-	this->_buffer_recv.resize( data + 1 );
+	if ( (ssize_t) this->_buffer_recv.capacity() <= data )
+		this->_buffer_recv.resize( data + 1 );
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 	if ( n == 0 )
 	{
 		INFO( "Client closed connection (fd=" << this->_socket_fd << ")" );
 		delete this;
+		return ( EXIT_SUCCESS );
+	}
+	else if ( n == -1 )
+	{
+		WARN( "fd=" << this->_socket_fd << ": " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
 	LOG_BUFFER( this->_buffer_recv.c_str() );
@@ -173,7 +179,6 @@ HTTP::request_send ( void )
 {
 	DEBUG( "fd=" << this->_socket_fd
 			<< " bytes=" << this->_buffer_send.length() );
-	DEBUG( this->_socket_fd );
 	HTTP::compose_response( *this );
 	this->_request.target.clear();
 	::send( this->_socket_fd,
