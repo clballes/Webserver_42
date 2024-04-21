@@ -240,7 +240,8 @@ Server::setServerName ( std::string & arg )
 		return ( EXIT_FAILURE );
 	for ( std::string::size_type i = 0; i < arg.length(); i++ )
 	{
-		if ( ! isalnum( arg[i] ) && arg[i] != '-' && arg[i] != '.' )
+		if ( ! isalnum( arg[i] ) && arg[i] != '-'
+				&& arg[i] != '.' && arg[i] != ':' )
           	return ( EXIT_FAILURE );
 	}
     this->_server_name.push_back( arg );
