@@ -301,3 +301,8 @@ void	HTTP::setStatusCode( int value )
 	this->_status_code = value;
 	std::cout << "set sttaus code: " << this->_status_code << std::endl;
 }
+
+Server & HTTP::getServer()
+{
+	return this->_server;
+}

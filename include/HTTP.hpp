@@ -73,6 +73,7 @@ class HTTP: public IEvent
 		static t_http_method methods[];
 
 		t_request getRequest( void );
+		Server & getServer();
 		t_headers getHeaders( void );
 		std::string getCGIpass( void );
 		void set_message_body( std::string & );
