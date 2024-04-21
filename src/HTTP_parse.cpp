@@ -90,7 +90,6 @@ HTTP::parse_field_line ( std::string & line )
 
 static int parse_method ( t_request &, std::string & );
 static int parse_target ( t_request &, std::string & );
-static void parse_queries ( t_request &);
 static int parse_http_version ( t_request &, std::string & );
 
 int
@@ -99,15 +98,11 @@ HTTP::parse_start_line( std::string & line )
 	this->_status_code = parse_method( this->_request, line );
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
-	else
-		line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
+	line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
 	this->_status_code = parse_target( this->_request, line );
-	// parse if querys in url
-	parse_queries( this->_request );
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
-	else
-		line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
+	line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
 	this->_status_code = parse_http_version( this->_request, line );
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
@@ -140,43 +135,23 @@ parse_method( t_request & request, std::string & line )
 	return ( EXIT_SUCCESS );
 }
 
-void
-parse_queries( t_request & request )
-{
-	std::size_t pos = request.target.find('?');
-    if (pos != std::string::npos)
-	{
-        // Extract the query string starting from '?', nose si necessita començar x ?
-        request.query = request.target.substr(pos);
-		std::cout << "REQUEST QUERY: " << request.query  << std::endl;
-		// if queries exist, limit them in the target, target should be without the queries
-		request.target = request.target.substr(0, pos);
-	}
-}
+static std::string parse_query ( std::string & );
 
 int
 parse_target( t_request & request, std::string & line )
 {
-	std::string::size_type  pos;
+	std::string::size_type	pos;
+	std::string				value;
 
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
-
-	std::cout << "url decoded is " << request.target << std::endl;
-	std::string p_string = line.substr( 0, pos );
-	if ( p_string.length() < request.target.length() )
-		return ( FORBIDDEN );
-	else if ( line.compare( 0, request.target.length() - 1, request.target ) )
-		request.target.append( line.substr( request.target.length(),
-					pos - request.target.length() ) );
-	else
-	{
-		request.target.append( line.substr( 0, pos ));
-	}
-	
+	value = line.substr( 0, pos );
+	request.query = parse_query( value );
+	if ( request.query.length() > 0 )
+		value.erase( value.length() - request.query.length() );
+	request.target = value;
 	urldecode( request.target );
-	LOG( " AFTER PARSING TARGET; request.target: \"" << request.target << "\"" );
 	return ( EXIT_SUCCESS );
 }
 
@@ -195,3 +170,44 @@ parse_http_version ( t_request & request, std::string & line )
 	request.http_version = HTTP_11;
 	return ( EXIT_SUCCESS );
 }
+
+/* From RFC3986 section 3.4
+ * https://www.rfc-editor.org/rfc/rfc3986#section-3.4
+ *
+ * The query component is indicated by the first question
+ * mark ("?") character and terminated by a number sign ("#") character
+ * or by the end of the URI.
+ * */
+
+std::string
+parse_query( std::string & target )
+{
+	std::string value;
+	std::string::size_type pos, end;
+
+	pos = target.find( '?' );
+	if ( pos != std::string::npos )
+	{
+		end = target.find( '#' );
+		if ( end == std::string::npos )
+			end = target.length();
+		value = target.substr( pos, end - pos );
+	}
+	return ( value );
+}
+
+/* From RFC3986 section 3.5
+ * https://www.rfc-editor.org/rfc/rfc3986#section-3.5
+ *
+ * A fragment identifier component is indicated by the presence of a
+ * number sign ("#") character and terminated by the end of the URI.
+ * [...]
+ * the fragment identifier is not used in the scheme-specific
+ * processing of a URI; instead, the fragment identifier is separated
+ * from the rest of the URI prior to a dereference, and thus the
+ * identifying information within the fragment itself is dereferenced
+ * solely by the user agent, regardless of the URI scheme.
+ *
+ * This translates to: the fragment is not send to the server.
+ *
+ */

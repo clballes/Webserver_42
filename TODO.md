@@ -6,5 +6,6 @@
 - [ ] CGI: Location: getters that match request.target
 - [ ] set DEFAULTS
 - [ ] server_name & server_port env del cgi
-- [ ] query, fragments #,  target que quedi net
+- [ ] el isregularfile com gestionem aixo
+- [ ] no em funciona el getFLAG
 - [ ] CGI SERVER NAME
