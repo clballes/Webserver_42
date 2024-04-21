@@ -5,6 +5,9 @@
 
 #include "Router.hpp"
 
+int
+IEvent::kq = 0;
+
 t_conf_opts
 Router::_opts[] =
 {
