@@ -28,6 +28,8 @@ typedef std::map< std::string, std::string > t_headers;
 
 class HTTP;
 class CGI;
+class Router;
+class Server;
 
 typedef struct s_http_method
 {
@@ -45,10 +47,8 @@ typedef struct s_request
 	std::string query;
 	std::string body;
 	int http_version;
-} t_request;
 
-class Router;
-class Server;
+} t_request;
 
 class HTTP: public IEvent
 {
