@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdlib>		/* EXIT_SUCCESS, EXIT_FAILURE */
 #include "log.hpp"
 
 class Location

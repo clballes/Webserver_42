@@ -90,7 +90,7 @@ int CGI::register_process( pid_t pid)
     // Register the event with kqueue
     if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
 	{
-		ERROR( PROGRAM_NAME << ": kevent: " << ::strerror( errno ) );
+		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
     return ( EXIT_SUCCESS );
@@ -106,7 +106,7 @@ CGI::execute ( void )
     fdopen = open( this->_http.getRequest().target.c_str(), O_RDONLY );
     if ( fdopen == -1 )
 	{
-        ERROR( this->_http.getRequest().target << " " << ::strerror( errno ) );
+        ERROR( this->_http.getRequest().target << " " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
     }
     if ( pipe( _pipefd ) == -1 )
@@ -117,7 +117,7 @@ CGI::execute ( void )
     pid = fork();
 	if ( pid == -1 )
     {
-        ERROR( "fork: " << ::strerror( errno ) );
+        ERROR( "fork: " << std::strerror( errno ) );
 		// TODO: should not exit
 		return ( EXIT_FAILURE );
     }
@@ -128,7 +128,7 @@ CGI::execute ( void )
         dup2( fdopen, STDIN_FILENO );
 		close( _pipefd[WRITE] );
         execve( _http.getCGIpass().c_str(), NULL, this->_env );
-		ERROR( "exec: " << ::strerror( errno ) );
+		ERROR( "exec: " << std::strerror( errno ) );
         exit( EXIT_FAILURE );
 		// TODO: timeout
     }

@@ -4,6 +4,8 @@
 /* Wed Apr 10 14:49:21 2024                                                   */
 
 #include "file.hpp"
+#include <unistd.h>
+#include <sys/stat.h>
 
 bool
 is_regular_file( const std::string & filename )
@@ -15,6 +17,7 @@ is_regular_file( const std::string & filename )
     return ( S_ISREG( file_info.st_mode ) );
 }
 
-bool routeExists(const std::string& route) {
-    return access(route.c_str(), 0) == 0;
+bool routeExists( const std::string & route )
+{
+    return ( access( route.c_str(), 0 ) == 0 );
 }

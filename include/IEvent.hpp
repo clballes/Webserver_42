@@ -6,8 +6,9 @@
 #ifndef _IEVENT_HPP_
 #define _IEVENT_HPP_
 
-#include <sys/event.h>		/* kqueue, ... */
-#include <sys/time.h>		/* kqueue */
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
 
 class IEvent
 {

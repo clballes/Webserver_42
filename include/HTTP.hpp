@@ -10,6 +10,10 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <unistd.h> 		/* close */
+#include <cstdlib>
+#include <cstring>
+
 #include "IEvent.hpp"
 #include "Router.hpp"
 #include "Server.hpp"

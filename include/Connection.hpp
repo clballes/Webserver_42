@@ -6,7 +6,7 @@
 #ifndef _CONNECTION_HPP_
 #define _CONNECTION_HPP_
 
-#include <netinet/in.h>
+#include <netinet/in.h>		/* struct sockaddr_in */
 #include <sys/socket.h>		/* socket,
 							   accept,
 							   listen,
@@ -25,9 +25,10 @@
 							   getaddrinfo,
 							   freeaddrinfo,
 							   read */
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <arpa/inet.h>		/* ntohs, ntohl, htons, htonl */
+#include <fcntl.h>			/* fcntl */
+#include <cstdlib>			/* EXIT_SUCCESS, EXIT_FAILURE */
+#include <cstring>			/* std::strerror */
 
 #include "log.hpp"
 

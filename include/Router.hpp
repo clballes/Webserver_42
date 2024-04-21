@@ -5,6 +5,7 @@
 
 #ifndef _ROUTER_HPP_
 #define _ROUTER_HPP_
+
 #include <sys/socket.h>		/* socket,
 							   accept,
 							   listen,
@@ -32,16 +33,15 @@
 #include <sys/time.h>		/* kqueue */
 #include <vector>
 #include <string>
-#include <stack>
+#include <sstream>
+#include <cstdlib>			/* EXIT_SUCCESS, EXIT_FAILURE */
+#include <cstring>			/* std::strerror */
 
-#include "IEvent.hpp"
 #include "Connection.hpp"
 #include "HTTP.hpp"
 #include "Server.hpp"
 #include "file.hpp"
 #include "string.hpp"
-#include <cstdlib>
-#include <cstring>
 #include "log.hpp"
 
 #define CONTEXT			0

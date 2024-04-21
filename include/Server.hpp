@@ -6,16 +6,12 @@
 #ifndef _SERVER_HPP_
 #define _SERVER_HPP_
 
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <netinet/in.h>		/* struct sockaddr_in */
+#include <arpa/inet.h>		/* ntohs, ntohl */
 #include <string>
-#include <sstream>
 #include <vector>
 #include <map>
 
-#include "IEvent.hpp"
 #include "Location.hpp"
 #include "define.hpp"
 #include "log.hpp"

@@ -26,7 +26,7 @@ Connection::Connection ( const struct sockaddr_in & address,
 	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
 				F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1 )
 	{
-		ERROR( "socket: " << ::strerror( errno ) );
+		ERROR( "socket: " << std::strerror( errno ) );
 		this->_good = false;
 		return ;
 	}
@@ -37,7 +37,7 @@ Connection::Connection ( const struct sockaddr_in & address,
 			|| setsockopt( this->_socket_fd, SOL_SOCKET, SO_REUSEPORT,
 				&enable, sizeof( enable ) ) == -1 )
 	{
-		ERROR( "socket: " << ::strerror( errno ) );
+		ERROR( "socket: " << std::strerror( errno ) );
 		this->_good = false;
 		return ;
 	}
@@ -46,14 +46,14 @@ Connection::Connection ( const struct sockaddr_in & address,
 	if ( ::bind( this->_socket_fd, (struct sockaddr *) &this->_address,
 				sizeof( this->_address ) ) == -1 )
 	{
-		ERROR( "bind: " << ::strerror( errno )
+		ERROR( "bind: " << std::strerror( errno )
 				<< " (fd=" << this->_socket_fd << ")" );
 		this->_good = false;
 		return ;
 	}
 	if ( ::listen( this->_socket_fd, 0x0 ) == -1 )
 	{
-		ERROR( "listen: " << ::strerror( errno )
+		ERROR( "listen: " << std::strerror( errno )
 				<< " (fd=" << this->_socket_fd << ")" );
 		this->_good = false;
 		return ;

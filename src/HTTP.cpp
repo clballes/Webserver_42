@@ -91,7 +91,7 @@ HTTP::register_recv ( void )
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
 	{
-		ERROR( PROGRAM_NAME << ": kevent: " << ::strerror( errno ) );
+		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
@@ -107,7 +107,7 @@ HTTP::register_send ( void )
 			EV_ADD | EV_ENABLE | EV_CLEAR | EV_ONESHOT, 0, 0, (void *) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
 	{
-		ERROR( PROGRAM_NAME << " :kevent: " << ::strerror( errno ) );
+		ERROR( PROGRAM_NAME << " :kevent: " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
@@ -138,7 +138,7 @@ HTTP::request_recv ( int64_t data )
 	this->_buffer_recv.clear();	
 	this->_server = this->_router.getServer( this->_request.host,
 			this->_address.sin_addr.s_addr, this->_address.sin_port );
-	if ( this->_request.method == nullptr )
+	if ( this->_request.method == 0x0 )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	//TODO: location
 	else
@@ -234,7 +234,7 @@ HTTP::load_file( HTTP & http, std::string target )
 	}
 	if ( file.good() == false )
 	{
-		WARN( target << ": " << ::strerror( errno ) );
+		WARN( target << ": " << std::strerror( errno ) );
 		return ( FORBIDDEN );
 	}
 	return ( OK );

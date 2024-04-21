@@ -10,6 +10,9 @@
 #include "IEvent.hpp"
 #include "HTTP.hpp"
 #include <map>
+#include <cstdlib>
+#include <cstring>
+
 // #include "Log.hpp"
 
 class HTTP;

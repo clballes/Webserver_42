@@ -6,8 +6,6 @@
 #pragma once
 
 #include <string>
-#include <sys/stat.h>
-#include <unistd.h>
 
-bool is_regular_file( const std::string & filename );
-bool routeExists(const std::string& route);
+bool is_regular_file ( const std::string & filename );
+bool routeExists ( const std::string & route );
