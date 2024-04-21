@@ -72,8 +72,6 @@ void
 HTTP::dispatch ( struct kevent & ev )
 {
 	DEBUG ( "ev=" << ev.ident );
-	if ( ev.flags & EVFILT_READ )
-	DEBUG( ev.ident );
 	if ( ev.filter == EVFILT_READ )
 		this->request_recv( ev.data );
 	else if ( ev.filter == EVFILT_WRITE )
@@ -189,6 +187,7 @@ HTTP::request_send ( void )
 int
 HTTP::compose_response ( HTTP & http )
 {
+	//mirar aqui els errors
 	DEBUG( http._status_code );
 	DEBUG( http._socket_fd );
 	// status-line
@@ -269,7 +268,7 @@ HTTP::getCGIpass( void )
 	return ( this->_server.getCGIpass() );
 }
 
-void	HTTP::setMessageBody( std::string &message )
+void	HTTP::set_message_body( std::string &message )
 {
 	this->_message_body = message;
 }
@@ -282,4 +281,15 @@ t_request HTTP::getRequest( void )
 t_headers HTTP::getHeaders()
 {
 	return this->_request_headers;
+}
+
+void HTTP::set_response_headers( std::string arg, std::string value )
+{
+	
+	this->_response_headers[ arg ] = value;
+}
+
+void	HTTP::setStatusCode( int value )
+{
+	this->_status_code = value;
 }

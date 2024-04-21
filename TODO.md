@@ -5,4 +5,6 @@
 - [ ] Methods: CGI a part, get,post,etc...
 - [ ] CGI: Location: getters that match request.target
 - [ ] set DEFAULTS
-- [ ] query, params
+- [ ] server_name & server_port env del cgi
+- [ ] query, fragments #,  target que quedi net
+- [ ] CGI SERVER NAME

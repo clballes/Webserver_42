@@ -26,9 +26,8 @@ class CGI : public IEvent
 
 		void dispatch ( struct kevent & ev );
 		int register_process( pid_t pid );
-		int request_send ( void );
 		int execute ( void );
-		std::string getLine();
+		void parsing_headers (std::string line);
 		void map_to_arr();
 		void setmap();
 
@@ -38,7 +37,6 @@ class CGI : public IEvent
 		char ** _env;
 		std::map <std::string, std::string> _envMap;
 		int _pipefd[2];
-		std::string _line;
 };
 
 #endif /* CGI.hpp */

@@ -36,20 +36,20 @@ HTTP::http_get ( HTTP & http )
 	DEBUG( "status code: " << http._status_code );
 	if ( !http._server.getCGIpass( http._request.target ).empty() )
 	{
-	 	std::cout << " --------------------- CGI PASS ---------------------- " << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
+	 	std::cout << " --------------------- CGI PASS  " << std::endl; //els errors apges no estan initialitzats en el default ni en el normal
 		http.cgi_ptr = new CGI( http );
 		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	else if (http._status_code == 200)
 	{
-	 	std::cout << " --------------------- 200 CODE ---------------------- " << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
+	 	std::cout << " --------------------- 200 CODE ---------------------- " << std::endl; //els errors apges no estan initialitzats en el default ni en el normal
 		// load_file(http, http._request.target);
 		http.register_send();
 	}
 	else
 	{
-	 	std::cout << " --------------------- 403 ERR CODE ---------------------- " << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
+	 	std::cout << " --------------------- 403 ERR CODE ---------------------- " << std::endl; //els errors apges no estan initialitzats en el default ni en el normal
 	 // si tenim errors load error 403 del index html
 	 	std::cout << http._server.getErrorPage( http._status_code ) << std::endl; //elss errors apges no estan initialitzats en el default ni en el normal
 		HTTP::load_file( http, "/Users/clara/Desktop/web_server_2/www/403.html" );
