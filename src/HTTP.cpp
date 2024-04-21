@@ -23,7 +23,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_server( router_instance.getDefaultServer() )
 {
 	this->cgi_ptr = NULL;
-	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
+	//std::memset( &this->_request, 0x0, sizeof( this->_request ) );
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
@@ -112,12 +112,17 @@ HTTP::request_recv ( int64_t data )
 	LOG_BUFFER( this->_buffer_recv.c_str() );
 	if ( this->parse() == EXIT_FAILURE )
 	{
-		WARN( "Something went wrong while parsing HTTP recv" );	
-		//TODO: return failure or what ? decide...
+		WARN( "Something went wrong while parsing HTTP recv" );
+		return ( EXIT_FAILURE );
 	}
-	this->_buffer_recv.clear();	
+	this->_buffer_recv.clear();
+	
+	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
+		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
-			this->_address.sin_addr.s_addr, this->_address.sin_port );
+			ntohl( this->_address.sin_addr.s_addr ),
+			ntohs( this->_address.sin_port ) );	
+	
 	if ( this->_request.method == 0x0 )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	//TODO: location

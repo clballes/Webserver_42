@@ -355,14 +355,25 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 {
 	std::vector< Server >::iterator it;
 	
-	DEBUG( server_name );
-	// TODO: implement server search logic host, port, server_name (header host)
+	DEBUG( "\"" << server_name << "\"" );
 	it = this->_servers.begin();
 	while ( it != this->_servers.end() )
 	{
-		if ( it->getPort() == port && it->getHost() == host
-				&& it->hasServerName( server_name ) == true )
+		if ( it->hasServerName( server_name ) == true )
+		{
+			LOG( "checking=" << server_name );
+			LOG( "checking=" << port << " vs=" << it->getPort() );
+			LOG( "checking=" << host << " vs=" << it->getHost() );
+			DEBUG( "found" );
 			return ( *it );
+		}
+		// TODO: incomming host port
+		// if ( it->hasServerName( server_name ) == true
+		// && it->getPort() == port && it->getHost() == host )
+		//{
+		//	DEBUG( "found" );
+		//	return ( *it );
+		//}
 		it++;
 	}
 	return ( this->getDefaultServer() );
@@ -371,6 +382,7 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 Server &
 Router::getDefaultServer ( void )
 {
+	DEBUG( "default" );
 	return ( this->_servers[0] );
 }
 
