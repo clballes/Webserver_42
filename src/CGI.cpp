@@ -118,7 +118,11 @@ CGI::execute ( void )
 		close( _pipefd[WRITE] );
 		// std::cout <<"cgi es:" << _http.getCGIpass().c_str() << std::endl;
         // execve( _http.getCGIpass().c_str(), NULL, this->_env );
-        execve( "/Users/clballes/Desktop/web/tests/cgi2_script.py", NULL, this->_env );
+		if (strncmp(_http.methods->method, "POST", 5) == 0)
+        	execve( "/Users/clballes/Desktop/web/tests/cgi_post.py", NULL, this->_env );
+		else if (strncmp(_http.methods->method, "GET", 5) == 0)
+        	execve( "/Users/clballes/Desktop/web/cgi-bin/cgi2_script.py", NULL, this->_env );
+
 		ERROR( "exec en el cgi: " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
 		// TODO: timeout
