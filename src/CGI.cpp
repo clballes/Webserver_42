@@ -169,46 +169,46 @@ void CGI::map_to_arr()
 
 void CGI::parsing_headers( std::string line )
 {
-    size_t i = 0;
-    size_t pos;
+	std::map <std::string, std::string> mapHeaders;
     size_t pos_final = line.find("\n\n");
 
     // Separate headers and body
     std::string headers, body;
     if (pos_final != std::string::npos) {
         headers = line.substr(0, pos_final);
-		std::cout << "pos" << pos_final << "Headers: " << headers << std::endl;
-
         body = line.substr(pos_final + 2);
 		this->_http.set_message_body ( body );
-        headers = line; // No body found
+    }
+	else
+		headers = line;
+
+	std::transform(headers.begin(), headers.end(), headers.begin(), ::tolower);
+	headers = normalize(headers);
+	size_t i = 0;
+    while (i < headers.length()) {
+        size_t pos = headers.find(":", i);
+        if (pos != std::string::npos) {
+            std::string str = headers.substr(i, pos - i);
+            size_t pos_sp = headers.find(" ", pos + 2);
+            std::string str2;
+            if (pos_sp != std::string::npos) {
+                str2 = headers.substr(pos + 2, pos_sp - pos - 2);
+            } else {
+                str2 = headers.substr(pos + 2);
+            }
+            mapHeaders[str] = str2;
+            i = pos_sp != std::string::npos ? pos_sp + 1 : pos + 1;
+        } else {
+            break;
+        }
     }
 
-    // Parsing headers
-	while (i < headers.length()) {
-		pos = headers.find("\n", i);
-		if (pos != std::string::npos) {
-			std::string str = headers.substr(i, pos - i);
-			std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-			if (str.find("content-type:") != std::string::npos) {
-				std::string value = str.substr(14);
-				this->_http.set_response_headers("content-type", value);
-			} else if (str.find("status:") != std::string::npos) {
-				int status_code = std::atoi(str.substr(8, 4).c_str());
-				this->_http.setStatusCode(status_code);
-				break;
-			}
-			i = pos + 1;
-		}  
-		else {
-			// Process the last header if it's the "Status" header
-			std::string str = headers.substr(i);
-			std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-			if (str.find("status:") != std::string::npos) {
-				int status_code = std::atoi(str.substr(7).c_str()); // Adjusted to skip "Status: "
-				this->_http.setStatusCode(status_code);
-			}
-			break; // Exit the loop since there are no more headers
-		}
-	}
+	for (std::map<std::string, std::string>::iterator it = mapHeaders.begin(); it != mapHeaders.end(); ++it)
+	{
+		if (it->first == "content-type")
+			this->_http.set_response_headers ( it->first , it->second);
+		if (it->first == "status")
+			this->_http.setStatusCode ( std::atoi(it->second.c_str()) );
+    }
+
 }

@@ -5,8 +5,8 @@ import os
 
 def handle_get_request():
     # Set content type to text/html
-    print("Content-Type: text/html")
-    print("Status: 200\n")
+    print("Content-Type: text/html        ")
+    print("Status:                   200\n")
     with open('/Users/clballes/Desktop/web/www/index.html', 'r') as file:
         content = file.read()
     print(content)
