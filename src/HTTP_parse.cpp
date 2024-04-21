@@ -68,16 +68,13 @@ HTTP::parse_field_line ( std::string & line )
 
 	len = line.length();
 	pos = line.find_first_of( ":" );
-	// TODO
-	//if ( pos == std::string::npos
-	//		|| line.find( " ", 0, pos ) != std::string::npos )
-	//	return ( EXIT_FAILURE );
 	field_name = line.substr( 0, pos );
 	++pos;
-	if ( pos == len )
-		return ( EXIT_FAILURE );
-	field_value = line.substr( pos, len - pos );
-	trim_f( field_value, &std::isspace );
+	if ( pos != len )
+	{
+		field_value = line.substr( pos, len - pos );
+		trim_f( field_value, &std::isspace );
+	}
 	this->_request_headers.insert( this->_request_headers.end(),
 			std::pair< std::string, std::string> ( field_name, field_value ) );
 	return ( EXIT_SUCCESS );
