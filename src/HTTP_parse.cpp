@@ -92,10 +92,12 @@ static int parse_method ( t_request &, std::string & );
 static int parse_target ( t_request &, std::string & );
 static void parse_queries ( t_request &);
 static int parse_http_version ( t_request &, std::string & );
+static void parse_fragments (t_request & request );
 
 int
 HTTP::parse_start_line( std::string & line )
 {
+	std::cout << "line is: "<<line<< std::endl;
 	this->_status_code = parse_method( this->_request, line );
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
@@ -103,7 +105,9 @@ HTTP::parse_start_line( std::string & line )
 		line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
 	this->_status_code = parse_target( this->_request, line );
 	// parse if querys in url
+	parse_fragments( this->_request );
 	parse_queries( this->_request );
+
 	if ( this->_status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	else
@@ -123,6 +127,7 @@ parse_method( t_request & request, std::string & line )
 	std::string             value;
 	int                     iterator;
 
+
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
@@ -138,6 +143,20 @@ parse_method( t_request & request, std::string & line )
 		return ( NOT_IMPLEMENTED );
 	request.method = &HTTP::methods[iterator];
 	return ( EXIT_SUCCESS );
+}
+
+void
+parse_fragments(  t_request & request )
+{
+	std::size_t pos = request.target.find('#');
+    if (pos != std::string::npos)
+	{
+        // Extract the query string starting from '?', nose si necessita començar x ?
+        request.fragments = request.target.substr(pos);
+		std::cout << "REQUEST frag: " << request.fragments  << std::endl;
+		// if queries exist, limit them in the target, target should be without the queries
+		request.target = request.target.substr(0, pos);
+	}
 }
 
 void
@@ -158,6 +177,8 @@ int
 parse_target( t_request & request, std::string & line )
 {
 	std::string::size_type  pos;
+
+	LOG( "begininig - TARGET; request.target: \"" << request.target << line << "\"" );
 
 	pos = line.find_first_of( SP, 0 );
 	if ( pos == std::string::npos )

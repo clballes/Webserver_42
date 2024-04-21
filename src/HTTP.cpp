@@ -141,31 +141,41 @@ HTTP::request_recv ( int64_t data )
 	//TODO: location
 	else
 	{
-		
-		// fe run open x si existeix sino return 404 o access millor
-		std::cout << "AAAAAAAAA" << std::endl;
+		perform();
+	}
+	return ( EXIT_SUCCESS );
+}
+
+void HTTP::perform()
+{
+	if (can_access_file( this->_request.target ) == false)
+	{
+		std::cout << " ---------------- hello ----------------- " << std::endl;
+		this->_status_code = 404;
+	}
+	else
+	{
+		std::cout << " ---------------- AAAAAAAA ----------------- " << this->_server.getFlag( F_AUTOINDEX ) << std::endl;
 		if ( this->_server.getFlag( F_AUTOINDEX ) == false
 				&& is_regular_file( this->_request.target ) == false )
 		{
-			std::cout << "AAAAAAAAA1" << std::endl;
+			std::cout << "entres aqui¿?" << std::endl;
 			this->_status_code = check_index();
-			load_file( *this, this->_request.target );
-			//register_sedn
+			if (this->_status_code == 200)
+				load_file( *this, this->_request.target );
+			this->register_send();
 		}
 		else if ( this->_server.getFlag( F_AUTOINDEX ) == true
-				&& is_regular_file( this->_request.target ) == false )
+				&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
 		{
-			std::cout << "AAAAAAAAA2" << std::endl;
-			this->_status_code = autoindex( *this );
-			//register_send
+			this->_status_code = autoindex( *this ); //em torna 200 o 404
+			this->register_send();
 		}
 		else
 		{
-			std::cout << "AAAAAAAAA3" << std::endl;
 			this->_request.method->method_func( * this );
 		}
 	}
-	return ( EXIT_SUCCESS );
 }
 
 int
@@ -188,8 +198,15 @@ int
 HTTP::compose_response ( HTTP & http )
 {
 	//mirar aqui els errors
+	if (http._status_code > 300 && http._status_code < 500)
+	{
+		load_file( http, http._server.getErrorPage(http._status_code) );
+	}
 	DEBUG( http._status_code );
 	DEBUG( http._socket_fd );
+	DEBUG( http._status_code );
+	DEBUG( " !!!!!!!! ENTRO EN EL COMPOSE!!!!!!!!" );
+
 	// status-line
 	http._buffer_send.append( "HTTP/1.1 " );
 	// TODO replace to_string()
@@ -245,7 +262,7 @@ HTTP::check_index()
 	std::vector<std::string> vec = this->_server.getIndex();
 	for (std::vector<std::string>::const_iterator it = vec.begin(); it != vec.end(); ++it)
 	{
-		std::string tempTarget = this->_request.target; // Create a temporary target to check existence
+		std::string tempTarget = this->_request.target;
 		tempTarget.append(*it);
 		if (routeExists(tempTarget))
 		{
@@ -255,7 +272,7 @@ HTTP::check_index()
 		}
 		else
 		{
-			tempTarget.clear(); // Clear the temporary target if route does not exist
+			tempTarget.clear();
 		}
 	}
 	return ( FORBIDDEN );
@@ -285,7 +302,6 @@ t_headers HTTP::getHeaders()
 
 void HTTP::set_response_headers( std::string arg, std::string value )
 {
-	
 	this->_response_headers[ arg ] = value;
 }
 

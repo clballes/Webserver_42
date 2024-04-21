@@ -9,11 +9,14 @@
 - [ ] set DEFAULTS
 - [ ] server_name & server_port env del cgi
 
-
 ## MARTI
-## CLARA
-- [ ] query, fragments #,  target que quedi net
-- [] FUK METHODS
-- [ ] el isregularfile
-- [ ] CGI SERVER NAME
 
+## CLARA
+
+- [ ] fragments # no els gestiona el server, per tant no cla ferho
+      target que quedi net
+- [] FUK METHODS
+- [ ] el isregularfile com gestionem aixo
+- [ ] no em funciona el getFLAG
+
+- [ ] CGI SERVER NAME

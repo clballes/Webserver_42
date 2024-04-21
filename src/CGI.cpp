@@ -15,10 +15,11 @@ CGI::CGI ( HTTP & http ): _http( http ), _env( 0x0 )
 	map_to_arr();
 
 	// PRINTING ENVIRONEMNT CGI
-	std::cout << "----------------- Printing char** array:" << std::endl;
+	std::cout << " ----------------------------------------- " << std::endl;
     for (int i = 0; this->_env[i] != NULL; ++i) {
         std::cout << this->_env[i] << std::endl;
     }
+	std::cout << " ----------------------------------------- " << std::endl;
 	return ;
 }
 
@@ -89,6 +90,7 @@ CGI::execute ( void )
 	int   fdopen;
 	pid_t pid;
 
+	DEBUG( this->_http.getRequest().target.c_str() << " and "<< _http.getCGIpass().c_str())
 	DEBUG( "" );
     fdopen = open( this->_http.getRequest().target.c_str(), O_RDONLY );
     if ( fdopen == -1 )
@@ -114,8 +116,10 @@ CGI::execute ( void )
 		dup2( _pipefd[WRITE], STDOUT_FILENO );
         dup2( fdopen, STDIN_FILENO );
 		close( _pipefd[WRITE] );
-        execve( _http.getCGIpass().c_str(), NULL, this->_env );
-		ERROR( "exec: " << ::strerror( errno ) );
+		// std::cout <<"cgi es:" << _http.getCGIpass().c_str() << std::endl;
+        // execve( _http.getCGIpass().c_str(), NULL, this->_env );
+        execve( "/Users/clara/Desktop/web_server_2/tests/cgi2_script.py", NULL, this->_env );
+		ERROR( "exec en el cgi: " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
 		// TODO: timeout
     }
@@ -133,16 +137,13 @@ CGI::dispatch ( struct kevent & ev )
 	DEBUG( ev.ident );
 	if (ev.filter == EVFILT_PROC )
 	{
-		char buffer[1024]; // Buffer to read into
+		char buffer[1024];
 		std::string line;
-		// Read from the pipe until there's no more data
 		ssize_t bytesRead;
 		while ( (bytesRead = read( _pipefd[READ], buffer, sizeof( buffer ) ) ) > 0 )
 		{
 			line.append(buffer, bytesRead);
 		}
-		// this->_response_cgi = line;
-		// std::cout <<  "respose is: "<< this->_response_cgi << std::endl;
 		parsing_headers( line );
 		close( _pipefd[READ] );
 		this->_http.register_send();
@@ -170,38 +171,29 @@ void CGI::parsing_headers( std::string line)
 {
     size_t i = 0;
     size_t pos;
-    size_t posfinal;
-	// std::cout << << std::endl;
+    // size_t posfinal;
     while (i < line.length())
 	{
         pos = line.find("\r\n", i);
-		posfinal = line.find("\r\n\r\n");
-		std::cout << posfinal << std::endl;		
-        if (pos != std::string::npos) {
-            std::string str = line.substr(i, pos - i);
-            if (str.find("Content-Type:") != std::string::npos)
-			{
-				std::string value = str.substr(14, str.size());
-				this->_http.set_response_headers("content-type:", value );
-				i = pos + 2;
-            }
-            else if (str.find("Status:") != std::string::npos)
-			{
-                std::cout << "Status:" << std::atoi(str.substr(8, 4).c_str()) << std::endl;
-				this->_http.setStatusCode( std::atoi(line.substr(8, 4).c_str()) );
-				break;
-            }
-        }
-		if (posfinal != std::string::npos)
+		// posfinal = line.find("\r\n\r\n");
+		if (pos != std::string::npos)
 		{
-			std::string str = line.substr(posfinal + 5, line.length());
-			std::cout << "str:" << str << std::endl;
-			this->_http.set_message_body( str );
-		}
-		else
-		{
-			std::cout << "incorrect parsing llelel" << std::endl;
+			std::string str = line.substr(i, pos - i);
+				std::cout << "str is: "<< str <<std::endl;
+			std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
-		} 
-}
+			if (str.find("content-type:") != std::string::npos) {
+				std::cout << "Content-Type header found: " << str <<std::endl;
+				std::string value = str.substr(14, str.size());
+				// this->_http.set_response_headers("content-type", value);
+				std::cout << "value: "<< value << std::endl;
+				i = pos + 2;
+			} else if (str.find("status:") != std::string::npos) {
+				std::cout << "Status header found" << std::endl;
+				int status_code = std::atoi(str.substr(pos + 1).c_str());
+				this->_http.setStatusCode(status_code);
+				break;
+			}
+		}
+	}
 }

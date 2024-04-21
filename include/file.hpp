@@ -11,3 +11,4 @@
 
 bool is_regular_file( const std::string & filename );
 bool routeExists(const std::string& route);
+bool can_access_file(const std::string &filename);
