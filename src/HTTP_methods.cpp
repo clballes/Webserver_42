@@ -36,22 +36,12 @@ int
 HTTP::http_post ( HTTP & http )
 {
 	DEBUG( "" );
-	if ( http._status_code == INTERNAL_SERVER_ERROR )
+	if ( http._server.getCGIpass( http._request.target ).empty() )
 	{
-		LOG( http._server.getErrorPage(500) );
-		(void) HTTP::load_file( http, http._server.getErrorPage(500) );
-	}
-	if ( http._server.getCGIpass( http._request.target ).length() != 0 )
-	{
-		CGI *cgi_ptr = new CGI( http );
-		if ( cgi_ptr->execute() == EXIT_FAILURE )
+		std::cout << "Entrering cgi¿?" << std::endl;
+		http.cgi_ptr = new CGI( http );
+		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
-		http._status_code = 200;
-	}
-	else
-	{
-		http._status_code = 204;
-		http._message_body.clear();
 	}
 	return ( EXIT_SUCCESS );
 }

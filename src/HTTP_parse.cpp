@@ -159,6 +159,7 @@ parse_query( std::string & target )
 			end = target.length();
 		value = target.substr( pos, end - pos );
 	}
+	std::cout << "query:" << value << std::endl;
 	return ( value );
 }
 

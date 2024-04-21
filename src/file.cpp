@@ -19,7 +19,7 @@ is_regular_file( const std::string & filename )
 
 bool can_access_file ( const std::string & filename )
 {
-    if ( filename.back() == '/' )
+    if ( !filename.empty() && filename.back() == '/' )
 	{
         return ( true );
     }

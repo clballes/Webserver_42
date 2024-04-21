@@ -136,12 +136,16 @@ HTTP::perform ( void )
 	DEBUG( this->_request.target );
 	if ( can_access_file( this->_request.target ) == false )
 	{
+		std::cout << "A0" << std::endl;
+
 		this->_status_code = 404;
 	}
 	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == false
 			&& is_regular_file( this->_request.target ) == false )
 	{
+		std::cout << "A" << std::endl;
 		this->_status_code = check_index();
+		std::cout << this->_status_code << std::endl;
 		if (this->_status_code == 200)
 			load_file( *this, this->_request.target );
 		this->register_send();
@@ -241,10 +245,15 @@ HTTP::check_index ( void )
 			it != vec.end(); ++it )
 	{
 		std::string tempTarget = this->_request.target;
-		tempTarget.append( *it );
-		if ( routeExists( tempTarget ) )
+		std::cout << "temp:" << tempTarget << std::endl;
+		tempTarget.append("/");
+		tempTarget.append(*it);
+		std::cout << "temp2:" << tempTarget << std::endl;
+
+		if (routeExists(tempTarget))
 		{
-			this->_request.target.append( *it );
+			this->_request.target.append("/");
+			this->_request.target.append(*it);
 			std::cout << "route exists" << this->_request.target << std::endl;
 			return ( OK );
 		}
@@ -282,16 +291,24 @@ HTTP::getHeaders ( void )
 	return ( this->_request_headers );
 }
 
-void HTTP::set_response_headers( std::string arg, std::string value )
+void
+HTTP::set_response_headers ( std::string arg, std::string value )
 {
 	this->_response_headers[ arg ] = value;
 	std::cout << "set: " << arg << value << std::endl;
 	return ;
 }
 
-void	HTTP::setStatusCode( int value )
+void
+HTTP::setStatusCode ( int value )
 {
 	this->_status_code = value;
 	std::cout << "set sttaus code: " << this->_status_code << std::endl;
 	return ;
+}
+
+Server &
+HTTP::getServer ( void )
+{
+	return ( this->_server );
 }
