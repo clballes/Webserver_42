@@ -24,7 +24,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_server( router_instance.getDefaultServer() )
 {
 	this->cgi_ptr = NULL;
-	//std::memset( &this->_request, 0x0, sizeof( this->_request ) );
+	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
@@ -116,7 +116,6 @@ HTTP::request_recv ( int64_t data )
 		WARN( "Something went wrong while parsing HTTP recv" );
 		return ( EXIT_FAILURE );
 	}
-	this->_buffer_recv.clear();
 	
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
@@ -125,21 +124,21 @@ HTTP::request_recv ( int64_t data )
 	
 	if ( this->_request.method == 0x0 )
 		this->_status_code = INTERNAL_SERVER_ERROR;
-	//TODO: location
 	else
-	{
-		perform();
-	}
+		this->perform();
 	return ( EXIT_SUCCESS );
 }
 
-void HTTP::perform()
+void
+HTTP::perform ( void )
 {
-	if (can_access_file( this->_request.target ) == false)
+	// TODO: proper reorder
+	DEBUG( this->_request.target );
+	if ( can_access_file( this->_request.target ) == false )
 	{
 		this->_status_code = 404;
 	}
-	if ( this->_server.getFlag( F_AUTOINDEX ) == false
+	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == false
 			&& is_regular_file( this->_request.target ) == false )
 	{
 		this->_status_code = check_index();
@@ -157,6 +156,7 @@ void HTTP::perform()
 	{
 		this->_request.method->method_func( * this );
 	}
+	return ;
 }
 
 int
