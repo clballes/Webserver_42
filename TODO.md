@@ -2,10 +2,9 @@
 - [ ] timeout
 - [ ] tests
 - [ ] proper decorde_url / encode_url
-- [ ] Methods: CGI a part, get,post,etc...
+- [ ] Methods: CGI a part, get, post, etc...
 - [ ] CGI: Location: getters that match request.target
 - [ ] set DEFAULTS
 - [ ] server_name & server_port env del cgi
 - [ ] el isregularfile com gestionem aixo
-- [ ] no em funciona el getFLAG
 - [ ] CGI SERVER NAME
