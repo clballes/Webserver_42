@@ -150,31 +150,25 @@ void HTTP::perform()
 {
 	if (can_access_file( this->_request.target ) == false)
 	{
-		std::cout << " ---------------- hello ----------------- " << std::endl;
 		this->_status_code = 404;
+	}
+	if ( this->_server.getFlag( F_AUTOINDEX ) == false
+			&& is_regular_file( this->_request.target ) == false )
+	{
+		this->_status_code = check_index();
+		if (this->_status_code == 200)
+			load_file( *this, this->_request.target );
+		this->register_send();
+	}
+	else if ( this->_server.getFlag( F_AUTOINDEX ) == true
+			&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
+	{
+		this->_status_code = autoindex( *this ); //em torna 200 o 404
+		this->register_send();
 	}
 	else
 	{
-		std::cout << " ---------------- AAAAAAAA ----------------- " << this->_server.getFlag( F_AUTOINDEX ) << std::endl;
-		if ( this->_server.getFlag( F_AUTOINDEX ) == false
-				&& is_regular_file( this->_request.target ) == false )
-		{
-			std::cout << "entres aqui¿?" << std::endl;
-			this->_status_code = check_index();
-			if (this->_status_code == 200)
-				load_file( *this, this->_request.target );
-			this->register_send();
-		}
-		else if ( this->_server.getFlag( F_AUTOINDEX ) == true
-				&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
-		{
-			this->_status_code = autoindex( *this ); //em torna 200 o 404
-			this->register_send();
-		}
-		else
-		{
-			this->_request.method->method_func( * this );
-		}
+		this->_request.method->method_func( * this );
 	}
 }
 
@@ -204,9 +198,6 @@ HTTP::compose_response ( HTTP & http )
 	}
 	DEBUG( http._status_code );
 	DEBUG( http._socket_fd );
-	DEBUG( http._status_code );
-	DEBUG( " !!!!!!!! ENTRO EN EL COMPOSE!!!!!!!!" );
-
 	// status-line
 	http._buffer_send.append( "HTTP/1.1 " );
 	// TODO replace to_string()
@@ -303,9 +294,11 @@ t_headers HTTP::getHeaders()
 void HTTP::set_response_headers( std::string arg, std::string value )
 {
 	this->_response_headers[ arg ] = value;
+	std::cout << "set: " << arg << value << std::endl;
 }
 
 void	HTTP::setStatusCode( int value )
 {
 	this->_status_code = value;
+	std::cout << "set sttaus code: " << this->_status_code << std::endl;
 }

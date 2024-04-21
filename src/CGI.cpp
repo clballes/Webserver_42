@@ -118,7 +118,7 @@ CGI::execute ( void )
 		close( _pipefd[WRITE] );
 		// std::cout <<"cgi es:" << _http.getCGIpass().c_str() << std::endl;
         // execve( _http.getCGIpass().c_str(), NULL, this->_env );
-        execve( "/Users/clara/Desktop/web_server_2/tests/cgi2_script.py", NULL, this->_env );
+        execve( "/Users/clballes/Desktop/web/tests/cgi2_script.py", NULL, this->_env );
 		ERROR( "exec en el cgi: " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
 		// TODO: timeout
@@ -167,33 +167,48 @@ void CGI::map_to_arr()
     this->_env[index] = NULL;
 }
 
-void CGI::parsing_headers( std::string line)
+void CGI::parsing_headers( std::string line )
 {
     size_t i = 0;
     size_t pos;
-    // size_t posfinal;
-    while (i < line.length())
-	{
-        pos = line.find("\r\n", i);
-		// posfinal = line.find("\r\n\r\n");
-		if (pos != std::string::npos)
-		{
-			std::string str = line.substr(i, pos - i);
-				std::cout << "str is: "<< str <<std::endl;
-			std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    size_t pos_final = line.find("\n\n");
 
+    // Separate headers and body
+    std::string headers, body;
+    if (pos_final != std::string::npos) {
+        headers = line.substr(0, pos_final);
+		std::cout << "pos" << pos_final << "Headers: " << headers << std::endl;
+
+        body = line.substr(pos_final + 2);
+		this->_http.set_message_body ( body );
+        headers = line; // No body found
+    }
+
+    // Parsing headers
+	while (i < headers.length()) {
+		pos = headers.find("\n", i);
+		if (pos != std::string::npos) {
+			std::string str = headers.substr(i, pos - i);
+			std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 			if (str.find("content-type:") != std::string::npos) {
-				std::cout << "Content-Type header found: " << str <<std::endl;
-				std::string value = str.substr(14, str.size());
-				// this->_http.set_response_headers("content-type", value);
-				std::cout << "value: "<< value << std::endl;
-				i = pos + 2;
+				std::string value = str.substr(14);
+				this->_http.set_response_headers("content-type", value);
 			} else if (str.find("status:") != std::string::npos) {
-				std::cout << "Status header found" << std::endl;
-				int status_code = std::atoi(str.substr(pos + 1).c_str());
+				int status_code = std::atoi(str.substr(8, 4).c_str());
 				this->_http.setStatusCode(status_code);
 				break;
 			}
+			i = pos + 1;
+		}  
+		else {
+			// Process the last header if it's the "Status" header
+			std::string str = headers.substr(i);
+			std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+			if (str.find("status:") != std::string::npos) {
+				int status_code = std::atoi(str.substr(7).c_str()); // Adjusted to skip "Status: "
+				this->_http.setStatusCode(status_code);
+			}
+			break; // Exit the loop since there are no more headers
 		}
 	}
 }
