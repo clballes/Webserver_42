@@ -20,6 +20,7 @@ HTTP::methods[] = {
 HTTP::HTTP ( Router & router_instance, int fd ):
 	_socket_fd( 0 ),
 	_router( router_instance ),
+	_connection( router_instance.getConnection( fd ) ),
 	_server( router_instance.getDefaultServer() )
 {
 	this->cgi_ptr = NULL;
@@ -120,8 +121,7 @@ HTTP::request_recv ( int64_t data )
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
-			ntohl( this->_address.sin_addr.s_addr ),
-			ntohs( this->_address.sin_port ) );	
+			this->_connection.getHost(), this->_connection.getPort() );
 	
 	if ( this->_request.method == 0x0 )
 		this->_status_code = INTERNAL_SERVER_ERROR;
