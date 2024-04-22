@@ -53,6 +53,7 @@ Server::getRoute ( std::string & location ) const
 		if ( it->first.compare( location ) == 0 )
 		{
 			DEBUG( "found" );
+			it->second.log_conf();
 			return ( const_cast< Location & >( it->second ) );
 		}
 		++it;
@@ -75,6 +76,21 @@ Server::getDefaultRoute ( void ) const
 	if ( it == this->_routes.end() )
 		it = this->_routes.begin();
 	return ( const_cast< Location & >( it->second ) );
+}
+
+std::string &
+Server::getRouteString ( std::string & location ) const
+{
+	t_route_map::const_iterator it;
+
+	it = this->_routes.begin();
+	while ( it != this->_routes.end() )
+	{
+		if ( it->first.compare( location ) == 0 )
+			return ( const_cast< std::string & >( it->first ) );
+		++it;
+	}
+	return ( const_cast< std::string & >( this->_routes.begin()->first ) );
 }
 
 bool

@@ -48,6 +48,8 @@ class Server
 		const std::string & getErrorPage ( int );
 		Location & getRoute ( std::string & ) const;
 		Location & getDefaultRoute ( void ) const;
+		std::string & getRouteString ( std::string & ) const;
+
 		const struct sockaddr_in & getListen ( void ) const;
 		in_addr_t getHost ( void ) const;
 		in_port_t getPort ( void ) const;
