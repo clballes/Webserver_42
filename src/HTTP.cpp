@@ -126,8 +126,16 @@ HTTP::request_recv ( int64_t data )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	else
 	{
+		// append location root change if it fits location the target
+		this->_request.target_autoindex = this->_request.target;
 		std::string line = this->_server.getRouteString( this->_request.target );
 		std::cout << " --------------------------- line is:" << line << std::endl;
+		if (!line.empty())
+		{
+			std::string root_location = this->_server.getRoot( line );
+			this->_request.target.replace( 0 , line.length(), root_location );
+			std::cout << " --------------------------- server is:" << this->_request.target << std::endl;
+		}
 		perform();
 	}
 	return ( EXIT_SUCCESS );
