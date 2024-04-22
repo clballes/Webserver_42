@@ -103,3 +103,32 @@ Location::setIndex ( std::string & arg )
 	this->_index.push_back( arg );
 	return ( EXIT_SUCCESS );
 }
+
+int
+Location::setUploadFiles ( std::string & arg )
+{
+	// TODO: validate
+	this->_upload_files = arg;
+	return ( EXIT_SUCCESS );
+}
+
+int
+Location::setRedirection ( std::string & arg )
+{
+	// TODO: validate
+	this->_redirection = arg;
+	return ( EXIT_SUCCESS );
+}
+
+void
+Location::log_conf ( void ) const
+{
+	std::clog << "\033[0;34m";
+	LOG( "root=" << this->getRoot() );
+	LOG( "isDefault=" << this->isDefault() );
+	LOG( "flags=" << std::hex << this->getFlags() << std::dec );
+	LOG( "cgi_pass=" << this->getCGIpass() );
+	LOG( "cgi_param=" << this->getCGIparam() );
+	std::clog << "\033[0m";
+	return ;
+}

@@ -48,6 +48,8 @@ class Server
 		const std::string & getErrorPage ( int );
 		Location & getRoute ( std::string & ) const;
 		Location & getDefaultRoute ( void ) const;
+		std::string & getRouteString ( std::string & ) const;
+
 		const struct sockaddr_in & getListen ( void ) const;
 		in_addr_t getHost ( void ) const;
 		in_port_t getPort ( void ) const;
@@ -62,6 +64,8 @@ class Server
 		int setIndex ( std::string &, std::string = "" );
 		int setErrorPage ( int, std::string & );
 		int setRoute ( std::string & );
+		int setUploadFiles ( std::string &, std::string = "" );
+		int setRedirection ( std::string &, std::string = "" );
 
 		typedef std::map< std::string,
 				Location, longer< std::string > > t_route_map;

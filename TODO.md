@@ -1,11 +1,17 @@
 - [ ] proper log system
 - [ ] timeout
 - [ ] tests
-- [ ] proper decorde_url / encode_url
-- [ ] Methods: CGI a part, get,post,etc...
-- [ ] CGI: Location: getters that match request.target
-- [ ] set DEFAULTS
-- [ ] server_name & server_port env del cgi
+- [ ] encode\_url
+- [ ] set defaults
+- [ ] compare server blocks so there are no repetitions
+- [ ] upload\_files
+- [ ] redirection
+- [ ] chunked requests
+- [ ] directory control ( . .. )
+- [ ] required directives: listen, root?
+- [ ] methods: CGI, get, post...
+- [ ] cgi: Location: getters that match request.target
+- [ ] cgi: server\_name & server\_port env
 - [ ] el isregularfile com gestionem aixo
-- [ ] no em funciona el getFLAG
-- [ ] CGI SERVER NAME
+
+method o cgi -> compose_response -> register_send -> request_send

@@ -8,7 +8,7 @@ int
 HTTP::http_head ( HTTP & http )
 {
 	DEBUG( "" );
-	if (http._server.getCGIpass().length() != 0 )
+	if ( http._server.getCGIpass( http._request.target ).length() != 0 )
 	{}
 	else
 	{}

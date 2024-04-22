@@ -24,7 +24,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_server( router_instance.getDefaultServer() )
 {
 	this->cgi_ptr = NULL;
-	//std::memset( &this->_request, 0x0, sizeof( this->_request ) );
+	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
@@ -116,7 +116,6 @@ HTTP::request_recv ( int64_t data )
 		WARN( "Something went wrong while parsing HTTP recv" );
 		return ( EXIT_FAILURE );
 	}
-	// this->_buffer_recv.clear();
 	
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
@@ -125,7 +124,6 @@ HTTP::request_recv ( int64_t data )
 	
 	if ( this->_request.method == 0x0 )
 		this->_status_code = INTERNAL_SERVER_ERROR;
-	//TODO: location
 	else
 	{
 		strncpm()	
@@ -139,15 +137,18 @@ HTTP::request_recv ( int64_t data )
 	return ( EXIT_SUCCESS );
 }
 
-void HTTP::perform()
+void
+HTTP::perform ( void )
 {
-	if (can_access_file( this->_request.target ) == false)
+	// TODO: proper reorder
+	DEBUG( this->_request.target );
+	if ( can_access_file( this->_request.target ) == false )
 	{
 		std::cout << "A0" << std::endl;
 
 		this->_status_code = 404;
 	}
-	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target  ) == false
+	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == false
 			&& is_regular_file( this->_request.target ) == false )
 	{
 		std::cout << "A" << std::endl;
@@ -157,20 +158,17 @@ void HTTP::perform()
 			load_file( *this, this->_request.target );
 		this->register_send();
 	}
-	else if ( this->_server.getFlag( F_AUTOINDEX , this->_request.target ) == true
+	else if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == true
 			&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
 	{
-		std::cout << "A1" << std::endl;
-
 		this->_status_code = autoindex( *this ); //em torna 200 o 404
 		this->register_send();
 	}
 	else
 	{
-		std::cout << "A3" << std::endl;
-
 		this->_request.method->method_func( * this );
 	}
+	return ;
 }
 
 int
@@ -179,7 +177,6 @@ HTTP::request_send ( void )
 	DEBUG( "fd=" << this->_socket_fd
 			<< " bytes=" << this->_buffer_send.length() );
 	HTTP::compose_response( *this );
-	this->_request.target.clear();
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
@@ -248,10 +245,12 @@ HTTP::load_file( HTTP & http, std::string target )
 }
 
 int 
-HTTP::check_index()
+HTTP::check_index ( void )
 {
-	std::vector<std::string> vec = this->_server.getIndex();
-	for (std::vector<std::string>::const_iterator it = vec.begin(); it != vec.end(); ++it)
+	std::vector< std::string > & vec = this->_server.getIndex();
+
+	for ( std::vector< std::string >::const_iterator it = vec.begin();
+			it != vec.end(); ++it )
 	{
 		std::string tempTarget = this->_request.target;
 		std::cout << "temp:" << tempTarget << std::endl;
@@ -274,41 +273,50 @@ HTTP::check_index()
 	return ( FORBIDDEN );
 }
 
-// Getters
-std::string
-HTTP::getCGIpass( void )
+std::string &
+HTTP::getCGIpass ( void )
 {
-	return ( this->_server.getCGIpass() );
+	return ( const_cast < std::string & >
+			( this->_server.getCGIpass( this->_request.target ) ) );
 }
 
-void	HTTP::set_message_body( std::string &message )
+void
+HTTP::set_message_body ( std::string & message )
 {
 	this->_message_body = message;
+	return ;
 }
 
-t_request HTTP::getRequest( void )
+t_request &
+HTTP::getRequest ( void )
 {
-	return this->_request;
+	return ( this->_request );
 }
 
-t_headers HTTP::getHeaders()
+t_headers &
+HTTP::getHeaders ( void )
 {
-	return this->_request_headers;
+	return ( this->_request_headers );
 }
 
-void HTTP::set_response_headers( std::string arg, std::string value )
+void
+HTTP::set_response_headers ( std::string arg, std::string value )
 {
 	this->_response_headers[ arg ] = value;
 	std::cout << "set: " << arg << value << std::endl;
+	return ;
 }
 
-void	HTTP::setStatusCode( int value )
+void
+HTTP::setStatusCode ( int value )
 {
 	this->_status_code = value;
 	std::cout << "set sttaus code: " << this->_status_code << std::endl;
+	return ;
 }
 
-Server & HTTP::getServer()
+Server &
+HTTP::getServer ( void )
 {
-	return this->_server;
+	return ( this->_server );
 }
