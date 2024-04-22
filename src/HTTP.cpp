@@ -126,6 +126,8 @@ HTTP::request_recv ( int64_t data )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	else
 	{
+		// if its an http redirection
+		// lcoation block en el compose
 		// append location root change if it fits location the target
 		this->_request.target_autoindex = this->_request.target;
 		std::string line = this->_server.getRouteString( this->_request.target );
