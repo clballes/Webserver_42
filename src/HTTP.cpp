@@ -126,12 +126,8 @@ HTTP::request_recv ( int64_t data )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	else
 	{
-		strncpm()	
-		size_t res = this->_request.target.find("/");
-		std::string line = this->_request.target.substr(, );
-		// 		Define a directory or a file from where the file should be searched (for example,
-		// if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
-		// /tmp/www/pouic/toto/pouet).
+		std::string line = this->_server.getRouteString( this->_request.target );
+		std::cout << " --------------------------- line is:" << line << std::endl;
 		perform();
 	}
 	return ( EXIT_SUCCESS );

@@ -86,11 +86,13 @@ Server::getRouteString ( std::string & location ) const
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		if ( it->first.compare( location ) == 0 )
+		if ( location.compare( 0, it->first.length(), it->first ) == 0 )
+		
 			return ( const_cast< std::string & >( it->first ) );
 		++it;
 	}
-	return ( const_cast< std::string & >( this->_routes.begin()->first ) );
+	--it;
+	return ( const_cast< std::string & >( (it->first)));
 }
 
 bool
