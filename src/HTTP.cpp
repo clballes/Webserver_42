@@ -110,7 +110,8 @@ HTTP::request_recv ( int64_t data )
 		WARN( "fd=" << this->_socket_fd << ": " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
-	LOG_BUFFER( this->_buffer_recv.c_str() );
+	if ( this->_buffer_recv.empty() == false )
+		LOG_BUFFER( this->_buffer_recv.c_str() );
 	if ( this->parse() == EXIT_FAILURE )
 	{
 		WARN( "Something went wrong while parsing HTTP recv" );
