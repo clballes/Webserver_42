@@ -23,7 +23,9 @@ class Location
 		int setCGIparam ( std::string & );
 		int setCGIpass ( std::string & );
 		int setRoot ( std::string & );
-		int setIndex ( std::string & );	
+		int setIndex ( std::string & );
+		int setUploadFiles ( std::string & );
+		int setRedirection ( std::string & );
 
 		bool isDefault ( void ) const;
 		bool getFlag ( int ) const;
@@ -41,6 +43,8 @@ class Location
 		std::string					_root;
 		bool						_isDefault;
 		std::vector< std::string >	_index;
+		std::string					_upload_files;
+		std::string					_redirection;
 
 };
 

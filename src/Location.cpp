@@ -103,3 +103,19 @@ Location::setIndex ( std::string & arg )
 	this->_index.push_back( arg );
 	return ( EXIT_SUCCESS );
 }
+
+int
+Location::setUploadFiles ( std::string & arg )
+{
+	// TODO: validate
+	this->_upload_files = arg;
+	return ( EXIT_SUCCESS );
+}
+
+int
+Location::setRedirection ( std::string & arg )
+{
+	// TODO: validate
+	this->_redirection = arg;
+	return ( EXIT_SUCCESS );
+}

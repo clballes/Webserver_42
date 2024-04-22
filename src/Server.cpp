@@ -260,6 +260,18 @@ Server::setErrorPage ( int n, std::string & path )
 	return ( EXIT_SUCCESS );
 }
 
+int
+Server::setUploadFiles ( std::string & arg, std::string location )
+{
+	return ( this->getRoute( location ).setUploadFiles( arg ) );
+}
+
+int
+Server::setRedirection ( std::string & arg, std::string location )
+{
+	return ( this->getRoute( location ).setRedirection( arg ) );
+}
+
 void
 Server::log_conf ( void ) const 
 {
