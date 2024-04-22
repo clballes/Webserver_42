@@ -112,5 +112,7 @@ int set_index ( Server &, std::string &, std::string = "" );
 int set_listen( Server &, std::string &, std::string = "" );
 int set_root ( Server &, std::string &, std::string = "" );
 int set_server_name ( Server &, std::string &, std::string = "" );
+int set_upload_files ( Server &, std::string &, std::string = "" );
+int set_redirection ( Server &, std::string &, std::string = "" );
 
 #endif /* !_ROUTER_HPP_ */

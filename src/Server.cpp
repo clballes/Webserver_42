@@ -7,7 +7,6 @@
 
 Server::Server ( void ): _good( true )
 {
-	//DEBUG ( "" );
 	this->_error_pages[400] = "src/err_pages/400.html";
 	this->_error_pages[403] = "src/err_pages/403.html";
 	this->_error_pages[404] = "src/err_pages/404.html";
@@ -53,6 +52,7 @@ Server::getRoute ( std::string & location ) const
 	{
 		if ( it->first.compare( location ) == 0 )
 		{
+			DEBUG( "found" );
 			return ( const_cast< Location & >( it->second ) );
 		}
 		++it;
@@ -127,7 +127,6 @@ Server::hasServerName ( std::string & name ) const
 	it = this->_server_name.begin();
 	while ( it != this->_server_name.end() )
 	{
-		// TODO: *.example.com
 		if ( it->compare( name ) == 0 )
 			return ( true );
 		++it;
@@ -141,7 +140,6 @@ Server::getIndex ( std::string location ) const
 	return ( getRoute( location ).getIndex() );
 }
 
-// TODO: undefined behaviour control
 const std::string &
 Server::getErrorPage ( int errnum )
 {
@@ -169,8 +167,8 @@ Server::getListen ( void ) const
 int
 Server::setRoute ( std::string & location )
 {
-	DEBUG( "\"" << location << "\"" );
 	//
+	DEBUG( "\"" << location << "\"" );
 	std::clog << "routes so far: ";
 	for ( t_route_map::const_iterator it = this->_routes.begin();
 			it != this->_routes.end(); ++it )
@@ -191,14 +189,12 @@ Server::setRoute ( std::string & location )
 int
 Server::setFlag ( int flag, bool enable, std::string location )
 {
-	// TODO: validate
 	return ( getRoute( location ).setFlag( flag, enable ) );
 }
 
 int
 Server::setClientMaxBodySize ( std::size_t size )
 {
-	// TODO: validate
 	this->_client_max_body_size = size;
 	return ( EXIT_SUCCESS );
 }
@@ -206,14 +202,12 @@ Server::setClientMaxBodySize ( std::size_t size )
 int
 Server::setCGIparam ( std::string & arg, std::string location )
 {
-	// TODO: validate
 	return ( this->getRoute( location ).setCGIparam( arg ) );
 }
 
 int
 Server::setCGIpass ( std::string & arg, std::string location )
 {
-	// TODO: validate
 	return ( this->getRoute( location ).setCGIpass( arg ) );
 }
 
@@ -233,14 +227,14 @@ Server::setRoot ( std::string & arg, std::string location )
 int
 Server::setServerName ( std::string & arg )
 {
-	//TODO: check values
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
 	if ( ! isalpha( arg[0] ) )
 		return ( EXIT_FAILURE );
 	for ( std::string::size_type i = 0; i < arg.length(); i++ )
 	{
-		if ( ! isalnum( arg[i] ) && arg[i] != '-'
+		if ( ! isalnum( arg[i] )
+				&& arg[i] != '-'
 				&& arg[i] != '.' )
           	return ( EXIT_FAILURE );
 	}

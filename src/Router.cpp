@@ -12,17 +12,19 @@ t_conf_opts
 Router::_opts[] =
 {
 	{ CONTEXT, "server", yes, "main", 0x0 },
-	{ CONTEXT, "location", yes, "server,location", 0x0 },
+	{ CONTEXT, "location", yes, "server", 0x0 },
 	{ DIRECTIVE, "server_name", no, "server", &set_server_name },
 	{ DIRECTIVE, "listen", no, "server", &set_listen },
-	{ DIRECTIVE, "allow_methods", no, "server,location", &set_allow_methods },
-	{ DIRECTIVE, "root", no, "server,location", &set_root },
-	{ DIRECTIVE, "index", no, "server,location", &set_index },
-	{ DIRECTIVE, "autoindex", no, "server,location", &set_autoindex },
+	{ DIRECTIVE, "allow_methods", no, "location", &set_allow_methods },
+	{ DIRECTIVE, "root", no, "location", &set_root },
+	{ DIRECTIVE, "index", no, "server", &set_index },
+	{ DIRECTIVE, "autoindex", no, "location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, "location", &set_cgi_pass },
 	{ DIRECTIVE, "cgi_param", no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, "server", &set_error_page },
 	{ DIRECTIVE, "client_body", no, "server", &set_client_body },
+	{ DIRECTIVE, "upload_files", no, "location", &set_upload_files },
+	{ DIRECTIVE, "redirection", no, "location", &set_redirection },
 	{ 0, 0x0, 0, 0x0, 0x0 }
 };
 
@@ -311,7 +313,6 @@ int
 Router::register_read_socket ( Connection & instance ) const
 {
 	struct kevent ev;
-	//static struct timespec ev_timeout;
 
 	DEBUG( "fd=" << instance.getSocketFD() );
 	EV_SET( &ev, instance.getSocketFD(), EVFILT_READ,
@@ -362,8 +363,6 @@ Router::getConnection ( int fd )
 	return ( this->_connections[0] );
 }
 
-// TODO: make sure default server is configured
-// similar to default route
 Server &
 Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 {
@@ -398,6 +397,29 @@ Router::setConnection ( const struct sockaddr_in & address,
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
+
+/* The purpose of the following setters,
+ * set_*( Server &, std::string &, std::string = "" ),
+ * is to be a wrapper to the Server's class setter function
+ * of each directive defined in a t_conf_opts struct.
+ *
+ * These only convert the format, if needed, to be accepted 
+ * by the apropiate setter.
+ *
+ * set_allow_methods()
+ * set_autoindex()
+ * set_cgi_pass()
+ * set_cgi_param()
+ * set_client_body()
+ * set_error_page()
+ * set_index()
+ * set_listen()
+ * set_root()
+ * set_server_name()
+ * set_upload_files()
+ * set_redirection()
+ *
+ */
 
 int
 set_allow_methods( Server & instance, std::string & arg, std::string location )
@@ -530,9 +552,8 @@ set_index ( Server & instance, std::string & arg, std::string location )
 };
 
 int
-set_listen( Server & instance, std::string & arg, std::string location )
+set_listen( Server & instance, std::string & arg, std::string )
 {
-	(void) location;
 	struct sockaddr_in * address = NULL;
 	struct addrinfo hints, * result, * rp;
 	std::istringstream iss( arg );
@@ -575,11 +596,12 @@ set_listen( Server & instance, std::string & arg, std::string location )
 		}
 		rp = rp->ai_next;
 	}
-	if ( address == NULL )
-		return ( EXIT_FAILURE );
-	ecode = instance.setListen( *address );
-	freeaddrinfo( result );
-	if ( ecode == EXIT_FAILURE )
+	if ( address != NULL )
+	{
+		ecode = instance.setListen( *address );
+		freeaddrinfo( result );
+	}
+	if ( address == NULL || ecode == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
@@ -612,4 +634,16 @@ set_server_name ( Server & instance, std::string & arg, std::string )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
+}
+
+int
+set_upload_files ( Server & instance, std::string & arg, std::string location )
+{
+	return ( instance.setUploadFiles( arg, location ) );
+}
+
+int
+set_redirection ( Server & instance, std::string & arg, std::string location )
+{
+	return ( instance.setRedirection( arg, location ) );
 }
