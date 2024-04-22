@@ -1,17 +1,18 @@
-- [ ] proper log system
-- [ ] timeout
-- [ ] tests
-- [ ] encode\_url
-- [ ] set defaults
-- [ ] compare server blocks so there are no repetitions
-- [ ] upload\_files
-- [ ] redirection
-- [ ] chunked requests
-- [ ] directory control ( . .. )
-- [ ] required directives: listen, root?
-- [ ] methods: CGI, get, post...
-- [ ] cgi: Location: getters that match request.target
-- [ ] cgi: server\_name & server\_port env
-- [ ] el isregularfile com gestionem aixo
+- [ ] upload_files directive to store the upload file , check upload file
+- [ ] chunked requests es el EOF tambe si
 
-method o cgi -> compose_response -> register_send -> request_send
+## MARTI
+
+- [ ] timeout
+- [ ] compare server blocks so there are no repetitions
+- [ ] tests
+- [ ] set defaults
+- [ ] required directives: listen, root?
+- [ ] directory control ( . .. )
+
+## CLARA
+
+- REDIRECTION HTTP - mirar q getroute li passi be els params
+- mirar lu de www/ checkindex
+- fer un cgi super simple amb getenv
+  method o cgi -> compose_response -> register_send -> request_send
