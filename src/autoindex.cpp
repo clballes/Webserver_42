@@ -75,7 +75,7 @@ HTTP::autoindex ( HTTP & http )
 				page.append("<img src=\"/Users/clballes/Desktop/web42/tools/file_icon.png\" alt=\"File Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
 			}
 			page.append("<a href=\"http://");
-			page.append(http._request_headers["Host"]);
+			page.append(http._request_headers["host"]);
 			if ( http._request.target.size() > 1 )
 				page.append( http._request.target );
 			if ( page.back() != '/' )
