@@ -9,6 +9,7 @@
 
 #include "IEvent.hpp"
 #include "HTTP.hpp"
+#include "Server.hpp"
 #include <map>
 #include <cstdlib>
 #include <cstring>
@@ -16,12 +17,13 @@
 // #include "Log.hpp"
 
 class HTTP;
+class Server;
 
 class CGI : public IEvent
 {
 	public:
 
-		CGI ( HTTP & );
+		CGI ( HTTP & , Server &);
 		~CGI ( void );
 
 		void dispatch ( struct kevent & ev );
@@ -34,6 +36,7 @@ class CGI : public IEvent
 	protected:
 
 		HTTP &  _http;
+		Server &_server;
 		char ** _env;
 		std::map <std::string, std::string> _envMap;
 		int _pipefd[2];

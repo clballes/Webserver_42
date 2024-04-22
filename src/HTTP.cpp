@@ -110,7 +110,7 @@ HTTP::request_recv ( int64_t data )
 		WARN( "fd=" << this->_socket_fd << ": " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
-	if ( this->_buffer_recv.empty() == false )
+	if ( !this->_buffer_recv.empty() )
 		LOG_BUFFER( this->_buffer_recv.c_str() );
 	if ( this->parse() == EXIT_FAILURE )
 	{
@@ -127,6 +127,7 @@ HTTP::request_recv ( int64_t data )
 		this->_status_code = INTERNAL_SERVER_ERROR;
 	else
 	{
+		// filtrar allowed methods
 		// if its an http redirection
 		// lcoation block en el compose
 		// append location root change if it fits location the target
@@ -149,32 +150,11 @@ HTTP::perform ( void )
 {
 	// TODO: proper reorder
 	DEBUG( this->_request.target );
-	if ( can_access_file( this->_request.target ) == false )
-	{
-		std::cout << "A0" << std::endl;
 
-		this->_status_code = 404;
-	}
-	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == false
-			&& is_regular_file( this->_request.target ) == false )
-	{
-		std::cout << "A" << std::endl;
-		this->_status_code = check_index();
-		std::cout << this->_status_code << std::endl;
-		if (this->_status_code == 200)
-			load_file( *this, this->_request.target );
-		this->register_send();
-	}
-	else if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == true
-			&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
-	{
-		this->_status_code = autoindex( *this ); //em torna 200 o 404
-		this->register_send();
-	}
-	else
-	{
+	// else
+	// {
 		this->_request.method->method_func( * this );
-	}
+	// }
 	return ;
 }
 
@@ -195,7 +175,6 @@ HTTP::request_send ( void )
 int
 HTTP::compose_response ( HTTP & http )
 {
-	//mirar aqui els errors
 	if (http._status_code > 300 && http._status_code < 500)
 	{
 		load_file( http, http._server.getErrorPage(http._status_code) );
