@@ -12,7 +12,7 @@ HTTP::methods[] = {
 	{ "GET", &HTTP::http_get, HTTP_GET },
 	{ "HEAD", &HTTP::http_head, HTTP_HEAD },
 	{ "POST", &HTTP::http_post, HTTP_POST },
-	{ "PUT", &HTTP::http_put, HTTP_PUT },
+	// { "PUT", &HTTP::http_put, HTTP_PUT },
 	{ "DELETE", &HTTP::http_delete, HTTP_DELETE },
 	{ 0, 0, 0 }
 };
@@ -128,6 +128,12 @@ HTTP::request_recv ( int64_t data )
 	//TODO: location
 	else
 	{
+		strncpm()	
+		size_t res = this->_request.target.find("/");
+		std::string line = this->_request.target.substr(, );
+		// 		Define a directory or a file from where the file should be searched (for example,
+		// if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
+		// /tmp/www/pouic/toto/pouet).
 		perform();
 	}
 	return ( EXIT_SUCCESS );

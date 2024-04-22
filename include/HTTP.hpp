@@ -46,6 +46,7 @@ typedef struct s_request
 	t_http_method * method;
 	std::string host;
 	std::string target;
+	std::string routed_target;
 	std::string query;
 	std::string body;
 	int http_version;
@@ -67,7 +68,7 @@ class HTTP: public IEvent
 		void perform ( void );
 
 		static int load_file ( HTTP &, std::string );
-		int put_file( void );
+		// int put_file( void );
 		int check_index();
 
 		static t_http_method methods[];
@@ -105,7 +106,7 @@ class HTTP: public IEvent
 		static int http_get ( HTTP & );
 		static int http_head ( HTTP & );
 		static int http_post ( HTTP & );
-		static int http_put ( HTTP & );
+		// static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP & );
