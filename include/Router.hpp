@@ -31,6 +31,7 @@
 							   getprotobynumber */
 #include <sys/event.h>		/* kqueue, ... */
 #include <sys/time.h>		/* kqueue */
+#include <stack>
 #include <vector>
 #include <string>
 #include <sstream>
