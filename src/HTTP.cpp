@@ -234,16 +234,16 @@ int
 HTTP::check_index ( void )
 {
 	std::vector< std::string > & vec = this->_server.getIndex();
-
 	for ( std::vector< std::string >::const_iterator it = vec.begin();
 			it != vec.end(); ++it )
 	{
 		std::string tempTarget = this->_request.target;
-		std::cout << "temp:" << tempTarget << std::endl;
-		tempTarget.append("/");
+		char lastChar = tempTarget.at(tempTarget.size() - 1);
+		if (lastChar != '/')
+		{
+			tempTarget.append("/");
+		}
 		tempTarget.append(*it);
-		std::cout << "temp2:" << tempTarget << std::endl;
-
 		if (routeExists(tempTarget))
 		{
 			this->_request.target.append("/");
