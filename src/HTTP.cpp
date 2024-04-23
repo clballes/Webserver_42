@@ -127,8 +127,17 @@ HTTP::request_recv ( int64_t data )
 	// append location root change if it fits location the target
 	this->_request.target_replaced = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
-	std::string root_location = this->_server.getRoot( location );
-	this->_request.target_replaced.replace( 0 , location.length(), root_location );
+	if ( ! location.empty() )
+	{
+		std::string root_location = this->_server.getRoot( location );
+		this->_request.target_replaced.replace( 0 , location.length(), root_location );
+	}
+	else
+	{
+		std::string root_location = this->_server.getRoot( location );
+		root_location.append( "/" );
+		this->_request.target_replaced.replace( 0, 1, root_location );
+	}
 	LOG( YELLOW << "target_replaced=" << this->_request.target_replaced );
 	this->perform();
 	return ( EXIT_SUCCESS );

@@ -50,7 +50,7 @@ Server::getRoute ( std::string & location ) const
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		if ( location.compare( 0, it->first.length() + 1, it->first ) )
+		if ( location.compare( 0, it->first.length() + 1, it->first ) == 0 )
 			return ( const_cast< Location & >( it->second ) );
 		++it;
 	}
@@ -70,7 +70,7 @@ Server::getDefaultRoute ( void ) const
 		++it;
 	}
 	if ( it == this->_routes.end() )
-		it = this->_routes.begin();
+		--it;
 	return ( const_cast< Location & >( it->second ) );
 }
 
@@ -120,17 +120,21 @@ Server::getCGIparam ( std::string location ) const
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\", cgi_pass=\""
-			<< this->getRoute( location ).getCGIpass() << "\"" );
-	return ( getRoute( location ).getCGIpass() );
+	DEBUG( "location=\"" << location << "\"" );
+	const Location & loc = this->getRoute( location );
+	const std::string & cgi_pass = loc.getCGIpass();
+	DEBUG( "cgi_pass=\"" << cgi_pass << "\"" );
+	return ( cgi_pass );
 }
 
 const std::string &
 Server::getRoot ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\", root=\""
-			<< this->getRoute( location ).getRoot() << "\"" );
-	return ( getRoute( location ).getRoot() );
+	DEBUG( "location=\"" << location << "\"" );
+	const Location & loc = this->getRoute( location );
+	const std::string & root = loc.getRoot();
+	DEBUG( "root=\"" << root << "\"" );
+	return ( root );
 }
 
 std::vector< std::string > &
