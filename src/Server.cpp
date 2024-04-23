@@ -46,13 +46,12 @@ Server::getRoute ( std::string & location ) const
 {
 	t_route_map::const_iterator it;
 
-	DEBUG( "\"" << location << "\"" );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
 		if ( it->first.compare( location ) == 0 )
 		{
-			DEBUG( "found" );
+			LOG( "location=\"" << it->first << "\"" );
 			it->second.log_conf();
 			return ( const_cast< Location & >( it->second ) );
 		}
@@ -87,7 +86,6 @@ Server::getRouteString ( std::string & location ) const
 	while ( it != this->_routes.end() )
 	{
 		if ( location.compare( 0, it->first.length(), it->first ) == 0 )
-		
 			return ( const_cast< std::string & >( it->first ) );
 		++it;
 	}
@@ -98,12 +96,15 @@ Server::getRouteString ( std::string & location ) const
 bool
 Server::getFlag ( int mask, std::string location ) const
 {
+	DEBUG( "location=" << location );
+	getRoute( location ).log_conf();
 	return ( getRoute( location ).getFlag( mask ) );
 }
 
 std::size_t
 Server::getFlags ( std::string location ) const
 {
+	DEBUG( "location=" << location );
 	return ( getRoute( location ).getFlags() );
 }
 
@@ -116,18 +117,21 @@ Server::getClientMaxBodySize ( void ) const
 const std::string &
 Server::getCGIparam ( std::string location ) const
 {
+	DEBUG( "location=" << location );
 	return ( getRoute( location ).getCGIparam() );
 }
 
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
+	DEBUG( "location=\"" << location << "\"" );
 	return ( getRoute( location ).getCGIpass() );
 }
 
 const std::string &
 Server::getRoot ( std::string location ) const
 {
+	DEBUG( "location=\"" << location << "\"" );
 	return ( getRoute( location ).getRoot() );
 }
 
@@ -155,6 +159,7 @@ Server::hasServerName ( std::string & name ) const
 std::vector< std::string > &
 Server::getIndex ( std::string location ) const
 {
+	DEBUG( "location=" << location );
 	return ( getRoute( location ).getIndex() );
 }
 

@@ -15,8 +15,8 @@ Router::_opts[] =
 	{ CONTEXT, "location", yes, "server", 0x0 },
 	{ DIRECTIVE, "server_name", no, "server", &set_server_name },
 	{ DIRECTIVE, "listen", no, "server", &set_listen },
-	{ DIRECTIVE, "allow_methods", no, "server", &set_allow_methods },
-	{ DIRECTIVE, "root", no, "server", &set_root },
+	{ DIRECTIVE, "allow_methods", no, "location", &set_allow_methods },
+	{ DIRECTIVE, "root", no, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, "server", &set_index },
 	{ DIRECTIVE, "autoindex", no, "server", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, "location", &set_cgi_pass },
@@ -370,16 +370,13 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 	
 	if ( server_name.find( ':' ) != std::string::npos )
 		server_name.erase( server_name.find( ':' ) );
-	DEBUG( "server_name=\"" << server_name << "\"" );
+	DEBUG( "\"" << server_name << "\"" );
 	it = this->_servers.begin();
 	while ( it != this->_servers.end() )
 	{
 		if ( it->hasServerName( server_name ) == true
 				&& port == it->getPort() && host == it->getHost() )
-		{
-			DEBUG( "found" );
 			return ( *it );
-		}
 		it++;
 	}
 	return ( this->getDefaultServer() );
@@ -388,7 +385,6 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 Server &
 Router::getDefaultServer ( void )
 {
-	DEBUG( "default" );
 	return ( this->_servers[0] );
 }
 
