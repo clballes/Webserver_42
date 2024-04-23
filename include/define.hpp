@@ -15,12 +15,19 @@
 #define DEFAULT_CONF		"conf/default.conf"
 #define DEFAULT_ERROR_DIR   "www"
 
+// The following define(s) are meant to be
+// used for setting and checking server flags.
+// For example, with the allow_methods directive.
+
 #define F_AUTOINDEX			0x00010000 
 #define METHOD_GET			0x00001000
 #define METHOD_POST			0x00000100
 #define METHOD_PUT			0x00000010
 #define METHOD_DELETE		0x00000001
 #define METHOD_HEAD			0x00100000
+
+// The following define(s) are meant to be
+// used with a t_http_method.
 
 #define HTTP_GET			0x00000001
 #define HTTP_HEAD			0x00000002
@@ -29,8 +36,8 @@
 #define HTTP_DELETE			0x00000005
 #define HTTP_11				0x11
 
-#define LF					 012
-#define CR					 015
+#define LF					012
+#define CR					015
 #define SP 					040
 
 #include "HTTP_status_codes.hpp"

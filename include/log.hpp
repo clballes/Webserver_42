@@ -20,7 +20,9 @@
 #endif
 
 #define RED		"\033[0;31m"
+#define GREEN	"\033[0;32m"
 #define YELLOW	"\033[0;33m"
+#define BLUE	"\033[0;34m"
 #define RESET	"\033[0m"
 #define ENDL	"\n"
 
@@ -84,23 +86,27 @@
 	<< s << RESET << ENDL; \
 }
 
-#define LOG(s) { std::clog << s << ENDL; }
+#define LOG(s) { std::clog << s << RESET << ENDL; }
 
-#define LOG_BUFFER(str) \
+#define LOG_BUFFER(str,color) \
 { \
-	char *jakala = (char *) str; \
-	size_t it = 1; \
-	while ( jakala != 0 && *jakala != 0 ) \
+	std::string::const_iterator it = str.begin(); \
+	std::string::size_type counter = 1; \
+	while ( it != str.end() ) \
 	{ \
-		if ( std::isprint( *jakala ) ) { std::clog << *jakala; } \
-		else if ( *jakala == 011 ) { std::clog << "\\t"; ++it; } \
-		else if ( *jakala == 012 ) { std::clog << "\\n"; ++it; } \
-		else if ( *jakala == 015 ) { std::clog << "\\r"; ++it; } \
-		if ( it >= 40 ) { std::clog << ENDL; it = 0; } \
-		++jakala; \
+		if ( it == str.begin() ) { std::clog << color; } \
+		if ( std::isprint( *it ) ) { std::clog << *it; } \
+		else if ( *it == '\t' ) { std::clog << "\\t"; ++it; } \
+		else if ( *it == '\n' ) { std::clog << "\\n"; ++it; } \
+		else if ( *it == '\v' ) { std::clog << "\\v"; ++it; } \
+		else if ( *it == '\f' ) { std::clog << "\\f"; ++it; } \
+		else if ( *it == '\r' ) { std::clog << "\\r"; ++it; } \
+		if ( counter >= 80 ) { std::clog << ENDL; counter = 0; } \
 		++it; \
+		++counter; \
+		if ( it == str.end() ) { std::clog << ENDL; } \
 	} \
-	std::clog << ENDL; \
+	std::clog << RESET; \
 }
 
 #endif /* !_LOG_HPP_ */
