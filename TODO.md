@@ -10,7 +10,7 @@
 - [ ] set defaults
 - [ ] tests
 - [ ] filtrar valid (allowed) methods
-- [ ] /test != /test/ != /testy
+- [x] /test != /test/ != /testy
 - [ ] compare server blocks so there are no repetitions
 - [x] compare listen directives, so there are no duplicate Connections
 - [x] required directives: listen, root

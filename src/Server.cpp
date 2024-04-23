@@ -50,9 +50,7 @@ Server::getRoute ( std::string & location ) const
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		LOG( "location=" << location );
-		LOG( "it=" << it->first );
-		if ( location.compare( 0, it->first.length(), it->first ) )
+		if ( location.compare( 0, it->first.length() + 1, it->first ) )
 			return ( const_cast< Location & >( it->second ) );
 		++it;
 	}
@@ -84,7 +82,7 @@ Server::getRouteString ( std::string & location ) const
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		if ( location.compare( 0, it->first.length(), it->first ) == 0 )
+		if ( location.compare( 0, it->first.length() + 1, it->first ) == 0 )
 			return ( const_cast< std::string & >( it->first ) );
 		++it;
 	}
