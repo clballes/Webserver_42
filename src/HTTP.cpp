@@ -96,51 +96,41 @@ HTTP::request_recv ( int64_t data )
 	ssize_t n;
 
 	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );
-	if ( (ssize_t) this->_buffer_recv.capacity() <= data )
-		this->_buffer_recv.resize( data + 1 );
+	this->_buffer_recv.resize( data + 1 );
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
-	if ( n == 0 )
+	if ( n == -1 )
+	{
+		WARN( "fd=" << this->_socket_fd << ": " << std::strerror( errno ) );
+		return ( EXIT_FAILURE );
+	}
+	else if ( n == 0 )
 	{
 		INFO( "Client closed connection (fd=" << this->_socket_fd << ")" );
 		delete this;
 		return ( EXIT_SUCCESS );
 	}
-	else if ( n == -1 )
-	{
-		WARN( "fd=" << this->_socket_fd << ": " << std::strerror( errno ) );
-		return ( EXIT_FAILURE );
-	}
-	if ( this->_buffer_recv.empty() == false )
-		LOG_BUFFER( this->_buffer_recv.c_str() );
 	if ( this->parse() == EXIT_FAILURE )
 	{
-		WARN( "Something went wrong while parsing HTTP recv" );
+		LOG_BUFFER( this->_buffer_recv, RED );
+		WARN( "HTTP request does not comply with HTTP/1.1 specification." );
+		this->_buffer_recv.clear();
 		return ( EXIT_FAILURE );
 	}
-	
+	LOG_BUFFER( this->_buffer_recv, GREEN );
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
 			this->_connection.getHost(), this->_connection.getPort() );
-	
-	if ( this->_request.method == 0x0 )
-		this->_status_code = INTERNAL_SERVER_ERROR;
-	else
-	{
-		// if its an http redirection
-		// lcoation block en el compose
-		// append location root change if it fits location the target
-		this->_request.target_autoindex = this->_request.target;
-		std::string line = this->_server.getRouteString( this->_request.target );
-		std::cout << " --------------------------- line is:" << line << std::endl;
-		if (!line.empty())
-		{
-			std::string root_location = this->_server.getRoot( line );
-			this->_request.target.replace( 0 , line.length(), root_location );
-			std::cout << " --------------------------- server is:" << this->_request.target << std::endl;
-		}
-		perform();
-	}
+
+	// if its an http redirection
+	// lcoation block en el compose
+	// append location root change if it fits location the target
+	this->_request.target_replaced = this->_request.target;
+	std::string location = this->_server.getRouteString( this->_request.target );
+	std::string root_location = this->_server.getRoot( location );
+	this->_request.target_replaced.replace( 0 , location.length(), root_location );
+	LOG( YELLOW << "target_replaced=" << this->_request.target_replaced );
+	this->perform();
 	return ( EXIT_SUCCESS );
 }
 
@@ -148,15 +138,14 @@ void
 HTTP::perform ( void )
 {
 	// TODO: proper reorder
-	DEBUG( this->_request.target );
-	if ( can_access_file( this->_request.target ) == false )
+	DEBUG( this->_request.target_replaced );
+	if ( can_access_file( this->_request.target_replaced ) == false )
 	{
 		std::cout << "A0" << std::endl;
-
 		this->_status_code = 404;
 	}
 	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == false
-			&& is_regular_file( this->_request.target ) == false )
+			&& is_regular_file( this->_request.target_replaced ) == false )
 	{
 		std::cout << "A" << std::endl;
 		this->_status_code = check_index();

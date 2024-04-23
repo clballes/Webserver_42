@@ -12,7 +12,9 @@ HTTP::parse ( void )
 	std::string             line;
 
 	start = 0;
-	pos = this->_buffer_recv.find_first_of( LF, 0 );
+	pos = this->_buffer_recv.find_first_of( LF, start );
+	if ( pos == std::string::npos )
+		pos = this->_buffer_recv.length();
 	while ( pos != std::string::npos )
 	{
 		line = this->_buffer_recv.substr( start, pos - start );
@@ -21,8 +23,7 @@ HTTP::parse ( void )
 			if ( parse_start_line( line ) == EXIT_FAILURE )
 				return ( EXIT_FAILURE );
 		}
-		else if ( line.empty() == true
-				|| ( line.length() == 1 && line[0] == '\r' ) )
+		else if ( line.empty() || ( line.length() == 1 && line[0] == '\r' ) )
 		{
 			++pos;
 			break ;
@@ -35,11 +36,16 @@ HTTP::parse ( void )
 		else if ( ( pos - start ) != 1 )
 			return ( EXIT_FAILURE );
 		start = pos + 1;
-		pos = this->_buffer_recv.find_first_of( LF, pos + 1 );
+		pos = this->_buffer_recv.find_first_of( LF, start );
 	}
-	// TODO: method != GET/HEAD
+
 	// TODO: byte control from "content-length"
 	// TODO: chunked request
+	// We return if the method does not require to read
+	// the contents of a potential message body.
+	if ( this->_request.method->code != HTTP_POST
+			&& this->_request.method->code != HTTP_PUT )
+		return ( EXIT_SUCCESS );
 	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
 		this->_request.body = this->_buffer_recv.substr( pos );
 	return ( EXIT_SUCCESS );
@@ -103,6 +109,11 @@ parse_method( t_request & request, std::string & line )
 
 static std::string parse_query ( std::string & );
 
+// request-target = origin-form
+//
+// No other types of request-target are implemented.
+// These could be, absolute-form, authority-form, asterisk-form.
+
 int
 parse_target( t_request & request, std::string & line )
 {
@@ -116,10 +127,18 @@ parse_target( t_request & request, std::string & line )
 	request.query = parse_query( value );
 	if ( request.query.length() > 0 )
 		value.erase( value.length() - request.query.length() );
+	while ( value.length() > 1 && value.back() == '/' )
+		value.erase( value.length() - 1, 1 );
+	if ( value[0] != '/' )
+		return ( EXIT_FAILURE );
 	request.target = value;
 	urldecode( request.target );
 	return ( EXIT_SUCCESS );
 }
+
+// As of PROGRAM_NAME is only meant to work with HTTP/1.1
+// this call check if `line' ends with CR and
+// compares it's value with the supported HTTP version.
 
 int
 parse_http_version ( t_request & request, std::string & line )
@@ -137,13 +156,12 @@ parse_http_version ( t_request & request, std::string & line )
 	return ( EXIT_SUCCESS );
 }
 
-/* From RFC3986 section 3.4
- * https://www.rfc-editor.org/rfc/rfc3986#section-3.4
- *
- * The query component is indicated by the first question
- * mark ("?") character and terminated by a number sign ("#") character
- * or by the end of the URI.
- * */
+// From RFC3986 section 3.4
+// https://www.rfc-editor.org/rfc/rfc3986#section-3.4
+//
+// The query component is indicated by the first question
+// mark ("?") character and terminated by a number sign ("#") character
+// or by the end of the URI.
 
 std::string
 parse_query( std::string & target )
@@ -159,31 +177,27 @@ parse_query( std::string & target )
 			end = target.length();
 		value = target.substr( pos, end - pos );
 	}
-	std::cout << "query:" << value << std::endl;
 	return ( value );
 }
 
-/* From RFC3986 section 3.5
- * https://www.rfc-editor.org/rfc/rfc3986#section-3.5
- *
- * A fragment identifier component is indicated by the presence of a
- * number sign ("#") character and terminated by the end of the URI.
- * [...]
- * the fragment identifier is not used in the scheme-specific
- * processing of a URI; instead, the fragment identifier is separated
- * from the rest of the URI prior to a dereference, and thus the
- * identifying information within the fragment itself is dereferenced
- * solely by the user agent, regardless of the URI scheme.
- *
- * This translates to: the fragment is not send to the server.
- *
- */
+// From RFC3986 section 3.5
+// https://www.rfc-editor.org/rfc/rfc3986#section-3.5
+//
+// A fragment identifier component is indicated by the presence of a
+// number sign ("#") character and terminated by the end of the URI.
+// [...]
+// the fragment identifier is not used in the scheme-specific
+// processing of a URI; instead, the fragment identifier is separated
+// from the rest of the URI prior to a dereference, and thus the
+// identifying information within the fragment itself is dereferenced
+// solely by the user agent, regardless of the URI scheme.
+// 
+// This translates to: the fragment is not send to the server.
 
-/* No whitespace is allowed between the field name and colon.
- * A server MUST reject, with a response status code of 400 (Bad Request),
- * any received request message that contains whitespace between
- * a header field name and colon.
- */
+// No whitespace is allowed between the field name and colon.
+// A server MUST reject, with a response status code of 400 (Bad Request),
+// any received request message that contains whitespace between
+// a header field name and colon.
 
 int
 HTTP::parse_field_line ( std::string & line )
@@ -205,6 +219,11 @@ HTTP::parse_field_line ( std::string & line )
 			std::pair< std::string, std::string> ( field_name, field_value ) );
 	return ( EXIT_SUCCESS );
 }
+
+// The how_many_methods() and get_method_longest_len() calls
+// iterates through the methods stored in a t_http_method and
+// returns the numbers of iterations done and
+// the longest method's length found, respectively.
 
 static size_t
 how_many_methods( t_http_method * ptr )
@@ -228,8 +247,8 @@ get_method_longest_len ( t_http_method * ptr )
 	n = 0;
 	while ( ptr->method != NULL )
 	{
-		if ( strlen( ptr->method ) > n )
-			n = strlen( ptr->method );
+		if ( std::strlen( ptr->method ) > n )
+			n = std::strlen( ptr->method );
 		++ptr;
 	}
 	return ( n );
