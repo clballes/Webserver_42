@@ -9,7 +9,9 @@
 method o cgi -> compose_response -> register_send -> request_send
 - [ ] set defaults
 - [ ] compare server blocks so there are no repetitions
-- [ ] required directives: listen, root?
-- [ ] timeout
 - [ ] tests
 - [ ] filtrar valid (allowed) methods
+
+- [ ] /test != /test/ != /testy
+- [ ] required directives: listen, root?
+- [ ] timeout
