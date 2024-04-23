@@ -70,13 +70,12 @@ void CGI::setmap()
 int CGI::register_process( pid_t pid)
 {
     struct kevent ev;
-	
+	static struct timespec timeout = { 6, 0 };
+
 	DEBUG( pid );
-    // Set up the event structure for process monitoring
     EV_SET( &ev, pid, EVFILT_PROC,
            EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, (void *) this );
-    // Register the event with kqueue
-    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
+    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, &timeout ) == -1 )
 	{
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );

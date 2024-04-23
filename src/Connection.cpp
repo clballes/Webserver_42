@@ -5,19 +5,6 @@
 
 #include "Connection.hpp"
 
-Connection&
-Connection::operator= ( Connection & instance )
-{
-	DEBUG( instance._socket_fd );
-	this->_good = instance._good;
-	this->_socket_fd = instance._socket_fd;
-	//this->_sockaddr_len = instance._sockaddr_len;
-	std::memcpy( &this->_address, &instance._address,
-			sizeof( instance._address ) );
-	instance._good = false;
-	return ( *this );
-}
-
 Connection::Connection ( const struct sockaddr_in & address,
 		int domain, int type, int protocol ): _good( true ), _socket_fd( 0 )
 {
@@ -88,4 +75,10 @@ in_port_t
 Connection::getPort ( void ) const
 {
 	return ( ntohs( this->_address.sin_port ) );
+}
+
+const struct sockaddr_in &
+Connection::getAddress ( void ) const
+{
+	return ( this->_address );
 }

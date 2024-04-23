@@ -6,17 +6,17 @@
 #ifndef _ROUTER_HPP_
 #define _ROUTER_HPP_
 
-#include <sys/socket.h>		/* socket,
-							   accept,
-							   listen,
-							   send,
-							   recv,
-							   bind,
-							   connect,
-							   getaddrinfo,
-							   freeaddinfo,
-							   setsockopt,
-							   gettsockname */
+#include <sys/socket.h>		// socket,
+							// accept,
+							// listen,
+							// send,
+							// recv,
+							// bind,
+							// connect,
+							// getaddrinfo,
+							// freeaddinfo,
+							// setsockopt,
+							// gettsockname
 #include <sys/types.h>		/* common for
 							   gai_strerror,
 							   kqueue,
@@ -57,19 +57,17 @@ typedef struct s_conf_opts
 	int				type;
 	const char *	identifier;
 	bool			duplicate;
+	bool			required;
 	const char *	nest;
 	int ( *set_func )( Server &, std::string &, std::string );
 
 }					t_conf_opts;
 
-/*
- * class Router (TCP)
- *
- * It creates, binds, and sets to listen sockets to specific
- * struct sockaddr_in addresses.
- * Once a connection is received, routes it to its corresponding server.
- *
- */
+// class Router (TCP)
+//
+// It creates, binds, and sets to listen sockets to specific
+// struct sockaddr_in addresses.
+// Once a connection is received, routes it to its corresponding server.
 
 class Router: public IEvent
 {
@@ -96,6 +94,7 @@ class Router: public IEvent
 
 		int register_read_socket ( Connection & ) const;
 		int parse ( std::string & );
+		int isConnection ( const struct sockaddr_in & ) const;
 		int setConnection ( const struct sockaddr_in & ip_address,
 				int domain = AF_INET,
 				int type = SOCK_STREAM,
@@ -115,4 +114,4 @@ int set_server_name ( Server &, std::string &, std::string = "" );
 int set_upload_files ( Server &, std::string &, std::string = "" );
 int set_redirection ( Server &, std::string &, std::string = "" );
 
-#endif /* !_ROUTER_HPP_ */
+#endif // ! _ROUTER_HPP_

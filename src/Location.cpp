@@ -123,12 +123,10 @@ Location::setRedirection ( std::string & arg )
 void
 Location::log_conf ( void ) const
 {
-	std::clog << "\033[0;34m";
-	LOG( "root=" << this->getRoot() );
-	LOG( "isDefault=" << this->isDefault() );
-	LOG( "flags=" << std::hex << this->getFlags() << std::dec );
-	LOG( "cgi_pass=" << this->getCGIpass() );
-	LOG( "cgi_param=" << this->getCGIparam() );
-	std::clog << "\033[0m";
+	LOG( BLUE << "root=" << this->getRoot() );
+	LOG( BLUE << "isDefault=" << this->isDefault() );
+	LOG( BLUE << "flags=" << std::hex << this->getFlags() << std::dec );
+	LOG( BLUE << "cgi_pass=" << this->getCGIpass() );
+	LOG( BLUE << "cgi_param=" << this->getCGIparam() );
 	return ;
 }

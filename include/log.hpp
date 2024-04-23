@@ -101,7 +101,7 @@
 		else if ( *it == '\v' ) { std::clog << "\\v"; ++it; } \
 		else if ( *it == '\f' ) { std::clog << "\\f"; ++it; } \
 		else if ( *it == '\r' ) { std::clog << "\\r"; ++it; } \
-		if ( counter >= 80 ) { std::clog << ENDL; counter = 0; } \
+		/*if ( counter >= 80 ) { std::clog << ENDL; counter = 0; } */\
 		++it; \
 		++counter; \
 		if ( it == str.end() ) { std::clog << ENDL; } \

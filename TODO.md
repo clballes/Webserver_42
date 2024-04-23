@@ -5,13 +5,14 @@
 - [ ] methods: CGI, get, post...
 - [ ] cgi: server\_name & server\_port env
 - [ ] el isregularfile com gestionem aixo
-
-method o cgi -> compose_response -> register_send -> request_send
+- [ ] method o cgi -> compose\_response -> register\_send -> request\_send
+- [ ] location \*.php 
 - [ ] set defaults
-- [ ] compare server blocks so there are no repetitions
 - [ ] tests
 - [ ] filtrar valid (allowed) methods
-
 - [ ] /test != /test/ != /testy
-- [ ] required directives: listen, root?
+- [ ] compare server blocks so there are no repetitions
+- [x] compare listen directives, so there are no duplicate Connections
+- [x] required directives: listen, root
 - [ ] timeout
+- [ ] required directives: automate

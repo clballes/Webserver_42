@@ -7,6 +7,7 @@
 
 Server::Server ( void ): _good( true )
 {
+	std::memset( &this->_address, 0, sizeof( this->_address ) );
 	this->_error_pages[400] = "src/err_pages/400.html";
 	this->_error_pages[403] = "src/err_pages/403.html";
 	this->_error_pages[404] = "src/err_pages/404.html";
@@ -49,12 +50,10 @@ Server::getRoute ( std::string & location ) const
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		if ( it->first.compare( location ) == 0 )
-		{
-			LOG( "location=\"" << it->first << "\"" );
-			it->second.log_conf();
+		LOG( "location=" << location );
+		LOG( "it=" << it->first );
+		if ( location.compare( 0, it->first.length(), it->first ) )
 			return ( const_cast< Location & >( it->second ) );
-		}
 		++it;
 	}
 	return ( getDefaultRoute() );
@@ -97,7 +96,6 @@ bool
 Server::getFlag ( int mask, std::string location ) const
 {
 	DEBUG( "location=" << location );
-	getRoute( location ).log_conf();
 	return ( getRoute( location ).getFlag( mask ) );
 }
 
@@ -124,14 +122,16 @@ Server::getCGIparam ( std::string location ) const
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
+	DEBUG( "location=\"" << location << "\", cgi_pass=\""
+			<< this->getRoute( location ).getCGIpass() << "\"" );
 	return ( getRoute( location ).getCGIpass() );
 }
 
 const std::string &
 Server::getRoot ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
+	DEBUG( "location=\"" << location << "\", root=\""
+			<< this->getRoute( location ).getRoot() << "\"" );
 	return ( getRoute( location ).getRoot() );
 }
 
@@ -190,16 +190,6 @@ Server::getListen ( void ) const
 int
 Server::setRoute ( std::string & location )
 {
-	//
-	DEBUG( "\"" << location << "\"" );
-	std::clog << "routes so far: ";
-	for ( t_route_map::const_iterator it = this->_routes.begin();
-			it != this->_routes.end(); ++it )
-	{
-		std::clog << it->first << " ";
-	}
-	LOG( "" );
-	//
 	if ( this->_routes.find( location ) == this->_routes.end() )
 	{
 		(void) this->_routes[location];
@@ -293,6 +283,23 @@ int
 Server::setRedirection ( std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setRedirection( arg ) );
+}
+
+int
+Server::check ( void ) const
+{
+	if ( this->getPort() == 0 && this->getHost() == 0
+			&& this->_address.sin_family == 0 )
+	{
+		ERROR( "directive \"listen\" required" );
+		return ( EXIT_FAILURE );
+	}
+	if ( this->getDefaultRoute().getRoot().empty() == true )
+	{
+		ERROR( "directive \"root\" required" );
+		return ( EXIT_FAILURE );
+	}
+	return ( EXIT_SUCCESS );
 }
 
 void

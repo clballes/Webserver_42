@@ -11,21 +11,22 @@ IEvent::kq = 0;
 t_conf_opts
 Router::_opts[] =
 {
-	{ CONTEXT, "server", yes, "main", 0x0 },
-	{ CONTEXT, "location", yes, "server", 0x0 },
-	{ DIRECTIVE, "server_name", no, "server", &set_server_name },
-	{ DIRECTIVE, "listen", no, "server", &set_listen },
-	{ DIRECTIVE, "allow_methods", no, "location", &set_allow_methods },
-	{ DIRECTIVE, "root", no, "server,location", &set_root },
-	{ DIRECTIVE, "index", no, "server", &set_index },
-	{ DIRECTIVE, "autoindex", no, "server", &set_autoindex },
-	{ DIRECTIVE, "cgi_pass", no, "location", &set_cgi_pass },
-	{ DIRECTIVE, "cgi_param", no, "location", &set_cgi_param },
-	{ DIRECTIVE, "error_page", yes, "server", &set_error_page },
-	{ DIRECTIVE, "client_body", no, "server", &set_client_body },
-	{ DIRECTIVE, "upload_files", no, "location", &set_upload_files },
-	{ DIRECTIVE, "redirection", no, "location", &set_redirection },
-	{ 0, 0x0, 0, 0x0, 0x0 }
+	// type, identifier, duplicated, required, nest, set_func
+	{ CONTEXT, "server", yes, yes, "main", 0x0 },
+	{ CONTEXT, "location", yes, no, "server", 0x0 },
+	{ DIRECTIVE, "server_name", no, no, "server", &set_server_name },
+	{ DIRECTIVE, "listen", no, yes, "server", &set_listen },
+	{ DIRECTIVE, "allow_methods", no, yes, "location", &set_allow_methods },
+	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
+	{ DIRECTIVE, "index", no, no, "server", &set_index },
+	{ DIRECTIVE, "autoindex", no, no, "server", &set_autoindex },
+	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
+	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
+	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
+	{ DIRECTIVE, "client_body", no, no, "server", &set_client_body },
+	{ DIRECTIVE, "upload_files", no, no, "location", &set_upload_files },
+	{ DIRECTIVE, "redirection", no, no, "location", &set_redirection },
+	{ 0, 0x0, 0, 0, 0x0, 0x0 },
 };
 
 // TODO: make sure default server is configured
@@ -240,6 +241,9 @@ Router::parse( std::string & buffer )
 		else if ( directive == "}" )
 		{
 			location.clear();
+			if ( context.top() == "server"
+					&& this->_servers.back().check() == EXIT_FAILURE )
+				return ( EXIT_FAILURE );
 			context.pop();
 			continue ;
 		}
@@ -258,8 +262,8 @@ Router::parse( std::string & buffer )
 		return ( EXIT_FAILURE );
 	}
 	// log servers
-	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
-			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
+	//for ( std::vector< Server >::const_iterator it = this->_servers.begin();
+	//		it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
 	//
 	return ( EXIT_SUCCESS );
 }
@@ -271,10 +275,12 @@ Router::listen ( void )
 	struct kevent ev;
 	IEvent * instance;
 
-	DEBUG( IEvent::kq );
 	for ( std::vector< Server >::iterator i = this->_servers.begin();
 			i != this->_servers.end(); ++i )
 	{
+		//TODO: check if not active already
+		if ( Router::isConnection( i->getListen() ) == EXIT_SUCCESS )
+			continue ;
 		if ( this->setConnection( i->getListen() ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
@@ -314,7 +320,6 @@ Router::register_read_socket ( Connection & instance ) const
 {
 	struct kevent ev;
 
-	DEBUG( "fd=" << instance.getSocketFD() );
 	EV_SET( &ev, instance.getSocketFD(), EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void *) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
@@ -386,6 +391,22 @@ Server &
 Router::getDefaultServer ( void )
 {
 	return ( this->_servers[0] );
+}
+
+int
+Router::isConnection ( const struct sockaddr_in & address ) const
+{
+	std::vector< Connection >::const_iterator it;
+
+	it = this->_connections.begin();
+	while ( it != this->_connections.end() )
+	{
+		if ( std::memcmp( &(it->getAddress()), &address,
+					sizeof (struct sockaddr_in) ) == 0 )
+			return ( EXIT_SUCCESS );
+		++it;
+	}
+	return ( EXIT_FAILURE );
 }
 
 int

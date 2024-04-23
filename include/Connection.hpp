@@ -36,7 +36,6 @@ class Connection
 {
 	public:
 
-		Connection& operator= ( Connection & );
 		Connection ( const struct sockaddr_in &,
 				int = AF_INET, int = SOCK_STREAM, int = IPPROTO_TCP );
 		~Connection ( void );
@@ -45,6 +44,7 @@ class Connection
 		int getSocketFD ( void ) const;
 		in_addr_t getHost ( void ) const;
 		in_port_t getPort ( void ) const;
+		const struct sockaddr_in & getAddress ( void ) const;
 
 	private:
 	
