@@ -46,6 +46,12 @@ Location::getCGIpass ( void ) const
 	return ( this->_cgi_pass );
 }
 
+const std::pair<int, std::string >&
+Location::getRedirection ( void ) const
+{
+	return ( this->_redirection );
+}
+
 const std::string &
 Location::getRoot ( void ) const
 {
@@ -115,8 +121,15 @@ Location::setUploadFiles ( std::string & arg )
 int
 Location::setRedirection ( std::string & arg )
 {
-	// TODO: validate
-	this->_redirection = arg;
+	std::size_t spacePos = arg.find(' ');
+
+    std::string statusCodeStr = arg.substr(0, spacePos);
+    int statusCode;
+    std::istringstream(statusCodeStr) >> statusCode;
+
+    // Extract the route
+    std::string route = arg.substr(spacePos + 1);
+	this->_redirection = std::make_pair(statusCode, route);
 	return ( EXIT_SUCCESS );
 }
 

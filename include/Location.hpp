@@ -7,6 +7,7 @@
 #define _LOCATION_HPP_
 
 #include <string>
+#include <sstream>
 #include <vector>
 #include <cstdlib>		/* EXIT_SUCCESS, EXIT_FAILURE */
 #include "log.hpp"
@@ -31,6 +32,7 @@ class Location
 		bool getFlag ( int ) const;
 		std::size_t getFlags ( void ) const;
 		const std::string & getCGIparam ( void ) const ;
+		const std::pair<int, std::string >& getRedirection ( void ) const;
 		const std::string & getCGIpass ( void ) const;
 		const std::string & getRoot ( void ) const;
 		std::vector< std::string > & getIndex ( void ) const;
@@ -43,11 +45,10 @@ class Location
 		std::string					_cgi_param;
 		std::string					_cgi_pass;
 		std::string					_root;
+		std::pair<int, std::string> _redirection;
 		bool						_isDefault;
 		std::vector< std::string >	_index;
 		std::string					_upload_files;
-		std::string					_redirection;
-
 };
 
 #endif /* !_LOCATION_HPP_ */

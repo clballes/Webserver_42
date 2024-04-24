@@ -20,6 +20,7 @@ int
 HTTP::http_get ( HTTP & http )
 {
 	DEBUG( "target=\"" << http._request.target << "\"" );
+	DEBUG( "target=\"" << http._status_code << 	" AAAA " << http._request.file_info.st_mode << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode ) )
 	{
 		LOG( YELLOW << http._request.file << " is a directory" );
@@ -39,6 +40,7 @@ HTTP::http_get ( HTTP & http )
 		}
 		else
 		{
+			LOG( YELLOW << http._request.file << " iCGI" );
 			http.cgi_ptr = new CGI( http, http._server );
 			if ( http.cgi_ptr->execute() == EXIT_FAILURE )
 				return ( EXIT_FAILURE );
@@ -46,6 +48,7 @@ HTTP::http_get ( HTTP & http )
 	}
 	else
 	{
+		LOG( YELLOW << http._request.file << "  AAAAAAAAAA " );
 		http._status_code = NOT_FOUND;
 		http.register_send();
 	}

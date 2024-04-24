@@ -1,4 +1,3 @@
-- [ ] upload\_files directive to store the upload file , check upload file
 - [ ] chunked requests (es el EOF tambe si)
 
 ## mpuig-ma
@@ -22,7 +21,6 @@
 ## CLARA
 
 - [ ] REDIRECTION HTTP - mirar q getroute li passi be els params
-- [ ] mirar lu de www/ checkindex
-- [ ] fer un cgi super simple amb getenv
-- [ ] method o cgi -> compose\_response -> register\_send -> request\_send
-- [ ] cgi\_param insert in the env
+- [ ] parsing tirar error quan tira en la redireccio
+- [ ] cgi_param insert in the env
+- [ ] upload\_files directive to store the upload file , check upload file

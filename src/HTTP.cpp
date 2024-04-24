@@ -122,11 +122,9 @@ HTTP::request_recv ( int64_t data )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
 			this->_connection.getHost(), this->_connection.getPort() );
+	
 
-	// TODO: filtrar allowed methods
-	// if its an http redirection
-	// lcoation block en el compose
-	// append location root change if it fits location the target
+	// check for the location
 	this->_request.file = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
 	if ( ! location.empty() )
@@ -134,21 +132,35 @@ HTTP::request_recv ( int64_t data )
 		std::string root_location = this->_server.getRoot( location );
 		this->_request.file.replace( 0 , location.length(), root_location );
 	}
-	else
-	{
-		std::string root_location = this->_server.getRoot( location );
-		root_location.append( "/" );
-		this->_request.file.replace( 0, 1, root_location );
-	}
+	// PREGUNTA, si no tenim ocation i fem un get, no hem dafegir res en el root, la ruta es la q es ya oi?
+	// else
+	// {
+	// 	std::cout << "loco else " << std::endl;
+	// 	std::string root_location = this->_server.getRoot( location );
+	// 	root_location.append( "/" );
+	// 	this->_request.file.replace( 0, 1, root_location );
+	// 	std::cout << root_location << std::endl;
+	// 	std::cout << "req file: " << this->_request.file << std::endl;
+	// }
 	LOG( YELLOW << "file=" << this->_request.file );
 	stat( this->_request.file.c_str(), &this->_request.file_info );
+	
+	// check for redirection if there ys redirection apply
+	const std::pair <int, std::string> &redi = this->_server.getRedirection( location );
+	if (redi.first && redi.second.empty() == false)
+	{
+		this->_status_code = redi.first;
+		this->_response_headers["Location"] = redi.second;
+		this->register_send();
+	}
+	else
+		this->perform();
 	/*
 	if ( S_ISREG( this->_request.file_info.st_mode ) )
 		LOG( YELLOW << this->_request.file << " is regular" );
 	if ( S_ISDIR( this->_request.file_info.st_mode ) )
 		LOG( YELLOW << this->_request.file << " is directory" );
 	*/
-	this->perform();
 	return ( EXIT_SUCCESS );
 }
 
@@ -186,11 +198,12 @@ HTTP::request_send ( void )
 int
 HTTP::compose_response ( HTTP & http )
 {
-	if (http._status_code > 300 && http._status_code < 500)
+	if (http._status_code > 309 && http._status_code < 500)
 	{
 		load_file( http, http._server.getErrorPage(http._status_code) );
 	}
 	DEBUG( http._socket_fd );
+	DEBUG( "status_code=" << http._status_code );
 	DEBUG( "status_code=" << http._status_code );
 	// status-line
 	http._buffer_send.append( "HTTP/1.1 " );
@@ -210,6 +223,10 @@ HTTP::compose_response ( HTTP & http )
 		http._buffer_send.append( it->second );
 		http._buffer_send.append( "\r\n" );
 	}
+	std::cout << "priting resonse headers: "<< std::endl;
+	std::cout << http._buffer_send << std::endl;
+
+
 	http._buffer_send.append( "\r\n" );
 	// Add [message body], if any.
 	http._buffer_send.append( http._message_body );

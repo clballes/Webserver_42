@@ -138,6 +138,15 @@ Server::getCGIparam ( std::string location ) const
 	return ( cgi_param );
 }
 
+const std::pair<int, std::string> & Server::getRedirection ( std::string location ) const
+{
+	DEBUG( "location=\"" << location << "\"" );
+	const Location & loc = this->getRoute( location );
+	const std::pair<int, std::string> & redirection = loc.getRedirection();
+	DEBUG( "redirection status code=\"" << redirection.first << "  url:"<< redirection.second << "\"" );
+	return ( redirection );
+}
+
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
@@ -203,6 +212,13 @@ Server::getPort ( void ) const
 {
 	return ( ntohs( this->_address.sin_port ) );
 }
+
+// std::string
+// Server::getRedirection ( std::string & location ) const
+// {
+// 	return this->getRoute( location ).setRedirection( arg ) );
+// 	// return (this->redirection);
+// }
 
 const struct sockaddr_in &
 Server::getListen ( void ) const
