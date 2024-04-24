@@ -19,7 +19,7 @@ Router::_opts[] =
 	{ DIRECTIVE, "allow_methods", no, yes, "location", &set_allow_methods },
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, no, "server", &set_index },
-	{ DIRECTIVE, "autoindex", no, no, "server", &set_autoindex },
+	{ DIRECTIVE, "autoindex", no, no, "location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
 	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
