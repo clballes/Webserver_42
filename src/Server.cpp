@@ -42,15 +42,22 @@ Server::good ( void ) const
 	return ( this->_good );
 }
 
+// Locations, a.k.a routes, are stored without ending `/'.
+
 Location &
 Server::getRoute ( std::string & location ) const
 {
 	t_route_map::const_iterator it;
+	std::string cmp_str;
 
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		if ( location.compare( 0, it->first.length() + 1, it->first ) == 0 )
+		cmp_str.assign( it->first );
+		if ( location.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+			return ( const_cast< Location & >( it->second ) );
+		cmp_str.append( "/" );		
+		if ( location.compare( 0, cmp_str.length(), cmp_str ) == 0 )
 			return ( const_cast< Location & >( it->second ) );
 		++it;
 	}
@@ -78,11 +85,16 @@ std::string &
 Server::getRouteString ( std::string & location ) const
 {
 	t_route_map::const_iterator it;
+	std::string cmp_str;
 
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
-		if ( location.compare( 0, it->first.length() + 1, it->first ) == 0 )
+		cmp_str.assign( it->first );
+		if ( location.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+			return ( const_cast< std::string & >( it->first ) );
+		cmp_str.append( "/" );		
+		if ( location.compare( 0, cmp_str.length(), cmp_str ) == 0 )
 			return ( const_cast< std::string & >( it->first ) );
 		++it;
 	}
