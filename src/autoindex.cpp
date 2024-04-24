@@ -27,10 +27,10 @@ HTTP::autoindex ( HTTP & http )
 	std::string directory_name;
 	DIR*        directory;
 
-	// http._request.target_replaced is where the client asks
-	// whilst directory_name is the translated location
+	// http._request.target is where the client asks
+	// whilst http._request.target_replaced is the translated location
 	// on the server.
-	directory_name = http._request.target;
+	directory_name = http._request.target_replaced;
 	directory = opendir( directory_name.c_str() );
 	if ( directory == NULL )
 	{
@@ -41,7 +41,7 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "<!DOCTYPE html>" );
 	page.append( "<head>" );
 	page.append( "<title>" );
-	page.append( http._request.target_replaced );
+	page.append( http._request.target );
 	page.append( "</title>" );
 	// Add style tags
 	page.append("<style>");
@@ -76,8 +76,8 @@ HTTP::autoindex ( HTTP & http )
 			}
 			page.append("<a href=\"http://");
 			page.append(http._request_headers["host"]);
-			if ( http._request.target_replaced.size() > 1 )
-				page.append( http._request.target_replaced );
+			if ( http._request.target.size() > 1 )
+				page.append( http._request.target );
 			if ( page.back() != '/' )
 				page.append( "/" );
 			page.append( ent->d_name );
