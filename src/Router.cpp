@@ -19,7 +19,7 @@ Router::_opts[] =
 	{ DIRECTIVE, "allow_methods", no, yes, "location", &set_allow_methods },
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, no, "server", &set_index },
-	{ DIRECTIVE, "autoindex", no, no, "location", &set_autoindex },
+	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
 	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
@@ -372,14 +372,15 @@ Server &
 Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 {
 	std::vector< Server >::iterator it;
+	std::string mod_server_name( server_name );
 	
-	if ( server_name.find( ':' ) != std::string::npos )
-		server_name.erase( server_name.find( ':' ) );
-	DEBUG( "\"" << server_name << "\"" );
+	if ( mod_server_name.find( ':' ) != std::string::npos )
+		mod_server_name.erase( mod_server_name.find( ':' ) );
+	DEBUG( "server_name=\"" << mod_server_name << "\"" );
 	it = this->_servers.begin();
 	while ( it != this->_servers.end() )
 	{
-		if ( it->hasServerName( server_name ) == true
+		if ( it->hasServerName( mod_server_name ) == true
 				&& port == it->getPort() && host == it->getHost() )
 			return ( *it );
 		it++;

@@ -127,20 +127,27 @@ HTTP::request_recv ( int64_t data )
 	// if its an http redirection
 	// lcoation block en el compose
 	// append location root change if it fits location the target
-	this->_request.target_replaced = this->_request.target;
+	this->_request.file = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
 	if ( ! location.empty() )
 	{
 		std::string root_location = this->_server.getRoot( location );
-		this->_request.target_replaced.replace( 0 , location.length(), root_location );
+		this->_request.file.replace( 0 , location.length(), root_location );
 	}
 	else
 	{
 		std::string root_location = this->_server.getRoot( location );
 		root_location.append( "/" );
-		this->_request.target_replaced.replace( 0, 1, root_location );
+		this->_request.file.replace( 0, 1, root_location );
 	}
-	LOG( YELLOW << "target_replaced=" << this->_request.target_replaced );
+	LOG( YELLOW << "file=" << this->_request.file );
+	stat( this->_request.file.c_str(), &this->_request.file_info );
+	/*
+	if ( S_ISREG( this->_request.file_info.st_mode ) )
+		LOG( YELLOW << this->_request.file << " is regular" );
+	if ( S_ISDIR( this->_request.file_info.st_mode ) )
+		LOG( YELLOW << this->_request.file << " is directory" );
+	*/
 	this->perform();
 	return ( EXIT_SUCCESS );
 }
@@ -149,7 +156,7 @@ void
 HTTP::perform ( void )
 {
 	// TODO: proper reorder
-	DEBUG( this->_request.target_replaced );
+	DEBUG( "file=\"" << this->_request.file << "\"" );
 	this->_request.method->method_func( * this );
 	return ;
 }
@@ -164,9 +171,12 @@ HTTP::request_send ( void )
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
 			0x0 );
+	this->_status_code = 0;
 	this->_request.host.clear();
 	this->_request.target.clear();
-	this->_request.target_replaced.clear();
+	this->_request.file.clear();
+	std::memset( &this->_request.file_info, 0,
+			sizeof( this->_request.file_info ) );
 	this->_request.query.clear();
 	this->_request.body.clear();
 	this->_buffer_send.clear();
@@ -180,8 +190,8 @@ HTTP::compose_response ( HTTP & http )
 	{
 		load_file( http, http._server.getErrorPage(http._status_code) );
 	}
-	DEBUG( http._status_code );
 	DEBUG( http._socket_fd );
+	DEBUG( "status_code=" << http._status_code );
 	// status-line
 	http._buffer_send.append( "HTTP/1.1 " );
 	// TODO replace to_string()
@@ -213,7 +223,7 @@ HTTP::load_file( HTTP & http, std::string target )
 	std::ifstream file;
 	std::ifstream::pos_type pos;
 
-	DEBUG( target.c_str() );
+	DEBUG( "file=\"" << target << "\"" );
 	file.open( target, std::ios::in | std::ios::binary | std::ios::ate );
 	if ( file.good() == true && file.eof() == false )
 	{

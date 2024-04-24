@@ -51,11 +51,11 @@ void CGI::setmap()
 	this->_envMap["REMOTE_IDENT"] = headers["authorization"];
 	this->_envMap["REMOTE_USER"] = headers["authorization"];
 	// criptname i filename mimrar dwl tot
-	this->_envMap["SCRIPT_NAME"] = _http.getRequest().target_replaced;
-	this->_envMap["SCRIPT_FILENAME"] =  _http.getRequest().target_replaced;
-	this->_envMap["PATH_INFO"] = _server.getCGIpass(  this->_http.getRequest().target_replaced );	
-	this->_envMap["PATH_TRANSLATED"] = _server.getCGIpass(  this->_http.getRequest().target_replaced );
-	this->_envMap["REQUEST_URI"] =  _server.getCGIpass(  this->_http.getRequest().target_replaced ) + _http.getRequest().query;
+	this->_envMap["SCRIPT_NAME"] = _http.getRequest().file;
+	this->_envMap["SCRIPT_FILENAME"] =  _http.getRequest().file;
+	this->_envMap["PATH_INFO"] = _server.getCGIpass(  this->_http.getRequest().file );	
+	this->_envMap["PATH_TRANSLATED"] = _server.getCGIpass(  this->_http.getRequest().file );
+	this->_envMap["REQUEST_URI"] =  _server.getCGIpass(  this->_http.getRequest().file ) + _http.getRequest().query;
 	if (headers.find("host") != headers.end())
 		this->_envMap["SERVER_NAME"] = headers["host"];
 	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
@@ -84,12 +84,12 @@ CGI::execute ( void )
 	int   fdopen;
 	pid_t pid;
 
-	DEBUG( this->_http.getRequest().target_replaced.c_str() << " and "<< _http.getCGIpass().c_str())
+	DEBUG( this->_http.getRequest().file.c_str() << " and "<< _http.getCGIpass().c_str())
 	DEBUG( "" );
-    fdopen = open( this->_http.getRequest().target_replaced.c_str(), O_RDONLY );
+    fdopen = open( this->_http.getRequest().file.c_str(), O_RDONLY );
     if ( fdopen == -1 )
 	{
-        ERROR( this->_http.getRequest().target_replaced << " " << std::strerror( errno ) );
+        ERROR( this->_http.getRequest().file << " " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
     }
     if ( pipe( _pipefd ) == -1 )

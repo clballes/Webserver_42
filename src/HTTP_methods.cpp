@@ -19,38 +19,36 @@ HTTP::http_head ( HTTP & http )
 int
 HTTP::http_get ( HTTP & http )
 {
-	DEBUG( "target: " << http._request.target );
-	DEBUG( "status code: " << http._status_code );
-	//mirar be si es aqesta ruta
-	if ( can_access_file( http._request.target ) == false )
+	DEBUG( "target=\"" << http._request.target << "\"" );
+	if ( S_ISDIR( http._request.file_info.st_mode ) )
 	{
-		http._status_code = 404;
-		http.register_send();
-		return EXIT_SUCCESS;
-	}
-	if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) == false
-			&& is_regular_file( http._request.target ) == false )
-	{
-		http._status_code = http.check_index();
-		std::cout << http._status_code << std::endl;
-		if (http._status_code == 200)
-			load_file( http, http._request.target );
+		LOG( YELLOW << http._request.file << " is a directory" );
+		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )
+			http._status_code = HTTP::autoindex( http );
+		else
+			http._status_code = FORBIDDEN;
 		http.register_send();
 	}
-	else if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) == true
-			&& is_regular_file( http._request.target ) == false ) //check_regualrflie
+	else if ( S_ISREG( http._request.file_info.st_mode ) )
 	{
-		http._status_code = autoindex( http ); //em torna 200 o 404
+		LOG( YELLOW << http._request.file << " is a regular file" );
+		if ( http._server.getCGIpass( http._request.target ).empty() )
+		{
+			http._status_code = HTTP::load_file( http, http._request.file );
+			http.register_send();
+		}
+		else
+		{
+			http.cgi_ptr = new CGI( http, http._server );
+			if ( http.cgi_ptr->execute() == EXIT_FAILURE )
+				return ( EXIT_FAILURE );
+		}
+	}
+	else
+	{
+		http._status_code = NOT_FOUND;
 		http.register_send();
 	}
-	else if ( http._server.getCGIpass( http._request.target ).empty() )
-	{
-		http.cgi_ptr = new CGI( http , http._server);
-		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
-			return ( EXIT_FAILURE );
-	}
-	// else
-		// que fa si no fa cgi, load file noraml sense cgi 
 	return ( EXIT_SUCCESS );
 }
 

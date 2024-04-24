@@ -29,7 +29,7 @@ Connection::Connection ( const struct sockaddr_in & address,
 		return ;
 	}
 	#endif
-	DEBUG( this->_socket_fd );
+	//DEBUG( this->_socket_fd );
 	if ( ::bind( this->_socket_fd, (struct sockaddr *) &this->_address,
 				sizeof( this->_address ) ) == -1 )
 	{

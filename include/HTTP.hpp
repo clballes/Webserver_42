@@ -13,6 +13,7 @@
 #include <unistd.h> 		/* close */
 #include <cstdlib>
 #include <cstring>
+#include <sys/stat.h>
 
 #include "IEvent.hpp"
 #include "Router.hpp"
@@ -46,7 +47,8 @@ typedef struct s_request
 	t_http_method * method;
 	std::string host;
 	std::string target;
-	std::string target_replaced;
+	std::string file;
+	struct stat file_info;
 	std::string query;
 	std::string body;
 	int http_version;

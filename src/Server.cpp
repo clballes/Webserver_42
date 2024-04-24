@@ -33,6 +33,7 @@ Server::operator= ( const Server & instance )
 
 Server::~Server ( void )
 {
+	DEBUG ( "" );
 	return ;
 }
 
@@ -63,6 +64,8 @@ Server::getRoute ( std::string & location ) const
 	}
 	return ( getDefaultRoute() );
 }
+
+// TODO: there is no option to set default route.
 
 Location &
 Server::getDefaultRoute ( void ) const
@@ -105,15 +108,18 @@ Server::getRouteString ( std::string & location ) const
 bool
 Server::getFlag ( int mask, std::string location ) const
 {
-	DEBUG( "location=" << location );
+	DEBUG( "location=\"" << location << "\"" );
 	return ( getRoute( location ).getFlag( mask ) );
 }
 
 std::size_t
 Server::getFlags ( std::string location ) const
 {
-	DEBUG( "location=" << location );
-	return ( getRoute( location ).getFlags() );
+	DEBUG( "location=\"" << location << "\"" );
+	const Location & loc = this->getRoute( location );
+	std::size_t flags = loc.getFlags();
+	DEBUG( "flags=" << flags );
+	return ( flags );
 }
 
 std::size_t
@@ -125,8 +131,11 @@ Server::getClientMaxBodySize ( void ) const
 const std::string &
 Server::getCGIparam ( std::string location ) const
 {
-	DEBUG( "location=" << location );
-	return ( getRoute( location ).getCGIparam() );
+	DEBUG( "location=\"" << location << "\"" );
+	const Location & loc = this->getRoute( location );
+	const std::string & cgi_param = loc.getCGIparam();
+	DEBUG( cgi_param );
+	return ( cgi_param );
 }
 
 const std::string &
@@ -204,12 +213,16 @@ Server::getListen ( void ) const
 int
 Server::setRoute ( std::string & location )
 {
-	if ( this->_routes.find( location ) == this->_routes.end() )
+	std::string mod_location( location );
+
+	while ( mod_location.back() == '/' )
+		mod_location.erase( mod_location.length() - 1, 1 );
+	if ( this->_routes.find( mod_location ) == this->_routes.end() )
 	{
-		(void) this->_routes[location];
+		(void) this->_routes[mod_location];
 		return ( EXIT_SUCCESS );
 	}
-	ERROR( "location \"" << location << "\" already set" );
+	ERROR( "location \"" << mod_location << "\" already set" );
 	return ( EXIT_FAILURE );
 }
 

@@ -113,6 +113,8 @@ static std::string parse_query ( std::string & );
 //
 // No other types of request-target are implemented.
 // These could be, absolute-form, authority-form, asterisk-form.
+//
+// All `/' found at the end are removed.
 
 int
 parse_target( t_request & request, std::string & line )
@@ -124,13 +126,13 @@ parse_target( t_request & request, std::string & line )
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
 	value = line.substr( 0, pos );
+	if ( value[0] != '/' )
+		return ( EXIT_FAILURE );
 	request.query = parse_query( value );
 	if ( request.query.length() > 0 )
 		value.erase( value.length() - request.query.length() );
 	while ( value.length() > 1 && value.back() == '/' )
 		value.erase( value.length() - 1, 1 );
-	if ( value[0] != '/' )
-		return ( EXIT_FAILURE );
 	request.target = value;
 	urldecode( request.target );
 	return ( EXIT_SUCCESS );

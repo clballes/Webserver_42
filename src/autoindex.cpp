@@ -27,10 +27,8 @@ HTTP::autoindex ( HTTP & http )
 	std::string directory_name;
 	DIR*        directory;
 
-	// http._request.target is where the client asks
-	// whilst http._request.target_replaced is the translated location
-	// on the server.
-	directory_name = http._request.target_replaced;
+	DEBUG( http._request.file );
+	directory_name = http._request.file;
 	directory = opendir( directory_name.c_str() );
 	if ( directory == NULL )
 	{
@@ -70,9 +68,9 @@ HTTP::autoindex ( HTTP & http )
 			page.append(ent->d_name);
 			page.append("\">");
 			if (!is_regular_file(ent->d_name)) {
-				page.append("<img src=\"/Users/clara/Desktop/web_server_2/tools/dir_icon.png\" alt=\"Directory Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
+				page.append("<img src=\"/assets/dir_icon.png\" alt=\"Directory Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
 			} else {
-				page.append("<img src=\"/Users/clballes/Desktop/web42/tools/file_icon.png\" alt=\"File Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
+				page.append("<img src=\"/assets/file_icon.png\" alt=\"File Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
 			}
 			page.append("<a href=\"http://");
 			page.append(http._request_headers["host"]);
