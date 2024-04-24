@@ -97,6 +97,7 @@ HTTP::request_recv ( int64_t data )
 
 	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );
 	this->_buffer_recv.resize( data + 1 );
+	this->_buffer_recv.back() = '\0';
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 	if ( n == -1 )
 	{
@@ -163,6 +164,11 @@ HTTP::request_send ( void )
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
 			0x0 );
+	this->_request.host.clear();
+	this->_request.target.clear();
+	this->_request.target_replaced.clear();
+	this->_request.query.clear();
+	this->_request.body.clear();
 	this->_buffer_send.clear();
 	return ( EXIT_SUCCESS );
 }
