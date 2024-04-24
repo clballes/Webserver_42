@@ -59,6 +59,15 @@ int
 HTTP::http_post ( HTTP & http )
 {
 	DEBUG( "" );
+	if ( S_ISDIR( http._request.file_info.st_mode ) ) // si es un direcotry i eta enabled  podriem ferho o be posar error de forbidden
+	{
+		LOG( YELLOW << http._request.file << " is a directory" );
+		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )
+			http._status_code = HTTP::autoindex( http );
+		else
+			http._status_code = FORBIDDEN;
+		http.register_send();
+	}
 	if ( http._server.getCGIpass( http._request.target ).empty() )
 	{
 		http.cgi_ptr = new CGI( http , http._server);

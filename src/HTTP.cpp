@@ -122,39 +122,7 @@ HTTP::request_recv ( int64_t data )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
 			this->_connection.getHost(), this->_connection.getPort() );
-	
-
-	// check for the location
-	this->_request.file = this->_request.target;
-	std::string location = this->_server.getRouteString( this->_request.target );
-	if ( ! location.empty() )
-	{
-		std::string root_location = this->_server.getRoot( location );
-		this->_request.file.replace( 0 , location.length(), root_location );
-	}
-	// PREGUNTA, si no tenim ocation i fem un get, no hem dafegir res en el root, la ruta es la q es ya oi?
-	// else
-	// {
-	// 	std::cout << "loco else " << std::endl;
-	// 	std::string root_location = this->_server.getRoot( location );
-	// 	root_location.append( "/" );
-	// 	this->_request.file.replace( 0, 1, root_location );
-	// 	std::cout << root_location << std::endl;
-	// 	std::cout << "req file: " << this->_request.file << std::endl;
-	// }
-	LOG( YELLOW << "file=" << this->_request.file );
-	stat( this->_request.file.c_str(), &this->_request.file_info );
-	
-	// check for redirection if there ys redirection apply
-	const std::pair <int, std::string> &redi = this->_server.getRedirection( location );
-	if (redi.first && redi.second.empty() == false)
-	{
-		this->_status_code = redi.first;
-		this->_response_headers["Location"] = redi.second;
-		this->register_send();
-	}
-	else
-		this->perform();
+	this->perform();
 	/*
 	if ( S_ISREG( this->_request.file_info.st_mode ) )
 		LOG( YELLOW << this->_request.file << " is regular" );
@@ -167,6 +135,51 @@ HTTP::request_recv ( int64_t data )
 void
 HTTP::perform ( void )
 {
+	//check if the allowed method is available
+
+	int method = 0;
+	if (strcmp(this->_request.method->method, "GET") == 0) {
+		method = METHOD_GET;
+	} else if (strcmp(this->_request.method->method, "POST") == 0) {
+		method = METHOD_POST;
+	}
+	else if (strcmp(this->_request.method->method, "DELETE") == 0) {
+		method = METHOD_DELETE;
+	}
+	
+	LOG( YELLOW << "target=" << this->_request.target);
+
+	// check for the location root
+	this->_request.file = this->_request.target;
+	std::string location = this->_server.getRouteString( this->_request.target );
+	std::cout << "location isssss: "<< location << std::endl;
+
+	if ( ! location.empty() )
+	{
+		std::string root_location = this->_server.getRoot( location );
+		this->_request.file.replace( 0 , location.length(), root_location );
+	}
+	LOG( YELLOW << "file=" << this->_request.file << " loc:" << location);
+	stat( this->_request.file.c_str(), &this->_request.file_info );
+
+	// check if the allowed method is allowed to perform the request 
+	// if ( !this->_server.getFlag( method,this->_request.target ) && (_redirection_str.empty() == true)) //revisar perq en la cofig del tiemout quan no hi ha allowed methods definit no entra, clarament, pero veure si esta ok tenim un probelma per limitar els allowed methods i les redirections
+	// {
+	// 	this->_status_code = 405;
+	// 	this->register_send();
+	// 	return;
+	// }
+
+	// check for http redirection
+	const std::pair <int, std::string> &redi = this->_server.getRedirection( location );
+	if (redi.first && redi.second.empty() == false)
+	{
+		this->_status_code = redi.first;
+		this->_redirection_str = redi.second;
+		this->_response_headers["Location"] = redi.second;
+		this->register_send();
+		return ;
+	}
 	// TODO: proper reorder
 	DEBUG( "file=\"" << this->_request.file << "\"" );
 	this->_request.method->method_func( * this );

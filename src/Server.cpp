@@ -158,6 +158,16 @@ Server::getCGIpass ( std::string location ) const
 }
 
 const std::string &
+Server::getUploaded_file ( std::string location ) const
+{
+	DEBUG( "uploaded file=\"" << location << "\"" );
+	const Location & loc = this->getRoute( location );
+	const std::string & uploaded = loc.getUploadfile();
+	DEBUG( "uploaded=\"" << uploaded << "\"" );
+	return ( uploaded );
+}
+
+const std::string &
 Server::getRoot ( std::string location ) const
 {
 	DEBUG( "location=\"" << location << "\"" );
@@ -325,6 +335,7 @@ Server::setUploadFiles ( std::string & arg, std::string location )
 int
 Server::setRedirection ( std::string & arg, std::string location )
 {
+	
 	return ( this->getRoute( location ).setRedirection( arg ) );
 }
 

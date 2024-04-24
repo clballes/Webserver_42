@@ -39,7 +39,6 @@ typedef struct s_http_method
 	const char * method;
 	int ( *method_func )( HTTP & );
 	int code;
-
 } t_http_method;
 
 typedef struct s_request
@@ -100,6 +99,7 @@ class HTTP: public IEvent
 		std::string				_message_body;
 		t_request				_request;
 		int						_status_code;
+		std::string				_redirection_str;
 		bool					_keep_alive; //?
 
 		int parse ( void );

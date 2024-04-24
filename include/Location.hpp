@@ -36,6 +36,7 @@ class Location
 		const std::string & getCGIpass ( void ) const;
 		const std::string & getRoot ( void ) const;
 		std::vector< std::string > & getIndex ( void ) const;
+		const std::string & getUploadfile ( void ) const;
 
 		void log_conf ( void ) const;
 

@@ -4,6 +4,7 @@
 /* Wed Apr 17 17:14:14 2024                                                   */
 
 #include "Location.hpp"
+#include "file.hpp"
 
 Location::Location ( void ): _flags( 0 ), _isDefault( false )
 {
@@ -44,6 +45,12 @@ const std::string &
 Location::getCGIpass ( void ) const
 {
 	return ( this->_cgi_pass );
+}
+
+const std::string &
+Location::getUploadfile ( void ) const
+{
+	return ( this->_upload_files );
 }
 
 const std::pair<int, std::string >&
@@ -113,6 +120,10 @@ Location::setIndex ( std::string & arg )
 int
 Location::setUploadFiles ( std::string & arg )
 {
+	if ( can_access_file(arg ) == false)
+	{
+		return ( EXIT_FAILURE );
+	}
 	// TODO: validate
 	this->_upload_files = arg;
 	return ( EXIT_SUCCESS );
@@ -126,7 +137,11 @@ Location::setRedirection ( std::string & arg )
     std::string statusCodeStr = arg.substr(0, spacePos);
     int statusCode;
     std::istringstream(statusCodeStr) >> statusCode;
-
+	if (statusCode != 301 && statusCode != 302 && statusCode != 308 && statusCode != 303 && statusCode != 307 )
+	{
+		return (EXIT_FAILURE);
+	}
+	//nose si em faltaria parsejar si la ruta existeix de la direccio o ja petara despres
     // Extract the route
     std::string route = arg.substr(spacePos + 1);
 	this->_redirection = std::make_pair(statusCode, route);
