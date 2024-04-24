@@ -35,11 +35,12 @@ class CGI : public IEvent
 
 	protected:
 
-		HTTP &  _http;
-		Server &_server;
-		char ** _env;
-		std::map <std::string, std::string> _envMap;
-		int _pipefd[2];
+		HTTP &									_http;
+		Server &								_server;
+		pid_t									_pid;
+		char **									_env;
+		std::map < std::string, std::string >	_envMap;
+		int										_pipefd[2];
 };
 
 #endif /* CGI.hpp */

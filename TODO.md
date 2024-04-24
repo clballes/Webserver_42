@@ -6,7 +6,6 @@
 - [ ] filtrar valid (allowed) methods
 - [ ] location \*.php 
 - [ ] timeout
-
 - [ ] tests
 - [ ] set defaults
 - [ ] directory control ( . .. )
@@ -17,7 +16,9 @@
 - [x] required directives: listen, root
 - [ ] required directives: automate
 - [ ] server\_name listening to localhost should match server listening to 0.0.0.0 ?
-- [x] target: ending `/' does not imply file or directory; remove for simplification
+- [ ] check exec permissions pre-execve()
+- [ ] graceful\_stop
+- [ ] leaks
 
 ## CLARA
 
