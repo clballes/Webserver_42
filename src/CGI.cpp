@@ -8,7 +8,7 @@
 #define READ 0
 #define WRITE 1
 
-CGI::CGI ( HTTP & http ): _http( http ), _env( 0x0 )
+CGI::CGI ( HTTP & http , Server & server): _http( http ), _server ( server ), _env( 0x0 )
 {
 	DEBUG( "" );
 	setmap();
@@ -46,25 +46,20 @@ void CGI::setmap()
 	this->_envMap["SERVER_SOFTWARE"] = "Webserv/1.0";
 	this->_envMap["REQUEST_METHOD"] = _http.getRequest().method->method;
 	this->_envMap["QUERY_STRING"] = _http.getRequest().query;
-	this->_envMap["CONTENT_TYPE"] = headers["content-Type"];
+	this->_envMap["CONTENT_TYPE"] = headers["content-type"];
 	this->_envMap["CONTENT_LENGTH"] = std::to_string(_http.getRequest().body.length());
 	this->_envMap["REMOTE_IDENT"] = headers["authorization"];
 	this->_envMap["REMOTE_USER"] = headers["authorization"];
+	// criptname i filename mimrar dwl tot
 	this->_envMap["SCRIPT_NAME"] = _http.getRequest().target;
 	this->_envMap["SCRIPT_FILENAME"] =  _http.getRequest().target;
-	this->_envMap["PATH_INFO"] =_http.getCGIpass();	
-	this->_envMap["PATH_TRANSLATED"] = _http.getCGIpass(); 
-	this->_envMap["REQUEST_URI"] = _http.getCGIpass() + _http.getRequest().query;
-	this->_envMap["REQUEST_URI"] = _http.getCGIpass();
-	if (headers.find("Hostname") != headers.end())
-		this->_envMap["SERVER_NAME"] = headers["hostname"];
-	else
-		this->_envMap["SERVER_NAME"] = this->_envMap["REMOTEaddr"];
+	this->_envMap["PATH_INFO"] = _server.getCGIpass(  this->_http.getRequest().target );	
+	this->_envMap["PATH_TRANSLATED"] = _server.getCGIpass(  this->_http.getRequest().target );
+	this->_envMap["REQUEST_URI"] =  _server.getCGIpass(  this->_http.getRequest().target ) + _http.getRequest().query;
+	if (headers.find("host") != headers.end())
+		this->_envMap["SERVER_NAME"] = headers["host"];
 	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
-
-	// fer la funcio ara esta malament aixo
-	// this->_envMap["SERVER_NAME"] = std::to_string(_http.getServer()->getHost());
-	// this->_envMap["SERVER_PORT"] = _http.getServer()->getPort();	
+	this->_envMap["SERVER_PORT"] = std::to_string(_server.getPort());
 }
 
 int CGI::register_process( pid_t pid)
@@ -111,19 +106,14 @@ CGI::execute ( void )
     }
     if ( pid == 0 )
     {
+		_server.getRoute ( this->_http.getRequest().target_autoindex ).log_conf();
+		std::string cgi =  _server.getCGIpass( this->_http.getRequest().target_autoindex ); //aixo accedir CGI
+		std::cout << "cgi is: "<< cgi << std::endl;
         close( _pipefd[READ] );
 		dup2( _pipefd[WRITE], STDOUT_FILENO );
         dup2( fdopen, STDIN_FILENO );
 		close( _pipefd[WRITE] );
-		// std::cout <<"cgi es:" << _http.getCGIpass().c_str() << std::endl;
-        // execve( _http.getCGIpass().c_str(), NULL, this->_env );
-		// if (strncmp(_http.methods->method, "POST", 5) == 0)
-        // 	execve( "/Users/clballes/Desktop/web/tests/cgi_post.py", NULL, this->_env );
-		// else if (strncmp(_http.methods->method, "GET", 5) == 0)
-		std::string cgi =  _http.getServer().getCGIpass( this->_http.getRequest().target); //aixo accedir CGI
         execve(cgi.c_str() , NULL, this->_env );
-		
-		
 		ERROR( "exec en el cgi: " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
 		// TODO: timeout

@@ -122,6 +122,7 @@ HTTP::request_recv ( int64_t data )
 	this->_server = this->_router.getServer( this->_request.host,
 			this->_connection.getHost(), this->_connection.getPort() );
 
+	// TODO: filtrar allowed methods
 	// if its an http redirection
 	// lcoation block en el compose
 	// append location root change if it fits location the target
@@ -148,31 +149,7 @@ HTTP::perform ( void )
 {
 	// TODO: proper reorder
 	DEBUG( this->_request.target_replaced );
-	if ( can_access_file( this->_request.target_replaced ) == false )
-	{
-		std::cout << "A0" << std::endl;
-		this->_status_code = 404;
-	}
-	if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == false
-			&& is_regular_file( this->_request.target_replaced ) == false )
-	{
-		std::cout << "A" << std::endl;
-		this->_status_code = check_index();
-		std::cout << this->_status_code << std::endl;
-		if (this->_status_code == 200)
-			load_file( *this, this->_request.target );
-		this->register_send();
-	}
-	else if ( this->_server.getFlag( F_AUTOINDEX, this->_request.target ) == true
-			&& is_regular_file( this->_request.target ) == false ) //check_regualrflie
-	{
-		this->_status_code = autoindex( *this ); //em torna 200 o 404
-		this->register_send();
-	}
-	else
-	{
-		this->_request.method->method_func( * this );
-	}
+	this->_request.method->method_func( * this );
 	return ;
 }
 
@@ -193,7 +170,6 @@ HTTP::request_send ( void )
 int
 HTTP::compose_response ( HTTP & http )
 {
-	//mirar aqui els errors
 	if (http._status_code > 300 && http._status_code < 500)
 	{
 		load_file( http, http._server.getErrorPage(http._status_code) );
@@ -253,16 +229,16 @@ int
 HTTP::check_index ( void )
 {
 	std::vector< std::string > & vec = this->_server.getIndex();
-
 	for ( std::vector< std::string >::const_iterator it = vec.begin();
 			it != vec.end(); ++it )
 	{
 		std::string tempTarget = this->_request.target;
-		std::cout << "temp:" << tempTarget << std::endl;
-		tempTarget.append("/");
+		char lastChar = tempTarget.at( tempTarget.size() - 1 );
+		if ( lastChar != '/' )
+		{
+			tempTarget.append("/");
+		}
 		tempTarget.append(*it);
-		std::cout << "temp2:" << tempTarget << std::endl;
-
 		if (routeExists(tempTarget))
 		{
 			this->_request.target.append("/");

@@ -5,6 +5,7 @@
 
 #include "file.hpp"
 #include <unistd.h>
+#include <iostream>
 #include <sys/stat.h>
 
 bool
@@ -20,6 +21,10 @@ is_regular_file( const std::string & filename )
 bool can_access_file ( const std::string & filename )
 {
     if ( !filename.empty() && filename.back() == '/' )
+	{
+        return ( true );
+    }
+    if ( !filename.empty() && filename.back() != '/' && (is_regular_file( filename) == false))
 	{
         return ( true );
     }
