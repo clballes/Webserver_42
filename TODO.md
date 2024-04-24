@@ -9,7 +9,7 @@
 - [ ] tests
 - [ ] set defaults
 - [ ] directory control ( . .. )
-- [x] /test != /test/ != /testy
+- [x] /test != /test/ != /testy != /test/other
 - [x] compare listen directives, so there are no duplicate Connections
 - [ ] compare server blocks so there are no repetitions
 - [x] required directives: listen, root
