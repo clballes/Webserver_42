@@ -92,7 +92,11 @@ int
 Location::setRoot ( std::string & arg )
 {
 	// TODO: validate
-	this->_root.assign( arg );
+	std::string mod_arg( arg );
+
+	while ( mod_arg.back() == '/' )
+		mod_arg.erase( mod_arg.length() - 1, 1 );
+	this->_root.assign( mod_arg );
 	return ( EXIT_SUCCESS );
 }
 
