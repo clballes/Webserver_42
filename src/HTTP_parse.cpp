@@ -5,6 +5,13 @@
 
 #include "HTTP.hpp"
 
+static int parse_method ( t_request &, std::string & );
+static int parse_target ( t_request &, std::string & );
+static int parse_http_version ( t_request &, std::string & );
+static std::string parse_query ( std::string & );
+static size_t how_many_methods( t_http_method * ptr );
+static size_t get_method_longest_len ( t_http_method * ptr );
+
 int
 HTTP::parse ( void )
 {
@@ -56,10 +63,6 @@ HTTP::parse ( void )
 // start-line = request-line / status-line
 // request-line = method SP request-target SP HTTP-version
 
-static int parse_method ( t_request &, std::string & );
-static int parse_target ( t_request &, std::string & );
-static int parse_http_version ( t_request &, std::string & );
-
 int
 HTTP::parse_start_line( std::string & line )
 {
@@ -78,9 +81,6 @@ HTTP::parse_start_line( std::string & line )
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
-
-static size_t how_many_methods( t_http_method * ptr );
-static size_t get_method_longest_len ( t_http_method * ptr );
 
 int
 parse_method( t_request & request, std::string & line )
@@ -106,8 +106,6 @@ parse_method( t_request & request, std::string & line )
 	request.method = &HTTP::methods[iterator];
 	return ( EXIT_SUCCESS );
 }
-
-static std::string parse_query ( std::string & );
 
 // request-target = origin-form
 //

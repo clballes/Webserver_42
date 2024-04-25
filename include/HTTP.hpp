@@ -67,17 +67,17 @@ class HTTP: public IEvent
 		int register_send ( void );
 		int request_recv ( int64_t );
 		int request_send ( void );
-		void perform ( void );
+		int compose_response ( void );
 		int check_index();
 
+		Server & getServer();
 		t_request & getRequest( void );
 		t_headers & getHeaders( void );
-		Server & getServer();
-		std::string & getCGIpass( void );
+		std::string & getCGIpass( void ); //out
 		
-		void set_message_body( std::string & );
+		void setMessageBody( const std::string & );
 		void setStatusCode( int );
-		void set_response_headers( std::string arg, std::string value );
+		void setResponseHeaders( const std::string &, const std::string & );
 		
 		static int load_file ( HTTP &, std::string );
 		static t_http_method methods[];
@@ -109,7 +109,6 @@ class HTTP: public IEvent
 		static int http_head ( HTTP & );
 		static int http_post ( HTTP & );
 		static int http_delete ( HTTP & );
-		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP & );
 };
 

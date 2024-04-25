@@ -5,7 +5,8 @@
 
 #include "Server.hpp"
 
-Server::Server ( void ): _good( true )
+Server::Server ( void ):
+	_good( true )
 {
 	std::memset( &this->_address, 0, sizeof( this->_address ) );
 	this->_error_pages[400] = "src/err_pages/400.html";
@@ -33,7 +34,6 @@ Server::operator= ( const Server & instance )
 
 Server::~Server ( void )
 {
-	DEBUG ( "" );
 	return ;
 }
 
@@ -46,7 +46,7 @@ Server::good ( void ) const
 // Locations, a.k.a routes, are stored without ending `/'.
 
 Location &
-Server::getRoute ( std::string & location ) const
+Server::getRoute ( const std::string & location ) const
 {
 	t_route_map::const_iterator it;
 	std::string cmp_str;
@@ -84,8 +84,8 @@ Server::getDefaultRoute ( void ) const
 	return ( const_cast< Location & >( it->second ) );
 }
 
-std::string &
-Server::getRouteString ( std::string & location ) const
+const std::string &
+Server::getRouteString ( const std::string & location ) const
 {
 	t_route_map::const_iterator it;
 	std::string cmp_str;
@@ -115,10 +115,9 @@ Server::getFlag ( int mask, std::string location ) const
 std::size_t
 Server::getFlags ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	std::size_t flags = loc.getFlags();
-	DEBUG( "flags=" << flags );
+	DEBUG( "location=\"" << location << "\" flags=" << flags );
 	return ( flags );
 }
 
@@ -131,37 +130,34 @@ Server::getClientMaxBodySize ( void ) const
 const std::string &
 Server::getCGIparam ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	const std::string & cgi_param = loc.getCGIparam();
-	DEBUG( cgi_param );
+	DEBUG( "location=\"" << location << "\" cgi_param=\"" << cgi_param << "\"" );
 	return ( cgi_param );
 }
 
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	const std::string & cgi_pass = loc.getCGIpass();
-	DEBUG( "cgi_pass=\"" << cgi_pass << "\"" );
+	DEBUG( "location=\"" << location << "\" cgi_pass=\"" << cgi_pass << "\"" );
 	return ( cgi_pass );
 }
 
 const std::string &
 Server::getRoot ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	const std::string & root = loc.getRoot();
-	DEBUG( "root=\"" << root << "\"" );
+	DEBUG( "location=\"" << location << "\" root=\"" << root << "\"" );
 	return ( root );
 }
 
-std::vector< std::string > &
+const std::vector< std::string > &
 Server::getServerNames ( void ) const
 {
-	return ( const_cast< std::vector< std::string > & >( this->_server_name ) );
+	return ( this->_server_name );
 }
 
 bool
@@ -179,7 +175,7 @@ Server::hasServerName ( std::string & name ) const
 	return ( false );
 }
 
-std::vector< std::string > &
+const std::vector< std::string > &
 Server::getIndex ( std::string location ) const
 {
 	DEBUG( "location=" << location );
@@ -211,7 +207,7 @@ Server::getListen ( void ) const
 }
 
 int
-Server::setRoute ( std::string & location )
+Server::setRoute ( const std::string & location )
 {
 	std::string mod_location( location );
 
@@ -240,13 +236,13 @@ Server::setClientMaxBodySize ( std::size_t size )
 }
 
 int
-Server::setCGIparam ( std::string & arg, std::string location )
+Server::setCGIparam ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setCGIparam( arg ) );
 }
 
 int
-Server::setCGIpass ( std::string & arg, std::string location )
+Server::setCGIpass ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setCGIpass( arg ) );
 }
@@ -259,13 +255,13 @@ Server::setListen ( struct sockaddr_in & address )
 }
 
 int
-Server::setRoot ( std::string & arg, std::string location )
+Server::setRoot ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setRoot( arg ) );
 }
 
 int
-Server::setServerName ( std::string & arg )
+Server::setServerName ( const std::string & arg )
 {
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
@@ -283,13 +279,13 @@ Server::setServerName ( std::string & arg )
 }
 
 int
-Server::setIndex ( std::string & arg, std::string location )
+Server::setIndex ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setIndex( arg ) );
 }
 
 int
-Server::setErrorPage ( int n, std::string & path )
+Server::setErrorPage ( int n, const std::string & path )
 {
 	if ( n < 400 || n > 555 )
 	{
@@ -301,13 +297,13 @@ Server::setErrorPage ( int n, std::string & path )
 }
 
 int
-Server::setUploadFiles ( std::string & arg, std::string location )
+Server::setUploadFiles ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setUploadFiles( arg ) );
 }
 
 int
-Server::setRedirection ( std::string & arg, std::string location )
+Server::setRedirection ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setRedirection( arg ) );
 }

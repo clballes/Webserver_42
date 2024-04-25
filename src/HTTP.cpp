@@ -120,6 +120,8 @@ HTTP::request_recv ( int64_t data )
 		this->_buffer_recv.clear();
 		return ( EXIT_FAILURE );
 	}
+
+	// TODO: this goes into parse_request
 	LOG_BUFFER( this->_buffer_recv, GREEN );
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
@@ -143,25 +145,69 @@ HTTP::request_recv ( int64_t data )
 		root_location.append( "/" );
 		this->_request.file.replace( 0, 1, root_location );
 	}
-	LOG( YELLOW << "file=" << this->_request.file );
 	stat( this->_request.file.c_str(), &this->_request.file_info );
-	/*
-	if ( S_ISREG( this->_request.file_info.st_mode ) )
-		LOG( YELLOW << this->_request.file << " is regular" );
-	if ( S_ISDIR( this->_request.file_info.st_mode ) )
-		LOG( YELLOW << this->_request.file << " is directory" );
-	*/
-	this->perform();
-	return ( EXIT_SUCCESS );
+	return ( this->compose_response() );
 }
 
-void
-HTTP::perform ( void )
+// There is no need to check if this->_request.method is NULL
+// as this check is done in the parse() call;
+
+int
+HTTP::compose_response ( void )
 {
-	// TODO: proper reorder
-	DEBUG( "file=\"" << this->_request.file << "\"" );
-	this->_request.method->method_func( * this );
-	return ;
+	DEBUG( this->_socket_fd );
+	if ( S_ISREG( this->_request.file_info.st_mode ) )
+	{
+		LOG( GREEN << this->_request.file << " is regular" );
+	}
+	else if ( S_ISDIR( this->_request.file_info.st_mode ) )
+	{
+		LOG( GREEN << this->_request.file << " is directory" );
+	}
+	else
+	{
+		LOG( RED << this->_request.file << " is not regular neither directory" );
+	}
+
+	if ( ! this->_server.getCGIpass( this->_request.target ).empty() )
+	{
+		this->_cgi_ptr = new CGI( *this, this->_server );
+		if ( this->_cgi_ptr->execute() == EXIT_SUCCESS )
+			return ( EXIT_SUCCESS );
+		else
+			this->_status_code = BAD_GATEWAY;
+	}
+	else
+		(void) this->_request.method->method_func( * this );
+
+	DEBUG( "status_code=" << this->_status_code );
+	if ( this->_status_code >= 300 && this->_status_code <= 511 )
+	{
+		load_file( *this, this->_server.getErrorPage( this->_status_code ) );
+	}
+	
+	// TODO: replace to_string(); it's not c++98.
+	this->_buffer_send.append( "HTTP/1.1 " );
+	this->_buffer_send.append( std::to_string( this->_status_code ) );
+	this->_buffer_send.append( " \r\n" );
+	this->_response_headers["content-length"] = std::to_string( this->_message_body.size() );
+	// Add response headers if any + ending CRLF.
+	for ( t_headers::iterator it = this->_response_headers.begin();
+			it != this->_response_headers.end(); ++it )
+	{
+		this->_buffer_send.append( it->first );
+		this->_buffer_send.append( ": " );
+		this->_buffer_send.append( it->second );
+		this->_buffer_send.append( "\r\n" );
+	}
+	this->_buffer_send.append( "\r\n" );
+	// Add [message body] if any.
+	this->_buffer_send.append( this->_message_body );
+	this->_message_body.clear();
+
+	this->request_send();
+
+	return ( EXIT_SUCCESS );
 }
 
 int
@@ -169,7 +215,7 @@ HTTP::request_send ( void )
 {
 	DEBUG( "fd=" << this->_socket_fd
 			<< " bytes=" << this->_buffer_send.length() );
-	HTTP::compose_response( *this );
+	//HTTP::compose_response( *this );
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
@@ -183,40 +229,6 @@ HTTP::request_send ( void )
 	this->_request.query.clear();
 	this->_request.body.clear();
 	this->_buffer_send.clear();
-	return ( EXIT_SUCCESS );
-}
-
-int
-HTTP::compose_response ( HTTP & http )
-{
-	if (http._status_code > 300 && http._status_code < 500)
-	{
-		load_file( http, http._server.getErrorPage(http._status_code) );
-	}
-	DEBUG( http._socket_fd );
-	DEBUG( "status_code=" << http._status_code );
-	// status-line
-	http._buffer_send.append( "HTTP/1.1 " );
-	// TODO replace to_string()
-	http._buffer_send.append( std::to_string( http._status_code ) );
-	http._buffer_send.append( " \r\n" );
-	// TODO: replace to_string(); it's not c++98.
-	//http._response_headers["content-type"] = "text/html";
-	http._response_headers["content-length"] = std::to_string( http._message_body.size() );
-	// Add response headers, if any.
-	// + ending CRLF
-	for ( t_headers::iterator it = http._response_headers.begin();
-			it != http._response_headers.end(); ++it )
-	{
-		http._buffer_send.append( it->first );
-		http._buffer_send.append( ": " );
-		http._buffer_send.append( it->second );
-		http._buffer_send.append( "\r\n" );
-	}
-	http._buffer_send.append( "\r\n" );
-	// Add [message body], if any.
-	http._buffer_send.append( http._message_body );
-	http._message_body.clear();
 	return ( EXIT_SUCCESS );
 }
 
@@ -247,7 +259,7 @@ HTTP::load_file( HTTP & http, std::string target )
 int 
 HTTP::check_index ( void )
 {
-	std::vector< std::string > & vec = this->_server.getIndex();
+	const std::vector< std::string > & vec = this->_server.getIndex();
 	for ( std::vector< std::string >::const_iterator it = vec.begin();
 			it != vec.end(); ++it )
 	{
@@ -273,18 +285,10 @@ HTTP::check_index ( void )
 	return ( FORBIDDEN );
 }
 
-std::string &
-HTTP::getCGIpass ( void )
+Server &
+HTTP::getServer ( void )
 {
-	return ( const_cast < std::string & >
-			( this->_server.getCGIpass( this->_request.target ) ) );
-}
-
-void
-HTTP::set_message_body ( std::string & message )
-{
-	this->_message_body = message;
-	return ;
+	return ( this->_server );
 }
 
 t_request &
@@ -300,10 +304,18 @@ HTTP::getHeaders ( void )
 }
 
 void
-HTTP::set_response_headers ( std::string arg, std::string value )
+HTTP::setMessageBody ( const std::string & message )
 {
-	this->_response_headers[ arg ] = value;
-	std::cout << "set: " << arg << value << std::endl;
+	this->_message_body = message;
+	return ;
+}
+
+void
+HTTP::setResponseHeaders ( const std::string & name,
+		const std::string & value )
+{
+	this->_response_headers[name] = value;
+	LOG( "set: " << name << "=" << value );
 	return ;
 }
 
@@ -313,10 +325,4 @@ HTTP::setStatusCode ( int value )
 	this->_status_code = value;
 	std::cout << "set sttaus code: " << this->_status_code << std::endl;
 	return ;
-}
-
-Server &
-HTTP::getServer ( void )
-{
-	return ( this->_server );
 }

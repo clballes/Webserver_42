@@ -5,7 +5,8 @@
 
 #include "Location.hpp"
 
-Location::Location ( void ): _flags( 0 ), _isDefault( false )
+Location::Location ( void ):
+	_flags( 0 ), _isDefault( false )
 {
 	return ;
 }
@@ -52,7 +53,7 @@ Location::getRoot ( void ) const
 	return ( this->_root );
 }
 
-std::vector< std::string > &
+const std::vector< std::string > &
 Location::getIndex ( void ) const
 {
 	return ( const_cast< std::vector< std::string > & >( this->_index ) );
@@ -73,7 +74,7 @@ Location::setFlag ( int flag, bool enable )
 }
 
 int
-Location::setCGIparam ( std::string & arg )
+Location::setCGIparam ( const std::string & arg )
 {
 	// TODO: validate
 	this->_cgi_param.assign( arg );
@@ -81,7 +82,7 @@ Location::setCGIparam ( std::string & arg )
 }
 
 int
-Location::setCGIpass ( std::string & arg )
+Location::setCGIpass ( const std::string & arg )
 {
 	// TODO: validate
 	this->_cgi_pass.assign( arg );
@@ -89,7 +90,7 @@ Location::setCGIpass ( std::string & arg )
 }
 
 int
-Location::setRoot ( std::string & arg )
+Location::setRoot ( const std::string & arg )
 {
 	// TODO: validate
 	std::string mod_arg( arg );
@@ -101,7 +102,7 @@ Location::setRoot ( std::string & arg )
 }
 
 int
-Location::setIndex ( std::string & arg )
+Location::setIndex ( const std::string & arg )
 {
 	// TODO: validate
 	this->_index.push_back( arg );
@@ -109,7 +110,7 @@ Location::setIndex ( std::string & arg )
 }
 
 int
-Location::setUploadFiles ( std::string & arg )
+Location::setUploadFiles ( const std::string & arg )
 {
 	// TODO: validate
 	this->_upload_files = arg;
@@ -117,7 +118,7 @@ Location::setUploadFiles ( std::string & arg )
 }
 
 int
-Location::setRedirection ( std::string & arg )
+Location::setRedirection ( const std::string & arg )
 {
 	// TODO: validate
 	this->_redirection = arg;
