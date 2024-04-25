@@ -129,12 +129,14 @@ CGI::execute ( void )
 	if ( can_access_file( cgi, X_OK ) == false )
 	{
 		ERROR( cgi << ": " << std::strerror( errno ) );
+		this->_http.setStatusCode( BAD_GATEWAY );
 		return ( EXIT_FAILURE );
 	}
     fdopen = open( request.file.c_str(), O_RDONLY );
     if ( fdopen == -1 )
 	{
         ERROR( request.file << ": " << std::strerror( errno ) );
+		this->_http.setStatusCode( NOT_FOUND );
 		return ( EXIT_FAILURE );
     }
     if ( pipe( _pipefd ) == -1 )

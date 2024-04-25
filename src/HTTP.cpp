@@ -169,13 +169,16 @@ HTTP::compose_response ( void )
 		LOG( RED << this->_request.file << " is not regular neither directory" );
 	}
 
-	if ( ! this->_server.getCGIpass( this->_request.target ).empty() )
+	if ( this->_server.getFlag( this->_request.method->code,
+				this->_request.target ) == false )
+	{
+		this->_status_code = METHOD_NOT_ALLOWED;
+	}
+	else if ( ! this->_server.getCGIpass( this->_request.target ).empty() )
 	{
 		this->_cgi_ptr = new CGI( *this, this->_server );
 		if ( this->_cgi_ptr->execute() == EXIT_SUCCESS )
 			return ( EXIT_SUCCESS );
-		else
-			this->_status_code = BAD_GATEWAY;
 	}
 	else
 		(void) this->_request.method->method_func( * this );

@@ -16,7 +16,7 @@ Router::_opts[] =
 	{ CONTEXT, "location", yes, no, "server", 0x0 },
 	{ DIRECTIVE, "server_name", no, no, "server", &set_server_name },
 	{ DIRECTIVE, "listen", no, yes, "server", &set_listen },
-	{ DIRECTIVE, "allow_methods", no, yes, "location", &set_allow_methods },
+	{ DIRECTIVE, "limit_except", no, yes, "location", &set_limit_except },
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, no, "server", &set_index },
 	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
@@ -429,7 +429,7 @@ Router::setConnection ( const struct sockaddr_in & address,
  * These only convert the format, if needed, to be accepted 
  * by the apropiate setter.
  *
- * set_allow_methods()
+ * set_limit_except()
  * set_autoindex()
  * set_cgi_pass()
  * set_cgi_param()
@@ -445,7 +445,7 @@ Router::setConnection ( const struct sockaddr_in & address,
  */
 
 int
-set_allow_methods( Server & instance, std::string & arg, std::string location )
+set_limit_except( Server & instance, std::string & arg, std::string location )
 {
 	//TODO: implement t_methods from HTTP
 	//TODO: return EXIT_FAILURE if setFlag returns EXIT_FAILURE
@@ -454,19 +454,19 @@ set_allow_methods( Server & instance, std::string & arg, std::string location )
 	
 	if ( arg.empty() )
 	{
-		ERROR( "invalid number of arguments in \"allow_methods\"" );
+		ERROR( "invalid number of arguments in \"limit_except\"" );
 		return ( EXIT_FAILURE );
 	}
 	while ( iss >> word )
 	{
 		if ( word == "GET" )
-			instance.setFlag( METHOD_GET, true, location );
+			instance.setFlag( HTTP_GET, true, location );
 		else if ( word == "PUT" )
-			instance.setFlag( METHOD_PUT, true, location );
+			instance.setFlag( HTTP_PUT, true, location );
 		else if ( word == "POST" )
-			instance.setFlag( METHOD_POST, true, location );
+			instance.setFlag( HTTP_POST, true, location );
 		else if ( word == "HEAD" )
-			instance.setFlag( METHOD_HEAD, true, location );
+			instance.setFlag( HTTP_HEAD, true, location );
 		else
 		{
 			ERROR( "invalid method \"" << word << "\"" );

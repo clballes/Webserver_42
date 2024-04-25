@@ -14,6 +14,7 @@
 
 #include "Location.hpp"
 #include "define.hpp"
+#include "string.hpp"
 #include "log.hpp"
 
 template <class T> struct longer : std::binary_function <T,T,bool>
