@@ -21,9 +21,9 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_socket_fd( 0 ),
 	_router( router_instance ),
 	_connection( router_instance.getConnection( fd ) ),
-	_server( router_instance.getDefaultServer() )
+	_server( router_instance.getDefaultServer() ),
+	_cgi_ptr( NULL )
 {
-	this->cgi_ptr = NULL;
 	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );

@@ -68,20 +68,19 @@ class HTTP: public IEvent
 		int request_recv ( int64_t );
 		int request_send ( void );
 		void perform ( void );
-
-		static int load_file ( HTTP &, std::string );
-		// int put_file( void );
 		int check_index();
-
-		static t_http_method methods[];
 
 		t_request & getRequest( void );
 		t_headers & getHeaders( void );
 		Server & getServer();
 		std::string & getCGIpass( void );
+		
 		void set_message_body( std::string & );
 		void setStatusCode( int );
 		void set_response_headers( std::string arg, std::string value );
+		
+		static int load_file ( HTTP &, std::string );
+		static t_http_method methods[];
 
 	private:
 
@@ -91,24 +90,24 @@ class HTTP: public IEvent
 		Router &				_router;
 		Connection &			_connection;
 		Server &                _server;
-		CGI *cgi_ptr;			//LIBERAR MEMORIA
+		CGI *					_cgi_ptr;
 
+		int						_status_code;
 		t_headers				_request_headers;
 		t_headers				_response_headers;
 		std::string				_buffer_recv;
 		std::string				_buffer_send;
 		std::string				_message_body;
 		t_request				_request;
-		int						_status_code;
-		bool					_keep_alive; //?
+		bool					_keep_alive;
 
 		int parse ( void );
 		int parse_start_line ( std::string & );
 		int parse_field_line ( std::string & );
+		
 		static int http_get ( HTTP & );
 		static int http_head ( HTTP & );
 		static int http_post ( HTTP & );
-		// static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP & );

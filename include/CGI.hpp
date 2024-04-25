@@ -13,6 +13,7 @@
 #include <map>
 #include <cstdlib>
 #include <cstring>
+#include <signal.h>
 
 // #include "Log.hpp"
 
@@ -29,6 +30,7 @@ class CGI : public IEvent
 		void dispatch ( struct kevent & ev );
 		int register_process( pid_t pid );
 		int execute ( void );
+		void kill ( void ) const;
 		void parsing_headers (std::string line);
 		void map_to_arr();
 		void setmap();

@@ -118,7 +118,7 @@ CGI::execute ( void )
 		dup2( _pipefd[WRITE], STDOUT_FILENO );
         dup2( fdopen, STDIN_FILENO );
 		close( _pipefd[WRITE] );
-        execve(cgi.c_str() , NULL, this->_env );
+        execve( cgi.c_str() , NULL, this->_env );
 		ERROR( cgi << ": " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
     }
@@ -126,6 +126,14 @@ CGI::execute ( void )
 	waitpid( this->_pid, 0x0, 0x0 );
 	this->register_process( this->_pid );
 	return ( EXIT_SUCCESS );
+}
+
+void
+CGI::kill ( void ) const
+{
+	if ( this->_pid != 0 )
+		::kill( this->_pid, SIGKILL );
+	return ;
 }
 
 void

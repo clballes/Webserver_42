@@ -39,8 +39,8 @@ HTTP::http_get ( HTTP & http )
 		}
 		else
 		{
-			http.cgi_ptr = new CGI( http, http._server );
-			if ( http.cgi_ptr->execute() == EXIT_FAILURE )
+			http._cgi_ptr = new CGI( http, http._server );
+			if ( http._cgi_ptr->execute() == EXIT_FAILURE )
 				return ( EXIT_FAILURE );
 		}
 	}
@@ -58,8 +58,8 @@ HTTP::http_post ( HTTP & http )
 	DEBUG( "" );
 	if ( http._server.getCGIpass( http._request.target ).empty() )
 	{
-		http.cgi_ptr = new CGI( http , http._server);
-		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
+		http._cgi_ptr = new CGI( http , http._server);
+		if ( http._cgi_ptr->execute() == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
