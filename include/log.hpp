@@ -60,7 +60,8 @@
 
 #define ERROR(s) \
 { \
-	std::clog << s << ENDL; \
+	std::clog << RED \
+	<< s << RESET << ENDL; \
 }
 
 #define INFO_TIME(s) \
