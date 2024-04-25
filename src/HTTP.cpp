@@ -309,7 +309,7 @@ HTTP::getHeaders ( void )
 void
 HTTP::setMessageBody ( const std::string & message )
 {
-	this->_message_body = message;
+	this->_message_body.append( message );
 	return ;
 }
 
