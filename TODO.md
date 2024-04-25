@@ -3,8 +3,8 @@
 
 ## mpuig-ma
 
-- [ ] filtrar valid (allowed) methods
-- [ ] location \*.php 
+- [ ] filtrar valid (allowed) methods; rename to limit\_except
+- [x] location \*.php 
 - [ ] timeout
 - [ ] tests
 - [ ] set defaults
@@ -18,6 +18,7 @@
 - [ ] server\_name listening to localhost should match server listening to 0.0.0.0 ?
 - [ ] check exec permissions pre-execve()
 - [ ] graceful\_stop
+- [ ] POST, large request, expect: 100 + content-length--
 - [ ] leaks
 
 ## CLARA

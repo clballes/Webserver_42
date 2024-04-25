@@ -125,13 +125,27 @@ strtolower ( std::string & str )
 }
 
 std::size_t
-how_many_words ( std::string & str )
+how_many_characters_of ( const std::string & str, char c )
 {
-	std::string::iterator it;
+	std::string::const_iterator it;
+	std::size_t n = 0;
+
+	it = str.begin();
+	while ( it != str.end() )
+	{
+		if ( c == *it )
+			++n;
+		++it;
+	}
+	return ( n );
+}
+
+std::size_t
+how_many_words ( const std::string & str )
+{
+	std::string::const_iterator it;
 	std::size_t n = 1;
 
-	if ( str.empty() )
-		return ( 0 );
 	it = str.begin();
 	while ( it != str.end() )
 	{
@@ -141,15 +155,31 @@ how_many_words ( std::string & str )
 			++n;
 		++it;
 	}
-	return ( n );
+	return ( ( str.empty() == true ) ? 0 : n );
 }
 
 std::string
-get_word ( std::string & str, std::string delimiter )
+get_word ( const std::string & str, std::string delimiter )
 {
 	std::string word;
 
 	if ( str.find_first_of( delimiter ) != std::string::npos )
 		word.assign( str.substr( 0, str.find_first_of( delimiter ) ) );
 	return ( word );
+}
+
+bool
+compare_file_extension( const std::string & a, const std::string & b )
+{
+	std::string::size_type position, extension_length;
+
+	if ( how_many_characters_of(  a, '.' ) == 0 || a.empty() || b.empty() )
+		return ( false );
+	position = a.find_last_of( "." );
+	extension_length = a.length() - position;
+	if ( a.compare( a.length() - extension_length,
+				extension_length, b, b.length() - extension_length,
+				extension_length ) == 0 )
+		return ( true );
+	return ( false );
 }

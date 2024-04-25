@@ -48,20 +48,19 @@ Server::good ( void ) const
 Location &
 Server::getRoute ( const std::string & location ) const
 {
-	t_route_map::const_iterator it;
-	std::string cmp_str, target( location );
-	bool isExtension;
+	t_route_map::const_iterator		it;
+	std::string						target( location );
+	std::string						cmp_str;
 	
-	isExtension = ( target.begin() == '*' ) ? true : false;
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( isExtension == true )
+		if ( cmp_str[0] == '*' )
 		{
-			// rfind( "." ), only one
-			// reverse compare, if match return it->scond
-			return ( const_cast< Location & >( it->second ) );
+			cmp_str.erase( 0, 1 );
+			if ( compare_file_extension( target, cmp_str ) == true )
+				return ( const_cast< Location & >( it->second ) );
 		}
 		else
 		{
@@ -105,11 +104,20 @@ Server::getRouteString ( const std::string & location ) const
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
-			return ( const_cast< std::string & >( it->first ) );
-		cmp_str.append( "/" );		
-		if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
-			return ( const_cast< std::string & >( it->first ) );
+		if ( cmp_str[0] == '*' )
+		{
+			cmp_str.erase( 0, 1 );
+			if ( compare_file_extension( target, cmp_str ) == true )
+				return ( const_cast< std::string & >( it->first ) );
+		}
+		else
+		{
+			if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+				return ( const_cast< std::string & >( it->first ) );
+			cmp_str.append( "/" );		
+			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
+				return ( const_cast< std::string & >( it->first ) );
+		}
 		++it;
 	}
 	--it;
