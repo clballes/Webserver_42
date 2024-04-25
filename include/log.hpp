@@ -97,11 +97,11 @@
 	{ \
 		if ( it == str.begin() ) { std::clog << color; } \
 		if ( std::isprint( *it ) ) { std::clog << *it; } \
-		else if ( *it == '\t' ) { std::clog << "\\t"; ++it; } \
-		else if ( *it == '\n' ) { std::clog << "\\n"; ++it; } \
-		else if ( *it == '\v' ) { std::clog << "\\v"; ++it; } \
-		else if ( *it == '\f' ) { std::clog << "\\f"; ++it; } \
-		else if ( *it == '\r' ) { std::clog << "\\r"; ++it; } \
+		else if ( *it == '\t' ) { std::clog << "\\t"; ++counter; } \
+		else if ( *it == '\n' ) { std::clog << "\\n"; ++counter; } \
+		else if ( *it == '\v' ) { std::clog << "\\v"; ++counter; } \
+		else if ( *it == '\f' ) { std::clog << "\\f"; ++counter; } \
+		else if ( *it == '\r' ) { std::clog << "\\r"; ++counter; } \
 		/*if ( counter >= 80 ) { std::clog << ENDL; counter = 0; } */\
 		++it; \
 		++counter; \
