@@ -1,9 +1,8 @@
-- [ ] upload\_files directive to store the upload file , check upload file
 - [ ] chunked requests (es el EOF tambe si)
+- [ ] leaks
 
 ## mpuig-ma
 
-- [ ] timeout
 - [ ] tests
 - [ ] set defaults
 - [ ] directory control ( . .. )
@@ -12,7 +11,8 @@
 - [ ] graceful\_stop
 - [ ] POST, large request, expect: 100 + content-length--
 - [ ] compare server blocks so there are no repetitions
-- [ ] leaks
+- [ ] fix: response to cgi timeout
+- [x] timeout
 - [x] CGI: not calling request\_send()
 - [x] filtrar valid (allowed) methods;
 - [x] rename to limit\_except
@@ -25,6 +25,7 @@
 
 ## CLARA
 
+- [ ] upload\_files directive to store the upload file , check upload file
 - [ ] REDIRECTION HTTP - mirar q getroute li passi be els params
 - [ ] mirar lu de www/ checkindex
 - [ ] fer un cgi super simple amb getenv

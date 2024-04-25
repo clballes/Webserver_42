@@ -33,6 +33,8 @@
 #define CR					015
 #define SP 					040
 
+#define CGI_TIMEOUT			8
+
 #include "HTTP_status_codes.hpp"
 
 #endif /* !_WEBSERV_DEFINE_HPP_ */

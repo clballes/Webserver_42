@@ -29,11 +29,13 @@ class CGI : public IEvent
 		~CGI ( void );
 
 		void dispatch ( struct kevent & ev );
-		int register_process( void );
+		int register_process ( void );
+		int deregister_process ( void );
+		int deregister_timer ( void );
 		int execute ( void );
 		void kill ( void );
 		int parse_headers ( std::string & );
-		void setmap();
+		void setmap ( void );
 
 	protected:
 

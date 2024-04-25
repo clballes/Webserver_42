@@ -61,27 +61,53 @@ int
 CGI::register_process ( void )
 {
     struct kevent ev;
-	static struct timespec timeout = { 1, 0 };
 
 	DEBUG( this->_pid );
-	EV_SET( &ev, this->_pid, EVFILT_PROC,
-           EV_ADD | EV_ENABLE | EV_ONESHOT,
+	EV_SET( &ev, this->_pid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
 		   NOTE_EXIT | NOTE_EXITSTATUS, 0, (void *) this );
-    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, &timeout ) == -1 )
+    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
 	{
 		ERROR( "kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
-    /*
 	EV_SET( &ev, 1, EVFILT_TIMER, EV_ADD | EV_ENABLE,
-			NOTE_SECONDS | NOTE_ABSOLUTE, 1, (void *) this );
-    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
+			NOTE_SECONDS, CGI_TIMEOUT, (void *) this );
+    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
 	{
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
-	*/
     return ( EXIT_SUCCESS );
+}
+
+int
+CGI::deregister_process( void )
+{
+	struct kevent ev;
+
+	DEBUG ( this->_pid );
+	EV_SET( &ev, this->_pid, EVFILT_PROC, EV_DELETE, 0, 0, 0x0 );
+	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
+	{
+		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
+        return ( EXIT_FAILURE );
+    }
+	return ( EXIT_SUCCESS );
+}
+
+int
+CGI::deregister_timer ( void )
+{
+	struct kevent ev;
+
+	DEBUG ( this->_pid );
+	EV_SET( &ev, this->_pid, EVFILT_TIMER, EV_DELETE, 0, 0, 0x0 );
+	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
+	{
+		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
+        return ( EXIT_FAILURE );
+    }
+	return ( EXIT_SUCCESS );
 }
 
 void
@@ -120,7 +146,9 @@ CGI::dispatch ( struct kevent & ev )
 	}
 	else if ( ev.filter == EVFILT_TIMER )
 	{
-		WARN( "else" );
+		WARN( "time is up for this cgi" );
+		this->deregister_timer();
+		this->deregister_process();
 		delete this;
 	}
 	return ;
