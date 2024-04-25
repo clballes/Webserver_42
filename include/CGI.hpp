@@ -13,6 +13,7 @@
 #include <map>
 #include <cstdlib>
 #include <cstring>
+#include <sys/stat.h>
 #include <signal.h>
 
 // #include "Log.hpp"
@@ -28,9 +29,9 @@ class CGI : public IEvent
 		~CGI ( void );
 
 		void dispatch ( struct kevent & ev );
-		int register_process( pid_t pid );
+		int register_process( void );
 		int execute ( void );
-		void kill ( void ) const;
+		void kill ( void );
 		void parsing_headers (std::string line);
 		void map_to_arr();
 		void setmap();
@@ -40,7 +41,6 @@ class CGI : public IEvent
 		HTTP &									_http;
 		Server &								_server;
 		pid_t									_pid;
-		char **									_env;
 		std::map < std::string, std::string >	_envMap;
 		int										_pipefd[2];
 };

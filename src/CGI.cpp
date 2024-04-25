@@ -8,40 +8,68 @@
 #define READ 0
 #define WRITE 1
 
+static char ** map2array ( const std::map< std::string, std::string > & );
+
 CGI::CGI ( HTTP & http , Server & server):
-	_http( http ), _server ( server ), _env( 0x0 )
+	_http( http ), _server ( server )
 {
 	DEBUG( "" );
-	setmap();
-	map_to_arr();
+	this->setmap();
 	return ;
 }
 
 CGI::~CGI ( void )
 {
 	DEBUG( "" );
-	if ( this->_env != 0x0 )
-	{
-		for ( std::size_t i = 0; this->_env[i] != 0x0; ++i )
-			delete ( this->_env[i] );
-		delete ( this->_env );
-	}
 	return ;
 }
 
+void
+CGI::setmap ( void )
+{
+	std::map< std::string, std::string > & headers = _http.getHeaders();
+	const t_request & request = this->_http.getRequest();
+	const std::string & cgi_pass = this->_server.getCGIpass( request.file );
+
+	DEBUG ("Creating the map");
+	if ( headers.find( "auth-scheme" ) != headers.end()
+			&& headers["auth-scheme"] != "" )
+		this->_envMap["AUTH_TYPE"] = headers["authorization"];
+	this->_envMap["REDIRECT_STATUS"] = "200";
+	this->_envMap["GATEWAY_INTERFACE"] = "CGI/1.1";
+	this->_envMap["SERVER_PROTOCOL"] = "HTTP/1.1";
+	this->_envMap["SERVER_SOFTWARE"] = WEBSERV_VER;
+	this->_envMap["REQUEST_METHOD"] = request.method->method;
+	this->_envMap["QUERY_STRING"] = request.query;
+	this->_envMap["CONTENT_TYPE"] = headers["content-type"];
+	this->_envMap["CONTENT_LENGTH"] = std::to_string( request.body.length() );
+	this->_envMap["REMOTE_IDENT"] = headers["authorization"];
+	this->_envMap["REMOTE_USER"] = headers["authorization"];
+	// TODO: scriptname i filename mirar del tot
+	this->_envMap["SCRIPT_NAME"] = request.file;
+	this->_envMap["SCRIPT_FILENAME"] = request.file;
+	this->_envMap["PATH_INFO"] = cgi_pass;
+	this->_envMap["PATH_TRANSLATED"] = cgi_pass;
+	this->_envMap["REQUEST_URI"] =  cgi_pass + request.query;
+	if ( headers.find( "host" ) != headers.end() )
+		this->_envMap["SERVER_NAME"] = headers["host"];
+	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
+	this->_envMap["SERVER_PORT"] = std::to_string( _server.getPort() );
+}
+
 int
-CGI::register_process ( pid_t pid )
+CGI::register_process ( void )
 {
     struct kevent ev;
 	static struct timespec timeout = { 1, 0 };
 
-	DEBUG( pid );
-	EV_SET( &ev, pid, EVFILT_PROC,
+	DEBUG( this->_pid );
+	EV_SET( &ev, this->_pid, EVFILT_PROC,
            EV_ADD | EV_ENABLE | EV_ONESHOT,
 		   NOTE_EXIT | NOTE_EXITSTATUS, 0, (void *) this );
     if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, &timeout ) == -1 )
 	{
-		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
+		ERROR( "kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
     /*
@@ -67,9 +95,7 @@ CGI::dispatch ( struct kevent & ev )
 		std::string line;
 		ssize_t bytesRead;
 		while ( (bytesRead = read( _pipefd[READ], buffer, sizeof( buffer ) ) ) > 0 )
-		{
 			line.append(buffer, bytesRead);
-		}
 		parsing_headers( line );
 		close( _pipefd[READ] );
 		this->_http.register_send();
@@ -78,8 +104,6 @@ CGI::dispatch ( struct kevent & ev )
 	{
 		WARN( "else" );
 	}
-	else
-		WARN ( "HM" );
 	return ;
 }
 
@@ -88,13 +112,25 @@ CGI::dispatch ( struct kevent & ev )
 int
 CGI::execute ( void )
 {
-	int			fdopen;
-	t_request &	request = this->_http.getRequest();
-	std::string	cgi;
+	const t_request &	request = this->_http.getRequest();
+	char **				env;
+	std::string			cgi;
+	int					fdopen;
 
+	env = map2array( this->_envMap );
+	if ( env == NULL )
+	{
+		ERROR( PROGRAM_NAME << ": could not allocate memory" );
+		return ( EXIT_FAILURE );
+	}
 	cgi = this->_server.getRoute( request.target ).getCGIpass();
 	DEBUG( "cgi_pass=\"" << cgi << "\"" );
 	DEBUG( "file=\"" << request.file << "\"" );
+	if ( can_access_file( cgi, X_OK ) == false )
+	{
+		ERROR( cgi << ": " << std::strerror( errno ) );
+		return ( EXIT_FAILURE );
+	}
     fdopen = open( request.file.c_str(), O_RDONLY );
     if ( fdopen == -1 )
 	{
@@ -118,21 +154,24 @@ CGI::execute ( void )
 		dup2( _pipefd[WRITE], STDOUT_FILENO );
         dup2( fdopen, STDIN_FILENO );
 		close( _pipefd[WRITE] );
-        execve( cgi.c_str() , NULL, this->_env );
+        execve( cgi.c_str() , NULL, env );
 		ERROR( cgi << ": " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
     }
     close( _pipefd[WRITE] );
-	waitpid( this->_pid, 0x0, 0x0 );
-	this->register_process( this->_pid );
+	for ( std::size_t i = 0; env[i] != 0x0; ++i )
+		delete ( env[i] );
+	delete ( env );
+	this->register_process();
 	return ( EXIT_SUCCESS );
 }
 
 void
-CGI::kill ( void ) const
+CGI::kill ( void )
 {
 	if ( this->_pid != 0 )
 		::kill( this->_pid, SIGKILL );
+	delete this;
 	return ;
 }
 
@@ -147,7 +186,7 @@ CGI::parsing_headers ( std::string line )
     if (pos_final != std::string::npos) {
         headers = line.substr(0, pos_final);
         body = line.substr(pos_final + 2);
-		this->_http.set_message_body ( body );
+		this->_http.setMessageBody ( body );
     }
 	else
 		headers = line;
@@ -176,60 +215,33 @@ CGI::parsing_headers ( std::string line )
 	for (std::map<std::string, std::string>::iterator it = mapHeaders.begin(); it != mapHeaders.end(); ++it)
 	{
 		if (it->first == "content-type")
-			this->_http.set_response_headers ( it->first , it->second);
+			this->_http.setResponseHeaders ( it->first , it->second);
 		if (it->first == "status")
 			this->_http.setStatusCode ( std::atoi(it->second.c_str()) );
     }
+	return ;
 
 }
 
-void
-CGI::setmap ( void )
+static char **
+map2array ( const std::map< std::string, std::string > & envMap )
 {
-	std::map< std::string, std::string > & headers = _http.getHeaders();
-	
-	DEBUG ("Creating the map");
-	if ( headers.find( "auth-scheme" ) != headers.end()
-			&& headers["auth-scheme"] != "" )
-		this->_envMap["AUTH_TYPE"] = headers["authorization"];
-	this->_envMap["REDIRECT_STATUS"] = "200";
-	this->_envMap["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_envMap["SERVER_PROTOCOL"] = "HTTP/1.1";
-	this->_envMap["SERVER_SOFTWARE"] = WEBSERV_VER;
-	this->_envMap["REQUEST_METHOD"] = _http.getRequest().method->method;
-	this->_envMap["QUERY_STRING"] = _http.getRequest().query;
-	this->_envMap["CONTENT_TYPE"] = headers["content-type"];
-	this->_envMap["CONTENT_LENGTH"] = std::to_string(_http.getRequest().body.length());
-	this->_envMap["REMOTE_IDENT"] = headers["authorization"];
-	this->_envMap["REMOTE_USER"] = headers["authorization"];
-	// scriptname i filename mirar del tot
-	this->_envMap["SCRIPT_NAME"] = _http.getRequest().file;
-	this->_envMap["SCRIPT_FILENAME"] =  _http.getRequest().file;
-	this->_envMap["PATH_INFO"] = _server.getCGIpass(  this->_http.getRequest().file );
-	this->_envMap["PATH_TRANSLATED"] = _server.getCGIpass(  this->_http.getRequest().file );
-	this->_envMap["REQUEST_URI"] =  _server.getCGIpass(  this->_http.getRequest().file ) + _http.getRequest().query;
-	if ( headers.find( "host" ) != headers.end() )
-		this->_envMap["SERVER_NAME"] = headers["host"];
-	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
-	this->_envMap["SERVER_PORT"] = std::to_string(_server.getPort());
-}
-
-void
-CGI::map_to_arr ( void )
-{
-	int index;
 	std::map< std::string, std::string >::const_iterator it;
+	char ** env = NULL;
+	int index = 0;
 
-    this->_env = new char * [ (this->_envMap.size() * 2 ) + 1 ];
-    index = 0;
-	it = this->_envMap.begin();
-	while ( it != this->_envMap.end() )
+    env = new char * [ (envMap.size() * 2 ) + 1 ];
+	if ( env == NULL )
+		return ( NULL );
+	it = envMap.begin();
+	while ( it != envMap.end() )
 	{
 		std::string keyValueString = it->first + "=" + it->second;
-		this->_env[index] = new char[keyValueString.size() + 1];
-		std::strcpy( this->_env[index], keyValueString.c_str() );
+		env[index] = new char[keyValueString.size() + 1];
+		std::strcpy( env[index], keyValueString.c_str() );
 		++index;
 		++it;
 	}
-    this->_env[index] = NULL;
+    env[index] = NULL;
+	return ( env );
 }
