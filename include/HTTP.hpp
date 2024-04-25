@@ -73,7 +73,6 @@ class HTTP: public IEvent
 		Server & getServer();
 		t_request & getRequest( void );
 		t_headers & getHeaders( void );
-		std::string & getCGIpass( void ); //out
 		
 		void setMessageBody( const std::string & );
 		void setStatusCode( int );
