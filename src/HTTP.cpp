@@ -24,7 +24,10 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_server( router_instance.getDefaultServer() ),
 	_cgi_ptr( NULL )
 {
-	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
+	this->_request.method = 0x0;
+	std::memset( &this->_request.file_info, 0,
+			sizeof( this->_request.file_info ) );
+	this->_request.http_version = 0;
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
