@@ -3,7 +3,6 @@
 
 ## mpuig-ma
 
-- [ ] CGI: not calling request\_send()
 - [ ] timeout
 - [ ] tests
 - [ ] set defaults
@@ -14,6 +13,7 @@
 - [ ] POST, large request, expect: 100 + content-length--
 - [ ] compare server blocks so there are no repetitions
 - [ ] leaks
+- [x] CGI: not calling request\_send()
 - [x] filtrar valid (allowed) methods;
 - [x] rename to limit\_except
 - [x] location \*.php 

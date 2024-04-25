@@ -87,22 +87,41 @@ CGI::register_process ( void )
 void
 CGI::dispatch ( struct kevent & ev )
 {
+	std::string buffer;
+	int bytes_read;
+
 	DEBUG( ev.ident );
 	if ( ev.filter == EVFILT_PROC )
 	{
-		// TODO: fix
-		char buffer[1024];
-		std::string line;
-		ssize_t bytesRead;
-		while ( (bytesRead = read( _pipefd[READ], buffer, sizeof( buffer ) ) ) > 0 )
-			line.append(buffer, bytesRead);
-		parsing_headers( line );
+		char buf[1024];
+		bytes_read = read( this->_pipefd[READ], buf, sizeof( buf ) );
+		while ( bytes_read > 0 )
+		{
+			buffer.append( buf, bytes_read );
+			bytes_read = read( this->_pipefd[READ], buf, sizeof( buf ) );
+		}
+		if ( bytes_read == -1 )
+		{
+			ERROR( "CGI: " << strerror( errno ) );
+			this->_http.setStatusCode( BAD_GATEWAY );
+			this->_http.register_send();
+			delete this;
+			return ;
+		}
+		LOG_BUFFER( buffer, YELLOW );
 		close( _pipefd[READ] );
-		this->_http.register_send();
+		if ( parse_headers( buffer ) == EXIT_FAILURE )
+		{
+			this->_http.setStatusCode( BAD_GATEWAY );
+		}
+		this->_http.setMessageBody( buffer );
+		this->_http.compose_response();
+		delete this;
 	}
 	else if ( ev.filter == EVFILT_TIMER )
 	{
 		WARN( "else" );
+		delete this;
 	}
 	return ;
 }
@@ -177,8 +196,8 @@ CGI::kill ( void )
 	return ;
 }
 
-void
-CGI::parsing_headers ( std::string line )
+int
+CGI::parse_headers ( std::string & line )
 {
 	std::map <std::string, std::string> mapHeaders;
     size_t pos_final = line.find("\n\n");
@@ -213,15 +232,10 @@ CGI::parsing_headers ( std::string line )
             break;
         }
     }
-
-	for (std::map<std::string, std::string>::iterator it = mapHeaders.begin(); it != mapHeaders.end(); ++it)
-	{
-		if (it->first == "content-type")
-			this->_http.setResponseHeaders ( it->first , it->second);
-		if (it->first == "status")
-			this->_http.setStatusCode ( std::atoi(it->second.c_str()) );
-    }
-	return ;
+	for ( std::map<std::string, std::string>::iterator it = mapHeaders.begin();
+			it != mapHeaders.end(); ++it )
+		this->_http.setResponseHeaders ( it->first, it->second );
+	return ( EXIT_SUCCESS );
 
 }
 

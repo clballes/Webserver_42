@@ -32,8 +32,7 @@ class CGI : public IEvent
 		int register_process( void );
 		int execute ( void );
 		void kill ( void );
-		void parsing_headers (std::string line);
-		void map_to_arr();
+		int parse_headers ( std::string & );
 		void setmap();
 
 	protected:

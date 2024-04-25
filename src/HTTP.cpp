@@ -146,34 +146,25 @@ HTTP::request_recv ( int64_t data )
 		this->_request.file.replace( 0, 1, root_location );
 	}
 	stat( this->_request.file.c_str(), &this->_request.file_info );
-	return ( this->compose_response() );
+	return ( this->compute_response() );
 }
 
 // There is no need to check if this->_request.method is NULL
 // as this check is done in the parse() call;
 
 int
-HTTP::compose_response ( void )
+HTTP::compute_response ( void )
 {
 	DEBUG( this->_socket_fd );
 	if ( S_ISREG( this->_request.file_info.st_mode ) )
-	{
-		LOG( GREEN << this->_request.file << " is regular" );
-	}
+	{ LOG( GREEN << this->_request.file << " is regular" ); }
 	else if ( S_ISDIR( this->_request.file_info.st_mode ) )
-	{
-		LOG( GREEN << this->_request.file << " is directory" );
-	}
-	else
-	{
-		LOG( RED << this->_request.file << " is not regular neither directory" );
-	}
+	{ LOG( GREEN << this->_request.file << " is directory" ); }
+	else { LOG( RED << this->_request.file << " is not regular neither directory" ); }
 
 	if ( this->_server.getFlag( this->_request.method->code,
 				this->_request.target ) == false )
-	{
 		this->_status_code = METHOD_NOT_ALLOWED;
-	}
 	else if ( ! this->_server.getCGIpass( this->_request.target ).empty() )
 	{
 		this->_cgi_ptr = new CGI( *this, this->_server );
@@ -182,7 +173,13 @@ HTTP::compose_response ( void )
 	}
 	else
 		(void) this->_request.method->method_func( * this );
+	(void) this->compose_response();
+	return ( EXIT_SUCCESS );
+}
 
+int
+HTTP::compose_response ( void )
+{
 	DEBUG( "status_code=" << this->_status_code );
 	if ( this->_status_code >= 300 && this->_status_code <= 511 )
 	{
@@ -209,7 +206,6 @@ HTTP::compose_response ( void )
 	this->_message_body.clear();
 
 	this->request_send();
-
 	return ( EXIT_SUCCESS );
 }
 
@@ -218,7 +214,6 @@ HTTP::request_send ( void )
 {
 	DEBUG( "fd=" << this->_socket_fd
 			<< " bytes=" << this->_buffer_send.length() );
-	//HTTP::compose_response( *this );
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),

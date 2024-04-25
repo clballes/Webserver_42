@@ -67,6 +67,7 @@ class HTTP: public IEvent
 		int register_send ( void );
 		int request_recv ( int64_t );
 		int request_send ( void );
+		int compute_response ( void );
 		int compose_response ( void );
 		int check_index();
 
