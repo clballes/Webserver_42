@@ -49,17 +49,28 @@ Location &
 Server::getRoute ( const std::string & location ) const
 {
 	t_route_map::const_iterator it;
-	std::string cmp_str;
-
+	std::string cmp_str, target( location );
+	bool isExtension;
+	
+	isExtension = ( target.begin() == '*' ) ? true : false;
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( location.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+		if ( isExtension == true )
+		{
+			// rfind( "." ), only one
+			// reverse compare, if match return it->scond
 			return ( const_cast< Location & >( it->second ) );
-		cmp_str.append( "/" );		
-		if ( location.compare( 0, cmp_str.length(), cmp_str ) == 0 )
-			return ( const_cast< Location & >( it->second ) );
+		}
+		else
+		{
+			if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+				return ( const_cast< Location & >( it->second ) );
+			cmp_str.append( "/" );		
+			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
+				return ( const_cast< Location & >( it->second ) );
+		}
 		++it;
 	}
 	return ( getDefaultRoute() );
@@ -88,16 +99,16 @@ const std::string &
 Server::getRouteString ( const std::string & location ) const
 {
 	t_route_map::const_iterator it;
-	std::string cmp_str;
+	std::string cmp_str, target( location );
 
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( location.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+		if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
 			return ( const_cast< std::string & >( it->first ) );
 		cmp_str.append( "/" );		
-		if ( location.compare( 0, cmp_str.length(), cmp_str ) == 0 )
+		if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
 			return ( const_cast< std::string & >( it->first ) );
 		++it;
 	}
