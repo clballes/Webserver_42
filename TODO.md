@@ -7,10 +7,10 @@
 - [ ] set defaults
 - [ ] directory control ( . .. )
 - [ ] required directives: automate
-- [ ] server\_name listening to localhost should match server listening to 0.0.0.0 ?
 - [ ] graceful\_stop
 - [ ] POST, large request, expect: 100 + content-length--
 - [ ] compare server blocks so there are no repetitions
+- [ ] fix: CGI timer ident=1
 - [ ] fix: response to cgi timeout (segv)
 - [x] fix: limit\_except ( setFlag, getFlag, AUTOINDEX ... )
 - [x] timeout

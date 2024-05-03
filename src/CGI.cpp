@@ -86,7 +86,7 @@ CGI::deregister_process( void )
 	struct kevent ev;
 
 	DEBUG ( this->_pid );
-	EV_SET( &ev, this->_pid, EVFILT_PROC, EV_DELETE, 0, 0, 0x0 );
+	EV_SET( &ev, this->_pid, EVFILT_PROC, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
@@ -101,7 +101,7 @@ CGI::deregister_timer ( void )
 	struct kevent ev;
 
 	DEBUG ( this->_pid );
-	EV_SET( &ev, this->_pid, EVFILT_TIMER, EV_DELETE, 0, 0, 0x0 );
+	EV_SET( &ev, 1, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );

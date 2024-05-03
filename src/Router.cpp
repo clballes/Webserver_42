@@ -308,6 +308,7 @@ Router::listen ( void )
 		}
 		else if ( n_events == 0 )
 			continue ;
+		LOG( "ev=" << ev.ident );
 		instance = static_cast< IEvent * >( ev.udata );
 		instance->dispatch( ev );
 		// TODO: consider EVFILT_SIGNAL
