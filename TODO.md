@@ -11,7 +11,8 @@
 - [ ] graceful\_stop
 - [ ] POST, large request, expect: 100 + content-length--
 - [ ] compare server blocks so there are no repetitions
-- [ ] fix: response to cgi timeout
+- [ ] fix: response to cgi timeout (segv)
+- [x] fix: limit\_except ( setFlag, getFlag, AUTOINDEX ... )
 - [x] timeout
 - [x] CGI: not calling request\_send()
 - [x] filtrar valid (allowed) methods;

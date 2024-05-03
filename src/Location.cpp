@@ -5,9 +5,9 @@
 
 #include "Location.hpp"
 
-Location::Location ( void ):
-	_flags( 0 ), _isDefault( false )
+Location::Location ( void ): _isDefault( false )
 {
+	this->_flags = 0x11111111;
 	return ;
 }
 
@@ -19,14 +19,16 @@ Location::~Location ( void )
 void
 Location::setDefault ( void )
 {
+	//DEBUG( "" );
 	this->_isDefault = true;
+	this->_flags = 0x11111111;
 	return ;
 }
 
 bool
 Location::getFlag ( int mask ) const
 {
-	return ( this->_flags & mask );
+	return ( ( this->_flags & mask ) ? true : false );
 }
 
 std::size_t
@@ -68,8 +70,13 @@ Location::isDefault ( void ) const
 int
 Location::setFlag ( int flag, bool enable )
 {
+	//DEBUG( "flag=" << std::hex << flag << std::dec << " " << std::boolalpha << enable );
+	//DEBUG( std::hex << this->_flags << std::dec );
 	if ( enable == true )
 		this->_flags |= flag;
+	else
+		this->_flags ^= flag;
+	//DEBUG( std::hex << this->_flags << std::dec );
 	return ( EXIT_SUCCESS );
 }
 

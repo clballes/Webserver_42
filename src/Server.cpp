@@ -127,8 +127,10 @@ Server::getRouteString ( const std::string & location ) const
 bool
 Server::getFlag ( int mask, std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
-	return ( getRoute( location ).getFlag( mask ) );
+	const Location & loc = this->getRoute( location );
+	bool flag = loc.getFlag( mask );
+	DEBUG( "location=\"" << location << "\" flag=" << std::boolalpha << flag );
+	return ( flag );
 }
 
 std::size_t
@@ -136,7 +138,8 @@ Server::getFlags ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	std::size_t flags = loc.getFlags();
-	DEBUG( "location=\"" << location << "\" flags=" << flags );
+	DEBUG( "location=\"" << location << "\" flags="
+			<< std::hex << flags << std::dec );
 	return ( flags );
 }
 

@@ -451,28 +451,32 @@ set_limit_except( Server & instance, std::string & arg, std::string location )
 	//TODO: return EXIT_FAILURE if setFlag returns EXIT_FAILURE
 	std::istringstream iss( arg );
 	std::string word;
+	std::size_t limit_flag;
 	
 	if ( arg.empty() )
 	{
 		ERROR( "invalid number of arguments in \"limit_except\"" );
 		return ( EXIT_FAILURE );
 	}
+	limit_flag = 0x11111111;
+	limit_flag ^= F_AUTOINDEX;
 	while ( iss >> word )
 	{
 		if ( word == "GET" )
-			instance.setFlag( HTTP_GET, true, location );
+			limit_flag ^= HTTP_GET;
 		else if ( word == "PUT" )
-			instance.setFlag( HTTP_PUT, true, location );
+			limit_flag ^= HTTP_PUT;
 		else if ( word == "POST" )
-			instance.setFlag( HTTP_POST, true, location );
+			limit_flag ^= HTTP_POST;
 		else if ( word == "HEAD" )
-			instance.setFlag( HTTP_HEAD, true, location );
+			limit_flag ^= HTTP_HEAD;
 		else
 		{
 			ERROR( "invalid method \"" << word << "\"" );
 			return ( EXIT_FAILURE );
 		}
 	}
+	instance.setFlag( limit_flag, false, location );
 	return ( EXIT_SUCCESS );
 }
 
