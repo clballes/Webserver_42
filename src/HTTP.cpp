@@ -12,7 +12,7 @@ HTTP::methods[] = {
 	{ "GET", &HTTP::http_get, HTTP_GET },
 	{ "HEAD", &HTTP::http_head, HTTP_HEAD },
 	{ "POST", &HTTP::http_post, HTTP_POST },
-	// { "PUT", &HTTP::http_put, HTTP_PUT },
+	{ "PUT", &HTTP::http_put, HTTP_PUT },
 	{ "DELETE", &HTTP::http_delete, HTTP_DELETE },
 	{ 0, 0, 0 }
 };

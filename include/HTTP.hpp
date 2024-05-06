@@ -108,6 +108,7 @@ class HTTP: public IEvent
 		static int http_get ( HTTP & );
 		static int http_head ( HTTP & );
 		static int http_post ( HTTP & );
+		static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
 		static int autoindex ( HTTP & );
 };

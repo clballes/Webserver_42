@@ -51,6 +51,31 @@ HTTP::http_post ( HTTP & http )
 }
 
 int
+HTTP::http_put ( HTTP & http )
+{
+	std::ofstream file;
+
+	if ( S_ISREG( http._request.file_info.st_mode )
+			|| S_ISDIR( http._request.file_info.st_mode ) )
+	{
+		file.open( http._request.file,
+				std::ofstream::out | std::ofstream::trunc | std::ofstream::binary );
+		http._status_code = OK;
+	}
+	else
+	{
+		file.open( http._request.file,
+				std::ofstream::out | std::ofstream::trunc | std::ofstream::binary );
+		http._status_code = CREATED;
+	}
+	if ( http._request.body.empty() )
+		http._status_code = NO_CONTENT;
+	else
+		file << http._request.body;
+	return ( EXIT_SUCCESS );
+}
+
+int
 HTTP::http_delete ( HTTP & http )
 {
 	DEBUG( "target=\"" << http._request.file << "\"" );
