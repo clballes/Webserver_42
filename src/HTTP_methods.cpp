@@ -20,7 +20,7 @@ HTTP::http_head ( HTTP & http )
 int
 HTTP::http_get ( HTTP & http )
 {
-	DEBUG( "target=\"" << http._request.target << "\"" );
+	DEBUG( "target=\"" << http._request.file << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode ) )
 	{
 		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )
@@ -38,7 +38,7 @@ HTTP::http_get ( HTTP & http )
 int
 HTTP::http_post ( HTTP & http )
 {
-	DEBUG( "target=\"" << http._request.target << "\"" );
+	DEBUG( "target=\"" << http._request.file << "\"" );
 	// regular post, not cgi
 	//if ( http._server.getCGIpass( http._request.target ).empty() )
 	//{
@@ -46,30 +46,25 @@ HTTP::http_post ( HTTP & http )
 	//	if ( http._cgi_ptr->execute() == EXIT_FAILURE )
 	//		return ( EXIT_FAILURE );
 	//}
+	http._status_code = OK;
 	return ( EXIT_SUCCESS );
 }
 
 int
 HTTP::http_delete ( HTTP & http )
 {
-	DEBUG( "target=\"" << http._request.target << "\"" );
-	if ( is_regular_file( http._request.target ) )
+	DEBUG( "target=\"" << http._request.file << "\"" );
+	if ( S_ISREG( http._request.file_info.st_mode ) )
 	{
 		if ( remove( http._request.target.c_str() ) == 0 ) //cehck if si 
 		{
-			http._status_code = 200;
+			http._status_code = OK;
 			http._message_body.append( "<!DOCTYPE html><body><h1>File deleted.</h1></body></html>" );
 		}
 		else
-		{
-			http._status_code = 403;
-			HTTP::load_file( http, http._server.getErrorPage( 403 ) );
-		}
+			http._status_code = FORBIDDEN;
 	}
 	else
-	{
-		http._status_code = 404;
-		HTTP::load_file( http, http._server.getErrorPage( 404 ) );
-	}
+		http._status_code = NOT_FOUND;
 	return ( EXIT_SUCCESS );
 }

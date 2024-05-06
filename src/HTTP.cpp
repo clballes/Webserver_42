@@ -135,7 +135,6 @@ HTTP::request_recv ( int64_t data )
 
 	this->_request.file = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
-	LOG( "location=" << location );
 	if ( ! location.empty() )
 	{
 		std::string root_location = this->_server.getRoot( location );

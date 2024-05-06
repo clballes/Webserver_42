@@ -59,6 +59,7 @@ CGI::setmap ( void )
 		this->_envMap["SERVER_NAME"] = headers["host"];
 	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
 	this->_envMap["SERVER_PORT"] = std::to_string( _server.getPort() );
+	return ;
 }
 
 int
