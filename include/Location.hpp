@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>		/* EXIT_SUCCESS, EXIT_FAILURE */
+#include "define.hpp"
 #include "log.hpp"
 
 class Location

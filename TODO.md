@@ -1,29 +1,16 @@
-- [ ] leaks
-- [ ] graceful\_stop
-- [ ] tests
-- [ ] directory control ( . .. )
+- [ ] leaks, graceful\_stop
+- [ ] test: required directives ( Server check() )
+- [ ] test: wrong number of arguments ( conf )
+- [ ] test: wrong input(s)
+- [ ] test: default values
+- [ ] test: HTTP methods with wrong directory control ( . .. )
 
 ## mpuig-ma
 
-- [ ] required directives: automate
 - [ ] compare server blocks so there are no repetitions
-- [ ] set defaults
+- [ ] proper POST
 - [ ] POST, large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)
-- [x] fix: CGI GATEWAY\_TIMEOUT
-- [x] fix: CGI timer ident=1
-- [x] fix: response to cgi timeout (segv)
-- [x] fix: limit\_except ( setFlag, getFlag, AUTOINDEX ... )
-- [x] timeout
-- [x] CGI: not calling request\_send()
-- [x] filtrar valid (allowed) methods;
-- [x] rename to limit\_except
-- [x] location \*.php 
-- [x] check exec permissions pre-execve()
-- [x] /test != /test/ != /testy != /test/other
-- [x] Location /test/ == Location /test
-- [x] compare listen directives, so there are no duplicate Connections
-- [x] required directives: listen, root
 
 ## CLARA
 

@@ -39,6 +39,7 @@ int
 HTTP::http_post ( HTTP & http )
 {
 	DEBUG( "target=\"" << http._request.file << "\"" );
+	LOG( http._request_headers["content-type"] );
 	// regular post, not cgi
 	//if ( http._server.getCGIpass( http._request.target ).empty() )
 	//{
@@ -81,7 +82,7 @@ HTTP::http_delete ( HTTP & http )
 	DEBUG( "target=\"" << http._request.file << "\"" );
 	if ( S_ISREG( http._request.file_info.st_mode ) )
 	{
-		if ( remove( http._request.target.c_str() ) == 0 ) //cehck if si 
+		if ( remove( http._request.target.c_str() ) == 0 )
 		{
 			http._status_code = OK;
 			http._message_body.append( "<!DOCTYPE html><body><h1>File deleted.</h1></body></html>" );

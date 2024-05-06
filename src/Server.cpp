@@ -5,8 +5,7 @@
 
 #include "Server.hpp"
 
-Server::Server ( void ):
-	_good( true )
+Server::Server ( void ): _good( true )
 {
 	std::memset( &this->_address, 0, sizeof( this->_address ) );
 	this->_error_pages[400] = "src/err_pages/400.html";
@@ -17,6 +16,7 @@ Server::Server ( void ):
 	this->_error_pages[413] = "src/err_pages/413.html";
 	this->_error_pages[500] = "src/err_pages/500.html";
 	this->_routes[""].setDefault();
+	this->_routes[""].setRoot( "html" );
 	return ;
 }
 
@@ -327,7 +327,7 @@ Server::setRedirection ( const std::string & arg, std::string location )
 }
 
 int
-Server::check ( void ) const
+Server::check ( void )
 {
 	if ( this->getPort() == 0 && this->getHost() == 0
 			&& this->_address.sin_family == 0 )

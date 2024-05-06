@@ -69,7 +69,7 @@ class Server
 		typedef std::map< std::string,
 				Location, longer< std::string > > t_route_map;
 
-		int check ( void ) const;
+		int check ( void );
 
 	private:
 	

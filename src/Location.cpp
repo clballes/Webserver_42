@@ -8,6 +8,7 @@
 Location::Location ( void ): _isDefault( false )
 {
 	this->_flags = 0x11111111;
+	this->setFlag( F_AUTOINDEX, false );
 	return ;
 }
 

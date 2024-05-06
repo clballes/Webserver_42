@@ -153,6 +153,42 @@ check_context ( std::string & directive_name, std::string & context,
 }
 
 int
+compare_servers ( std::vector< Server > & servers )
+{
+	std::vector< Server >::const_iterator it;
+	
+	if ( servers.size() <= 1 )
+		return ( EXIT_SUCCESS );
+	it = servers.begin() + 1;
+	while ( it != servers.end() )
+	{
+		const Server & a = *( it - 1 );
+		const Server & b = *it;
+		if ( a.getPort() == b.getPort()
+				&& a.getHost() == b.getHost() )
+		{
+			if ( a.getServerNames().size() == b.getServerNames().size() )
+			{
+				ERROR( "repeated server_names" );
+				return ( EXIT_FAILURE );
+			}
+			const std::vector< std::string > & s_names = a.getServerNames();
+			for ( std::vector< std::string >::const_iterator n = s_names.begin();
+					n != s_names.end(); ++n )
+			{
+				if ( b.hasServerName( const_cast< std::string & >( *n ) ) == true )
+				{
+					ERROR( "server_name \"" << *n << "\" is repeated" );
+					return ( EXIT_FAILURE );
+				}
+			}
+		}
+		++it;
+	}
+	return ( EXIT_SUCCESS );
+}
+
+int
 Router::load ( std::string filename )
 {
 	std::string   buffer, line;
@@ -263,7 +299,8 @@ Router::parse( std::string & buffer )
 		ERROR( "context \"" << context.top() << "\" unclosed" );
 		return ( EXIT_FAILURE );
 	}
-	// log servers
+	if ( compare_servers( this->_servers ) == EXIT_FAILURE )
+		return ( EXIT_FAILURE );
 	//for ( std::vector< Server >::const_iterator it = this->_servers.begin();
 	//		it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
 	//
