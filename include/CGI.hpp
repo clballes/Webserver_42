@@ -42,6 +42,7 @@ class CGI : public IEvent
 		HTTP &									_http;
 		Server &								_server;
 		pid_t									_pid;
+		std::size_t								_timer_id;
 		std::map < std::string, std::string >	_envMap;
 		int										_pipefd[2];
 };

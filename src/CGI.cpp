@@ -14,6 +14,7 @@ CGI::CGI ( HTTP & http , Server & server):
 	_http( http ), _server ( server )
 {
 	DEBUG( "" );
+	this->_timer_id = 1;
 	this->setmap();
 	return ;
 }
@@ -70,7 +71,7 @@ CGI::register_process ( void )
 		ERROR( "kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
-	EV_SET( &ev, 1, EVFILT_TIMER, EV_ADD | EV_ENABLE,
+	EV_SET( &ev, this->_timer_id, EVFILT_TIMER, EV_ADD | EV_ENABLE,
 			NOTE_SECONDS, CGI_TIMEOUT, (void *) this );
     if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
 	{
@@ -101,7 +102,7 @@ CGI::deregister_timer ( void )
 	struct kevent ev;
 
 	DEBUG ( this->_pid );
-	EV_SET( &ev, 1, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
+	EV_SET( &ev, this->_timer_id, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
@@ -119,6 +120,7 @@ CGI::dispatch ( struct kevent & ev )
 	DEBUG( ev.ident );
 	if ( ev.filter == EVFILT_PROC )
 	{
+		this->deregister_timer();
 		char buf[1024];
 		bytes_read = read( this->_pipefd[READ], buf, sizeof( buf ) );
 		while ( bytes_read > 0 )
@@ -148,7 +150,6 @@ CGI::dispatch ( struct kevent & ev )
 	{
 		WARN( "time is up for this cgi" );
 		this->deregister_timer();
-		this->deregister_process();
 		delete this;
 	}
 	return ;

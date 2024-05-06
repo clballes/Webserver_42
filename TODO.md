@@ -1,17 +1,21 @@
-- [ ] chunked requests (es el EOF tambe si)
-- [ ] leaks
-
 ## mpuig-ma
 
-- [ ] tests
-- [ ] set defaults
-- [ ] directory control ( . .. )
-- [ ] required directives: automate
+- [ ] leaks
 - [ ] graceful\_stop
-- [ ] POST, large request, expect: 100 + content-length--
+
+- [ ] required directives: automate
 - [ ] compare server blocks so there are no repetitions
+- [ ] set defaults
+- [ ] cgi timeout in conf
+
+- [ ] tests
+- [ ] directory control ( . .. )
+
+- [ ] POST, large request, expect: 100 + content-length--
+- [ ] chunked requests (es el EOF tambe si)
 - [ ] fix: CGI timer ident=1
-- [ ] fix: response to cgi timeout (segv)
+
+- [x] fix: response to cgi timeout (segv)
 - [x] fix: limit\_except ( setFlag, getFlag, AUTOINDEX ... )
 - [x] timeout
 - [x] CGI: not calling request\_send()
