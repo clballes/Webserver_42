@@ -39,12 +39,13 @@ int
 HTTP::http_post ( HTTP & http )
 {
 	DEBUG( "target=\"" << http._request.target << "\"" );
-	if ( http._server.getCGIpass( http._request.target ).empty() )
-	{
-		http._cgi_ptr = new CGI( http , http._server);
-		if ( http._cgi_ptr->execute() == EXIT_FAILURE )
-			return ( EXIT_FAILURE );
-	}
+	// regular post, not cgi
+	//if ( http._server.getCGIpass( http._request.target ).empty() )
+	//{
+	//	http._cgi_ptr = new CGI( http , http._server);
+	//	if ( http._cgi_ptr->execute() == EXIT_FAILURE )
+	//		return ( EXIT_FAILURE );
+	//}
 	return ( EXIT_SUCCESS );
 }
 

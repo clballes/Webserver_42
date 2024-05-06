@@ -129,8 +129,12 @@ parse_target( t_request & request, std::string & line )
 	request.query = parse_query( value );
 	if ( request.query.length() > 0 )
 		value.erase( value.length() - request.query.length() );
-	while ( value.length() > 1 && value.back() == '/' )
-		value.erase( value.length() - 1, 1 );
+	if ( value.back() == '/' )
+	{
+		while ( value.length() > 1 && value.back() == '/' )
+			value.erase( value.length() - 1, 1 );
+		value.append( "/" );
+	}
 	request.target = value;
 	urldecode( request.target );
 	return ( EXIT_SUCCESS );

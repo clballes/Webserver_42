@@ -231,6 +231,8 @@ Router::parse( std::string & buffer )
 					return ( EXIT_FAILURE );
 				}
 				location.assign( directive_value );
+				if ( directive_value.back() != '/' )
+					directive_value.append( "/" );
 				// TODO: check only one argument
 				if ( this->_servers.back().setRoute( directive_value ) ) 
 					return ( EXIT_FAILURE );

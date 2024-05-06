@@ -64,9 +64,9 @@ Server::getRoute ( const std::string & location ) const
 		}
 		else
 		{
-			if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
-				return ( const_cast< Location & >( it->second ) );
-			cmp_str.append( "/" );		
+			//if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+			//	return ( const_cast< Location & >( it->second ) );
+			//cmp_str.append( "/" );		
 			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
 				return ( const_cast< Location & >( it->second ) );
 		}
@@ -112,9 +112,10 @@ Server::getRouteString ( const std::string & location ) const
 		}
 		else
 		{
-			if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
-				return ( const_cast< std::string & >( it->first ) );
-			cmp_str.append( "/" );		
+			LOG( "comparing=\"" << cmp_str << "\" with \"" << target << "\"" );
+			//if ( target.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
+			//	return ( const_cast< std::string & >( it->first ) );
+			//cmp_str.append( "/" );		
 			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
 				return ( const_cast< std::string & >( it->first ) );
 		}
@@ -235,6 +236,8 @@ Server::setRoute ( const std::string & location )
 
 	while ( mod_location.back() == '/' )
 		mod_location.erase( mod_location.length() - 1, 1 );
+	if ( mod_location.back() != '/' ) 
+		mod_location.append( "/" );
 	if ( this->_routes.find( mod_location ) == this->_routes.end() )
 	{
 		(void) this->_routes[mod_location];

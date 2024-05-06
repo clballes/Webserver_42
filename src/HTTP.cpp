@@ -132,11 +132,14 @@ HTTP::request_recv ( int64_t data )
 	// if its an http redirection
 	// lcoation block en el compose
 	// append location root change if it fits location the target
+
 	this->_request.file = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
+	LOG( "location=" << location );
 	if ( ! location.empty() )
 	{
 		std::string root_location = this->_server.getRoot( location );
+		root_location.append( "/" );
 		this->_request.file.replace( 0 , location.length(), root_location );
 	}
 	else
