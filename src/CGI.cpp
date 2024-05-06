@@ -137,7 +137,7 @@ CGI::dispatch ( struct kevent & ev )
 			return ;
 		}
 		LOG_BUFFER( buffer, YELLOW );
-		close( _pipefd[READ] );
+		close( this->_pipefd[READ] );
 		if ( parse_headers( buffer ) == EXIT_FAILURE )
 		{
 			this->_http.setStatusCode( BAD_GATEWAY );
@@ -150,6 +150,8 @@ CGI::dispatch ( struct kevent & ev )
 	{
 		WARN( "time is up for this cgi" );
 		this->deregister_timer();
+		this->_http.setStatusCode( GATEWAY_TIMEOUT );
+		this->_http.register_send();
 		delete this;
 	}
 	return ;
