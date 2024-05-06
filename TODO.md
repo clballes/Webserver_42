@@ -10,7 +10,8 @@
 - [ ] set defaults
 - [ ] POST, large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)
-- [ ] fix: CGI timer ident=1
+- [x] fix: CGI GATEWAY\_TIMEOUT
+- [x] fix: CGI timer ident=1
 - [x] fix: response to cgi timeout (segv)
 - [x] fix: limit\_except ( setFlag, getFlag, AUTOINDEX ... )
 - [x] timeout

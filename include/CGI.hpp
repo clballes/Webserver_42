@@ -45,6 +45,7 @@ class CGI : public IEvent
 		std::size_t								_timer_id;
 		std::map < std::string, std::string >	_envMap;
 		int										_pipefd[2];
+		static std::size_t						timer_id_threshold;
 };
 
 #endif /* CGI.hpp */

@@ -8,13 +8,16 @@
 #define READ 0
 #define WRITE 1
 
+std::size_t
+CGI::timer_id_threshold = INT_MAX;
+
 static char ** map2array ( const std::map< std::string, std::string > & );
 
 CGI::CGI ( HTTP & http , Server & server):
 	_http( http ), _server ( server )
 {
 	DEBUG( "" );
-	this->_timer_id = 1;
+	this->_timer_id = CGI::timer_id_threshold++;
 	this->setmap();
 	return ;
 }
@@ -108,6 +111,7 @@ CGI::deregister_timer ( void )
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
+	CGI::timer_id_threshold -= 1;
 	return ( EXIT_SUCCESS );
 }
 
@@ -151,6 +155,7 @@ CGI::dispatch ( struct kevent & ev )
 		WARN( "time is up for this cgi" );
 		this->deregister_timer();
 		this->_http.setStatusCode( GATEWAY_TIMEOUT );
+		this->_http.compose_response();
 		this->_http.register_send();
 		delete this;
 	}
