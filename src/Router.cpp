@@ -23,7 +23,7 @@ Router::_opts[] =
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
 	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
-	{ DIRECTIVE, "client_body", no, no, "server", &set_client_body },
+	{ DIRECTIVE, "client_max_body_size", no, no, "server, location", &set_client_max_body_size },
 	{ DIRECTIVE, "redirection", no, no, "location", &set_redirection },
 	{ 0, 0x0, 0, 0, 0x0, 0x0 },
 };
@@ -472,7 +472,7 @@ Router::setConnection ( const struct sockaddr_in & address,
  * set_autoindex()
  * set_cgi_pass()
  * set_cgi_param()
- * set_client_body()
+ * set_client_max_body_size()
  * set_error_page()
  * set_index()
  * set_listen()
@@ -546,33 +546,9 @@ set_cgi_pass ( Server & instance, std::string & arg, std::string location )
 }
 
 int
-set_client_body ( Server & instance, std::string & arg, std::string )
+set_client_max_body_size( Server & instance, std::string & arg, std::string location )
 {
-	std::size_t n = 0;
-	int alpha = 0;
-
-	if ( arg.empty() || arg.find( " " ) != std::string::npos )
-	{
-		ERROR( "invalid number of arguments in \"client_body\"" );
-		return ( EXIT_FAILURE );
-	}
-    for ( std::size_t i = 0; i < arg.length(); i++ )
-    {
-        if ( ! isdigit( arg[i] )
-				&& arg[i] != 'm' && arg[i] != 'M'
-				&& arg[i] != 'k' && arg[i] != 'K' )
-			return ( EXIT_FAILURE );
-		if ( isalpha( arg[i] ) )
-			alpha = arg[i];
-		if ( alpha != 0 && i != arg.length() - 1 )
-			return ( EXIT_FAILURE );
-    }
-	if ( alpha != 0 )
-		arg.erase( arg.length() - 1, 1 );
-    n = static_cast<std::size_t>( std::atoi( arg.c_str() ) );
-	if ( alpha == 'M' || alpha == 'm' )
-		n *= 1000;
-	return ( instance.setClientMaxBodySize( n ) );
+	return ( instance.setClientMaxBodySize( arg, location ) );
 }
 
 int

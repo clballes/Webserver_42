@@ -9,6 +9,7 @@
 
 #include "IEvent.hpp"
 #include "HTTP.hpp"
+#include "file.hpp"
 #include "Server.hpp"
 #include <map>
 #include <cstdlib>

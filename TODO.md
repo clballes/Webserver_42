@@ -9,7 +9,6 @@
 - [ ] test: HTTP methods with wrong directory control ( . .. )
 
 ## mpuig-ma
-
 - set default index ( i buscar primer els index abans que el autodirectory )
 - [ ] compare server blocks so there are no repetitions
 - [ ] proper POST
@@ -18,7 +17,7 @@
 - [ ] location extension + '/'
 
 ## CLARA
-- compute limit size body len
-- mirara err pages
-- config tests
-- cgi param borrar
+- [ ] compute limit size body len
+- [ ] mirara err pages
+- [ ] config tests
+- [ ] cgi param borrar

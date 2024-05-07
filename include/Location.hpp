@@ -24,6 +24,7 @@ class Location
 		int setFlag ( int, bool );
 		int setCGIparam ( const std::string & );
 		int setCGIpass ( const std::string & );
+		int setClientMaxBodySize ( const std::string & );
 		int setRoot ( const std::string & );
 		int setIndex ( const std::string & );
 		int setUploadFiles ( const std::string & );
@@ -35,6 +36,7 @@ class Location
 		const std::string & getCGIparam ( void ) const ;
 		const std::pair<int, std::string >& getRedirection ( void ) const;
 		const std::string & getCGIpass ( void ) const;
+		const size_t & getClientMaxBodySize ( void ) const;
 		const std::string & getRoot ( void ) const;
 		const std::vector< std::string > & getIndex ( void ) const;
 		const std::string & getUploadFile ( void ) const;
@@ -43,6 +45,7 @@ class Location
 	private:
 
 		std::size_t					_flags;
+		std::size_t					_client_max_body_size;
 		std::string					_cgi_param;
 		std::string					_cgi_pass;
 		std::string					_root;

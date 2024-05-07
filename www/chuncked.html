@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
   <head>
     <title>Form Submission Example</title>
@@ -69,5 +69,43 @@
         <input type="submit" value="Submit" />
       </form>
     </div>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chunked Request Example</title>
+  </head>
+  <body>
+    <form id="myForm">
+      <input type="text" name="data" id="data" value="Hello, world!" />
+      <button type="button" onclick="sendChunkedRequest()">
+        Send Chunked Request
+      </button>
+    </form>
+
+    <script>
+      function sendChunkedRequest() {
+        var formData = document.getElementById("data").value;
+        var chunkSize = 5; // Chunk size in characters
+        var chunks = [];
+
+        // Split data into chunks
+        for (var i = 0; i < formData.length; i += chunkSize) {
+          chunks.push(formData.substr(i, chunkSize));
+        }
+
+        // Send each chunk separately
+        for (var j = 0; j < chunks.length; j++) {
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/test", true);
+          xhr.setRequestHeader("Content-Type", "text/plain");
+          xhr.send(chunks[j]);
+        }
+      }
+    </script>
   </body>
 </html>

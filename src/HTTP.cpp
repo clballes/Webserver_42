@@ -134,6 +134,14 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_FAILURE );
 	}
 
+	// limit client size max body check && Setting size to 0 disables checking of client request body size.
+	if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0 && (this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ))
+	{
+		this->setStatusCode(CONTENT_TOO_LARGE);
+		this->compose_response();
+		return ( EXIT_FAILURE );
+	}
+
 	// TODO: this goes into parse_request
 	LOG_BUFFER( this->_buffer_recv, GREEN );
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
@@ -150,19 +158,15 @@ HTTP::request_recv ( int64_t data )
 	std::string location = this->_server.getRouteString( this->_request.target );
 	if ( ! location.empty() )
 	{
-		std::cout << "A" << std::endl;
 		std::string root_location = this->_server.getRoot( location );
 		root_location.append( "/" );
 		this->_request.file.replace( 0 , location.length(), root_location );
 	}
 	else
 	{
-		std::cout << "B" << std::endl;
-
 		std::string root_location = this->_server.getRoot( location );
 		root_location.append( "/" );
 		this->_request.file.replace( 0, 1, root_location );
-		std::cout << "req file: " << this->_request.file << std::endl;
 	}
 	stat( this->_request.file.c_str(), &this->_request.file_info );
 
@@ -222,13 +226,12 @@ HTTP::compose_response ( void )
 	if ( this->_status_code >= 300 && this->_status_code <= 511 )
 	{
 		load_file( *this, this->_server.getErrorPage( this->_status_code ) );
+		this->_response_headers["Content-Type"] = "text/html"; // perque no el posem?
 	}
-	
-	// TODO: replace to_string(); it's not c++98.
 	this->_buffer_send.append( "HTTP/1.1 " );
-	this->_buffer_send.append( std::to_string( this->_status_code ) );
+	this->_buffer_send.append( my_to_string( this->_status_code ) );
 	this->_buffer_send.append( " \r\n" );
-	this->_response_headers["content-length"] = std::to_string( this->_message_body.size() );
+	this->_response_headers["content-length"] = my_to_string( this->_message_body.size() );
 	// Add response headers if any + ending CRLF.
 	for ( t_headers::iterator it = this->_response_headers.begin();
 			it != this->_response_headers.end(); ++it )

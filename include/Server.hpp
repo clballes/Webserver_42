@@ -39,7 +39,7 @@ class Server
 		bool hasServerName ( std::string & ) const;
 		bool getFlag ( int, std::string = "" ) const;
 		std::size_t getFlags ( std::string = "" ) const;
-		std::size_t getClientMaxBodySize ( void ) const;
+		const std::size_t & getClientMaxBodySize ( std::string = ""  ) const;
 		const std::string & getCGIparam ( std::string = "" ) const ;
 		const std::string & getCGIpass ( std::string = "" ) const;
 		const std::string & getRoot ( std::string = "" ) const;
@@ -57,8 +57,8 @@ class Server
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
-		int setClientMaxBodySize ( std::size_t );
 		int setCGIparam ( const std::string &, std::string = "" );
+		int setClientMaxBodySize ( const std::string &, std::string = "" );
 		int setCGIpass ( const std::string &, std::string = "" );
 		int setRoot ( const std::string &, std::string = "" );
 		int setServerName ( const std::string & );

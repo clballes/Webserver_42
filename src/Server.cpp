@@ -15,6 +15,8 @@ Server::Server ( void ): _good( true )
 	this->_error_pages[410] = "src/err_pages/410.html";
 	this->_error_pages[413] = "src/err_pages/413.html";
 	this->_error_pages[500] = "src/err_pages/500.html";
+	// in nginx the default value for client_max is 1MB, then 1,048,576bytes
+	this->_client_max_body_size = 1 * 1024 * 1204; 
 	this->_routes[""].setDefault();
 	this->_routes[""].setRoot( "html" );
 	return ;
@@ -137,10 +139,13 @@ Server::getFlags ( std::string location ) const
 	return ( flags );
 }
 
-std::size_t
-Server::getClientMaxBodySize ( void ) const
+const std::size_t &
+Server::getClientMaxBodySize (  std::string location ) const
 {
-	return ( this->_client_max_body_size );
+	const Location & loc = this->getRoute( location );
+	const std::size_t & client_max_body_size = loc.getClientMaxBodySize();
+    DEBUG("location=\"" << location << "\" clientmaxbodysize=\"" << client_max_body_size << "\"");
+	return ( client_max_body_size );
 }
 
 const std::string &
@@ -235,13 +240,6 @@ Server::getPort ( void ) const
 	return ( ntohs( this->_address.sin_port ) );
 }
 
-// std::string
-// Server::getRedirection ( std::string & location ) const
-// {
-// 	return this->getRoute( location ).setRedirection( arg ) );
-// 	// return (this->redirection);
-// }
-
 const struct sockaddr_in &
 Server::getListen ( void ) const
 {
@@ -273,10 +271,9 @@ Server::setFlag ( int flag, bool enable, std::string location )
 }
 
 int
-Server::setClientMaxBodySize ( std::size_t size )
+Server::setClientMaxBodySize ( const std::string & arg, std::string location )
 {
-	this->_client_max_body_size = size;
-	return ( EXIT_SUCCESS );
+	return ( this->getRoute( location ).setClientMaxBodySize( arg ) );
 }
 
 int
@@ -395,6 +392,7 @@ Server::log_conf ( void ) const
 		LOG( " cgi_param=" << it->second.getCGIparam() );
 		LOG( " Redirection=" << it->second.getRedirection().first << " " << it->second.getRedirection().second );
 		LOG( " Upload files=" << it->second.getUploadFile() );
+		LOG(" Client max body size=" << it->second.getClientMaxBodySize() );
 		for ( std::vector< std::string >::const_iterator index_it = it->second.getIndex().begin();
 				index_it != it->second.getIndex().end(); ++index_it )
 			LOG( " index=" << *index_it );
