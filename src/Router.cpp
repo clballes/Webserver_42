@@ -21,7 +21,7 @@ Router::_opts[] =
 	{ DIRECTIVE, "index", no, no, "server", &set_index },
 	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
-	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
+	// { DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
 	{ DIRECTIVE, "client_max_body_size", no, no, "server, location", &set_client_max_body_size },
 	{ DIRECTIVE, "redirection", no, no, "location", &set_redirection },
@@ -478,7 +478,6 @@ Router::setConnection ( const struct sockaddr_in & address,
  * set_listen()
  * set_root()
  * set_server_name()
- * set_upload_files()
  * set_redirection()
  *
  */
@@ -533,11 +532,11 @@ set_autoindex( Server & instance, std::string & arg, std::string location )
 	return ( EXIT_FAILURE );
 }
 
-int
-set_cgi_param ( Server & instance, std::string & arg, std::string location )
-{
-	return ( instance.setCGIparam( arg, location ) );
-}
+// int
+// set_cgi_param ( Server & instance, std::string & arg, std::string location )
+// {
+// 	return ( instance.setCGIparam( arg, location ) );
+// }
 
 int
 set_cgi_pass ( Server & instance, std::string & arg, std::string location )
@@ -676,12 +675,6 @@ set_server_name ( Server & instance, std::string & arg, std::string )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
-}
-
-int
-set_upload_files ( Server & instance, std::string & arg, std::string location )
-{
-	return ( instance.setUploadFiles( arg, location ) );
 }
 
 int

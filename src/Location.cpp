@@ -43,11 +43,11 @@ Location::getFlags ( void ) const
 	return ( this->_flags );
 }
 
-const std::string &
-Location::getCGIparam ( void ) const
-{
-	return ( this->_cgi_param );
-}
+// const std::string &
+// Location::getCGIparam ( void ) const
+// {
+// 	return ( this->_cgi_param );
+// }
 
 const std::string &
 Location::getCGIpass ( void ) const
@@ -59,12 +59,6 @@ const std::size_t &
 Location::getClientMaxBodySize ( void ) const
 {
 	return ( this->_client_max_body_size );
-}
-
-const std::string &
-Location::getUploadFile ( void ) const
-{
-	return ( this->_upload_files );
 }
 
 const std::pair<int, std::string >&
@@ -104,13 +98,13 @@ Location::setFlag ( int flag, bool enable )
 	return ( EXIT_SUCCESS );
 }
 
-int
-Location::setCGIparam ( const std::string & arg )
-{
-	// TODO: validate
-	this->_cgi_param.assign( arg );
-	return ( EXIT_SUCCESS );
-}
+// int
+// Location::setCGIparam ( const std::string & arg )
+// {
+// 	// TODO: validate
+// 	this->_cgi_param.assign( arg );
+// 	return ( EXIT_SUCCESS );
+// }
 
 int
 Location::setCGIpass ( const std::string & arg )
@@ -188,18 +182,6 @@ Location::setIndex ( const std::string & arg )
 }
 
 int
-Location::setUploadFiles ( const std::string & arg )
-{
-	if ( can_access_file(arg, X_OK ) == false)
-	{
-		return ( EXIT_FAILURE );
-	}
-	// TODO: validate
-	this->_upload_files = arg;
-	return ( EXIT_SUCCESS );
-}
-
-int
 Location::setRedirection ( const std::string & arg )
 {
 	std::size_t spacePos = arg.find(' ');
@@ -225,7 +207,7 @@ Location::log_conf ( void ) const
 	LOG( BLUE << "isDefault=" << this->isDefault() );
 	LOG( BLUE << "flags=" << std::hex << this->getFlags() << std::dec );
 	LOG( BLUE << "cgi_pass=" << this->getCGIpass() );
-	LOG( BLUE << "cgi_param=" << this->getCGIparam() );
+	// LOG( BLUE << "cgi_param=" << this->getCGIparam() );
 	LOG( BLUE << "client_max_body_size=" << this->getClientMaxBodySize() );
 	return ;
 }

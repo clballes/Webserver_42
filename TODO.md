@@ -17,7 +17,9 @@
 - [ ] location extension + '/'
 
 ## CLARA
-- [ ] compute limit size body len
+- [ x ] compute limit size body len, iniciat a 1MB com diu nginx sempre i implmenteat dintre de location
+- [ x ] substituir to_string per my_to_string
+- [ x ] borrar uploaded files
+- [ x ] cgi comentat
 - [ ] mirara err pages
 - [ ] config tests
-- [ ] cgi param borrar

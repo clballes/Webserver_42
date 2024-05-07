@@ -148,14 +148,14 @@ Server::getClientMaxBodySize (  std::string location ) const
 	return ( client_max_body_size );
 }
 
-const std::string &
-Server::getCGIparam ( std::string location ) const
-{
-	const Location & loc = this->getRoute( location );
-	const std::string & cgi_param = loc.getCGIparam();
-	DEBUG( "location=\"" << location << "\" cgi_param=\"" << cgi_param << "\"" );
-	return ( cgi_param );
-}
+// const std::string &
+// Server::getCGIparam ( std::string location ) const
+// {
+// 	const Location & loc = this->getRoute( location );
+// 	const std::string & cgi_param = loc.getCGIparam();
+// 	DEBUG( "location=\"" << location << "\" cgi_param=\"" << cgi_param << "\"" );
+// 	return ( cgi_param );
+// }
 
 const std::pair<int, std::string> & Server::getRedirection ( std::string location ) const
 {
@@ -175,15 +175,6 @@ Server::getCGIpass ( std::string location ) const
 	return ( cgi_pass );
 }
 
-const std::string &
-Server::getUploadFile ( std::string location ) const
-{
-	DEBUG( "uploaded file=\"" << location << "\"" );
-	const Location & loc = this->getRoute( location );
-	const std::string & uploaded = loc.getUploadFile();
-	DEBUG( "uploaded=\"" << uploaded << "\"" );
-	return ( uploaded );
-}
 
 const std::string &
 Server::getRoot ( std::string location ) const
@@ -276,11 +267,11 @@ Server::setClientMaxBodySize ( const std::string & arg, std::string location )
 	return ( this->getRoute( location ).setClientMaxBodySize( arg ) );
 }
 
-int
-Server::setCGIparam ( const std::string & arg, std::string location )
-{
-	return ( this->getRoute( location ).setCGIparam( arg ) );
-}
+// int
+// Server::setCGIparam ( const std::string & arg, std::string location )
+// {
+// 	return ( this->getRoute( location ).setCGIparam( arg ) );
+// }
 
 int
 Server::setCGIpass ( const std::string & arg, std::string location )
@@ -338,12 +329,6 @@ Server::setErrorPage ( int n, const std::string & path )
 }
 
 int
-Server::setUploadFiles ( const std::string & arg, std::string location )
-{
-	return ( this->getRoute( location ).setUploadFiles( arg ) );
-}
-
-int
 Server::setRedirection ( const std::string & arg, std::string location )
 {
 	
@@ -389,9 +374,8 @@ Server::log_conf ( void ) const
 		LOG( " isDefault=" << it->second.isDefault() );
 		LOG( " flags=" << std::hex << it->second.getFlags() << std::dec );
 		LOG( " cgi_pass=" << it->second.getCGIpass() );
-		LOG( " cgi_param=" << it->second.getCGIparam() );
+		// LOG( " cgi_param=" << it->second.getCGIparam() );
 		LOG( " Redirection=" << it->second.getRedirection().first << " " << it->second.getRedirection().second );
-		LOG( " Upload files=" << it->second.getUploadFile() );
 		LOG(" Client max body size=" << it->second.getClientMaxBodySize() );
 		for ( std::vector< std::string >::const_iterator index_it = it->second.getIndex().begin();
 				index_it != it->second.getIndex().end(); ++index_it )

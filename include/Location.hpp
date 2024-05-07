@@ -22,24 +22,22 @@ class Location
 
 		void setDefault ( void );
 		int setFlag ( int, bool );
-		int setCGIparam ( const std::string & );
+		// int setCGIparam ( const std::string & );
 		int setCGIpass ( const std::string & );
 		int setClientMaxBodySize ( const std::string & );
 		int setRoot ( const std::string & );
 		int setIndex ( const std::string & );
-		int setUploadFiles ( const std::string & );
 		int setRedirection ( const std::string & );
 
 		bool isDefault ( void ) const;
 		bool getFlag ( int ) const;
 		std::size_t getFlags ( void ) const;
-		const std::string & getCGIparam ( void ) const ;
+		// const std::string & getCGIparam ( void ) const ;
 		const std::pair<int, std::string >& getRedirection ( void ) const;
 		const std::string & getCGIpass ( void ) const;
 		const size_t & getClientMaxBodySize ( void ) const;
 		const std::string & getRoot ( void ) const;
 		const std::vector< std::string > & getIndex ( void ) const;
-		const std::string & getUploadFile ( void ) const;
 		void log_conf ( void ) const;
 
 	private:
@@ -52,7 +50,6 @@ class Location
 		std::pair<int, std::string> _redirection;
 		bool						_isDefault;
 		std::vector< std::string >	_index;
-		std::string					_upload_files;
 };
 
 #endif /* !_LOCATION_HPP_ */
