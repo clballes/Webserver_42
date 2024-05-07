@@ -22,7 +22,8 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_router( router_instance ),
 	_connection( router_instance.getConnection( fd ) ),
 	_server( router_instance.getDefaultServer() ),
-	_cgi_ptr( NULL )
+	_cgi_ptr( NULL ),
+	_chunk_request( false )
 {
 	this->_request.method = 0x0;
 	std::memset( &this->_request.file_info, 0,
@@ -98,7 +99,7 @@ HTTP::request_recv ( int64_t data )
 {
 	ssize_t n;
 
-	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );
+	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );	
 	this->_buffer_recv.resize( data + 1 );
 	this->_buffer_recv.back() = '\0';
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
@@ -113,6 +114,16 @@ HTTP::request_recv ( int64_t data )
 		delete this;
 		return ( EXIT_SUCCESS );
 	}
+
+	if ( this->_chunk_request == true )
+	{
+		LOG_BUFFER( this->_buffer_recv, GREEN );
+		this->_chunk_request = false;
+		this->_request.body.assign( this->_buffer_recv );
+		return ( this->compute_response() );
+		return ( EXIT_SUCCESS );
+	}
+
 	if ( this->parse() == EXIT_FAILURE )
 	{
 		LOG_BUFFER( this->_buffer_recv, RED );
@@ -148,6 +159,13 @@ HTTP::request_recv ( int64_t data )
 		this->_request.file.replace( 0, 1, root_location );
 	}
 	stat( this->_request.file.c_str(), &this->_request.file_info );
+
+	if ( ! this->_request_headers["expect"].empty() )
+	{
+		this->_chunk_request = true;
+		return ( EXIT_SUCCESS );
+	}
+	
 	return ( this->compute_response() );
 }
 
@@ -158,6 +176,10 @@ int
 HTTP::compute_response ( void )
 {
 	DEBUG( this->_socket_fd );
+	/* for ( t_headers::const_iterator it = this->_request_headers.begin();
+			it != this->_request_headers.end(); ++it )
+		LOG( it->first << "=" << it->second );
+	LOG ( "" ); */
 	if ( S_ISREG( this->_request.file_info.st_mode ) )
 	{ LOG( GREEN << this->_request.file << " is regular" ); }
 	else if ( S_ISDIR( this->_request.file_info.st_mode ) )
@@ -260,6 +282,7 @@ int
 HTTP::check_index ( void )
 {
 	const std::vector< std::string > & vec = this->_server.getIndex();
+
 	for ( std::vector< std::string >::const_iterator it = vec.begin();
 			it != vec.end(); ++it )
 	{
@@ -267,14 +290,14 @@ HTTP::check_index ( void )
 		char lastChar = tempTarget.at( tempTarget.size() - 1 );
 		if ( lastChar != '/' )
 		{
-			tempTarget.append("/");
+			tempTarget.append( "/" );
 		}
-		tempTarget.append(*it);
-		if (routeExists(tempTarget))
+		tempTarget.append( *it );
+		if ( routeExists( tempTarget ) )
 		{
-			this->_request.target.append("/");
-			this->_request.target.append(*it);
-			std::cout << "route exists" << this->_request.target << std::endl;
+			this->_request.target.append( "/" );
+			this->_request.target.append( *it );
+			LOG( "route exists" << this->_request.target );
 			return ( OK );
 		}
 		else
