@@ -112,6 +112,7 @@ class HTTP: public IEvent
 		static int http_delete ( HTTP & );
 		static int compose_response ( HTTP & );
 		static int autoindex ( HTTP & );
+		void	handle_chunk(const std::string& );
 };
 
 #endif /* !_HTTP_HPP_ */

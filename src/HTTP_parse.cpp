@@ -5,6 +5,39 @@
 
 #include "HTTP.hpp"
 
+void		HTTP::handle_chunk(const std::string& body)
+{
+	std::string::size_type pos = 0;
+    std::string::size_type chunk_length;
+
+    while (pos < body.size()) {
+        // Find the position of the next '\r\n'
+        std::string::size_type next_crlf_pos = body.find("\r\n", pos);
+        if (next_crlf_pos == std::string::npos) {
+            std::cerr << "Invalid chunked data format\n";
+            return;
+        }
+
+        std::string chunk_length_hex = body.substr(pos, next_crlf_pos - pos);
+        chunk_length = strtol(chunk_length_hex.c_str(), NULL, 16);
+
+        // Move past the '\r\n' to the start of the chunk data
+        pos = next_crlf_pos + 2;
+
+        // Extract the chunk data
+        std::string chunk_data = body.substr(pos, chunk_length);
+		//store the extracted chunks in the body requested
+		this->_request.body += chunk_data;
+        pos += chunk_length + 2;
+
+		if (chunk_length == 0)
+		{
+			std::cout << " WE ARE AT THE END OF THE LINE "<< std::endl;
+			//nose si cal afegir despres els trailer que son additional headers
+		}
+    }
+}
+
 int
 HTTP::parse ( void )
 {
@@ -17,6 +50,7 @@ HTTP::parse ( void )
 		pos = this->_buffer_recv.length();
 	while ( pos != std::string::npos )
 	{
+	    std::cout << "lineeeeeee2 is: "<< line << std::endl;
 		line = this->_buffer_recv.substr( start, pos - start );
 		if ( start == 0 )
 		{
@@ -41,14 +75,25 @@ HTTP::parse ( void )
 
 	// TODO: byte control from "content-length"
 	// TODO: chunked request
+	std::cout << "lineeeeeee is: "<< line << std::endl;
 	// We return if the method does not require to read
 	// the contents of a potential message body.
 	if ( this->_request.method->code != HTTP_POST
 			&& this->_request.method->code != HTTP_PUT )
 		return ( EXIT_SUCCESS );
 	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
-		this->_request.body = this->_buffer_recv.substr( pos );
-	return ( EXIT_SUCCESS );
+	{
+		//this->_request.body = this->_buffer_recv.substr( pos );
+		//li sumo 4 perque em tregui el 3f
+		std::string body = this->_buffer_recv.substr( pos + 4 );
+		//si tenim chunks fes una cosa diferent
+		std::cout << "body:" << std::endl;
+		//nose perque em printeja 3f
+		std::cout << body << std::endl;
+		handle_chunk( body );
+		return EXIT_SUCCESS;
+	}
+	return EXIT_SUCCESS;
 }
 
 // From RFT9112:

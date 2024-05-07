@@ -118,6 +118,36 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_FAILURE );
 	}
 	LOG_BUFFER( this->_buffer_recv, GREEN );
+	// prinitng the headers
+        std::cout << "HEADERS ARE:" <<std::endl;
+
+	std::map<std::string, std::string>::iterator iter1;
+        for (iter1 = _request_headers.begin(); iter1 != _request_headers.end(); ++iter1) {
+            std::cout << iter1->first << ": " << iter1->second << std::endl;
+        }
+        std::cout << "HEADERS END" <<std::endl;
+	std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
+        if (iter != _request_headers.end()) {
+            if (iter->second == "chunked") {
+                std::cout << "hay chunks" << std::endl;
+				// Skip headers until reaching the chunked encoding header
+
+
+
+
+
+
+
+
+
+
+				// tenim chunks
+            }
+			else
+                std::cout << "request not supported!!" << std::endl;
+        }
+
+
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
@@ -159,6 +189,7 @@ HTTP::perform ( void )
 		std::string root_location = this->_server.getRoot( location );
 		this->_request.file.replace( 0 , location.length(), root_location );
 	}
+	//localtion / -> substituir pel root location default location default
 	LOG( YELLOW << "file=" << this->_request.file << " loc:" << location);
 	stat( this->_request.file.c_str(), &this->_request.file_info );
 

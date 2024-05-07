@@ -70,7 +70,14 @@ HTTP::http_post ( HTTP & http )
 	}
 	if ( http._server.getCGIpass( http._request.target ).empty() )
 	{
-		http.cgi_ptr = new CGI( http , http._server);
+		LOG( YELLOW << " --------------- is a directory" );
+		http._status_code = HTTP::load_file( http, http._request.file );
+		http.register_send();
+	}
+	else
+	{
+		LOG( YELLOW << http._request.file << " iCGI" );
+		http.cgi_ptr = new CGI( http, http._server );
 		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
