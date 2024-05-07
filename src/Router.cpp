@@ -24,7 +24,6 @@ Router::_opts[] =
 	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
 	{ DIRECTIVE, "client_body", no, no, "server", &set_client_body },
-	{ DIRECTIVE, "upload_files", no, no, "location", &set_upload_files },
 	{ DIRECTIVE, "redirection", no, no, "location", &set_redirection },
 	{ 0, 0x0, 0, 0, 0x0, 0x0 },
 };
@@ -266,9 +265,9 @@ Router::parse( std::string & buffer )
 					ERROR( "unnamed \"location\"." );
 					return ( EXIT_FAILURE );
 				}
-				location.assign( directive_value );
 				if ( directive_value.back() != '/' )
 					directive_value.append( "/" );
+				location.assign( directive_value );
 				// TODO: check only one argument
 				if ( this->_servers.back().setRoute( directive_value ) ) 
 					return ( EXIT_FAILURE );

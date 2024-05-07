@@ -129,6 +129,8 @@ HTTP::request_recv ( int64_t data )
 		LOG_BUFFER( this->_buffer_recv, RED );
 		WARN( "HTTP request does not comply with HTTP/1.1 specification." );
 		this->_buffer_recv.clear();
+		this->setStatusCode( NOT_IMPLEMENTED );
+		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
 

@@ -83,17 +83,17 @@ HTTP::parse ( void )
 	// chunked request
 	// We return if the method does not require to read
 	// the contents of a potential message body.
-	if ( this->_request.method->code != HTTP_POST
-			&& this->_request.method->code != HTTP_PUT )
-		return ( EXIT_SUCCESS );
+	// if ( this->_request.method->code != HTTP_POST
+	// 		&& this->_request.method->code != HTTP_PUT )
+	// 	return ( EXIT_SUCCESS );
 	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
 	{
-		//li sumo 4 perque em tregui el 3f
-		//this->_request.body = this->_buffer_recv.substr( pos );
-		std::string body = this->_buffer_recv.substr( pos + 4 );
+		this->_request.body = this->_buffer_recv.substr( pos );
 		std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
 		if (iter != _request_headers.end()) {
 			if (iter->second == "chunked") {
+				//li sumo 4 perque em tregui el 3f
+				std::string body = this->_buffer_recv.substr( pos + 4 );
 				std::cout << "hay chunks" << std::endl;
 				handle_chunk( body );
 			}
