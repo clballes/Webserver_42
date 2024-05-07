@@ -20,7 +20,7 @@ Router::_opts[] =
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, no, "server", &set_index },
 	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
-	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
+	{ DIRECTIVE, "cgi_pass", no, yes, "location", &set_cgi_pass },
 	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
 	{ DIRECTIVE, "client_body", no, no, "server", &set_client_body },

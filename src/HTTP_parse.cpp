@@ -74,8 +74,7 @@ HTTP::parse ( void )
 	}
 
 	// TODO: byte control from "content-length"
-	// TODO: chunked request
-	std::cout << "lineeeeeee is: "<< line << std::endl;
+	// chunked request
 	// We return if the method does not require to read
 	// the contents of a potential message body.
 	if ( this->_request.method->code != HTTP_POST
@@ -83,14 +82,18 @@ HTTP::parse ( void )
 		return ( EXIT_SUCCESS );
 	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
 	{
-		//this->_request.body = this->_buffer_recv.substr( pos );
 		//li sumo 4 perque em tregui el 3f
+		//this->_request.body = this->_buffer_recv.substr( pos );
 		std::string body = this->_buffer_recv.substr( pos + 4 );
-		//si tenim chunks fes una cosa diferent
-		std::cout << "body:" << std::endl;
-		//nose perque em printeja 3f
-		std::cout << body << std::endl;
-		handle_chunk( body );
+		std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
+		if (iter != _request_headers.end()) {
+			if (iter->second == "chunked") {
+				std::cout << "hay chunks" << std::endl;
+				handle_chunk( body );
+			}
+			else
+				std::cout << "request not supported!!" << std::endl;
+		}
 		return EXIT_SUCCESS;
 	}
 	return EXIT_SUCCESS;
