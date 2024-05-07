@@ -19,5 +19,8 @@ std::string & urldecode ( std::string & url );
 
 std::string & strtolower ( std::string & );
 
-std::size_t how_many_words ( std::string & );
-std::string get_word ( std::string &, std::string delimiter );
+std::size_t how_many_words ( const std::string & );
+std::size_t how_many_characters_of ( const std::string & str, char c );
+std::string get_word ( const std::string &, std::string delimiter );
+
+bool compare_file_extension( const std::string & a, const std::string & b );

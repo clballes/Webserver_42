@@ -4,107 +4,93 @@
 /* Tue Apr  9 16:50:09 2024                                                   */
 
 #include "HTTP.hpp"
+
 int
 HTTP::http_head ( HTTP & http )
 {
-	DEBUG( "" );
-	if ( http._server.getCGIpass( http._request.target ).length() != 0 )
-	{}
+	DEBUG( "target=\"" << http._request.target << "\"" );
+	if ( S_ISDIR( http._request.file_info.st_mode )
+			|| S_ISREG( http._request.file_info.st_mode ) )
+		http._status_code = OK;
 	else
-	{}
-	(void) http;
+		http._status_code = NOT_FOUND;
 	return ( EXIT_SUCCESS );
 }
 
 int
 HTTP::http_get ( HTTP & http )
 {
-	DEBUG( "target=\"" << http._request.target << "\"" );
-	DEBUG( "target=\"" << http._status_code << 	" AAAA " << http._request.file_info.st_mode << "\"" );
+	DEBUG( "target=\"" << http._request.file << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode ) )
 	{
-		LOG( YELLOW << http._request.file << " is a directory" );
 		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )
 			http._status_code = HTTP::autoindex( http );
 		else
 			http._status_code = FORBIDDEN;
-		http.register_send();
 	}
 	else if ( S_ISREG( http._request.file_info.st_mode ) )
-	{
-		LOG( YELLOW << http._request.file << " is a regular file" );
-		if ( http._server.getCGIpass( http._request.target ).empty() )
-		{
-			http._status_code = HTTP::load_file( http, http._request.file );
-			http.register_send();
-		}
-		else
-		{
-			LOG( YELLOW << http._request.file << " iCGI" );
-			http.cgi_ptr = new CGI( http, http._server );
-			if ( http.cgi_ptr->execute() == EXIT_FAILURE )
-				return ( EXIT_FAILURE );
-		}
-	}
+		http._status_code = HTTP::load_file( http, http._request.file );
 	else
-	{
-		LOG( YELLOW << http._request.file << "  AAAAAAAAAA " );
 		http._status_code = NOT_FOUND;
-		http.register_send();
-	}
 	return ( EXIT_SUCCESS );
 }
 
 int
 HTTP::http_post ( HTTP & http )
 {
-	DEBUG( "" );
-	if ( S_ISDIR( http._request.file_info.st_mode ) ) // si es un direcotry i eta enabled  podriem ferho o be posar error de forbidden
+	DEBUG( "target=\"" << http._request.file << "\"" );
+	LOG( http._request_headers["content-type"] );
+	// regular post, not cgi
+	//if ( http._server.getCGIpass( http._request.target ).empty() )
+	//{
+	//	http._cgi_ptr = new CGI( http , http._server);
+	//	if ( http._cgi_ptr->execute() == EXIT_FAILURE )
+	//		return ( EXIT_FAILURE );
+	//}
+	http._status_code = OK;
+	return ( EXIT_SUCCESS );
+}
+
+int
+HTTP::http_put ( HTTP & http )
+{
+	std::ofstream file;
+
+	if ( S_ISREG( http._request.file_info.st_mode )
+			|| S_ISDIR( http._request.file_info.st_mode ) )
 	{
-		LOG( YELLOW << http._request.file << " is a directory" );
-		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )
-			http._status_code = HTTP::autoindex( http );
-		else
-			http._status_code = FORBIDDEN;
-		http.register_send();
-	}
-	if ( http._server.getCGIpass( http._request.target ).empty() )
-	{
-		LOG( YELLOW << " --------------- is a directory" );
-		http._status_code = HTTP::load_file( http, http._request.file );
-		http.register_send();
+		file.open( http._request.file,
+				std::ofstream::out | std::ofstream::trunc | std::ofstream::binary );
+		http._status_code = OK;
 	}
 	else
 	{
-		LOG( YELLOW << http._request.file << " iCGI" );
-		http.cgi_ptr = new CGI( http, http._server );
-		if ( http.cgi_ptr->execute() == EXIT_FAILURE )
-			return ( EXIT_FAILURE );
+		file.open( http._request.file,
+				std::ofstream::out | std::ofstream::trunc | std::ofstream::binary );
+		http._status_code = CREATED;
 	}
+	if ( http._request.body.empty() )
+		http._status_code = NO_CONTENT;
+	else
+		file << http._request.body;
 	return ( EXIT_SUCCESS );
 }
 
 int
 HTTP::http_delete ( HTTP & http )
 {
-	DEBUG( "" );
-	if ( is_regular_file( http._request.target ) )
+	DEBUG( "target=\"" << http._request.file << "\"" );
+	if ( S_ISREG( http._request.file_info.st_mode ) )
 	{
-		if ( remove( http._request.target.c_str() ) == 0 ) //cehck if si 
+		if ( remove( http._request.target.c_str() ) == 0 )
 		{
-			http._status_code = 200;
+			http._status_code = OK;
 			http._message_body.append( "<!DOCTYPE html><body><h1>File deleted.</h1></body></html>" );
 		}
 		else
-		{
-			http._status_code = 403;
-			HTTP::load_file( http, http._server.getErrorPage( 403 ) );
-		}
+			http._status_code = FORBIDDEN;
 	}
 	else
-	{
-		http._status_code = 404;
-		HTTP::load_file( http, http._server.getErrorPage( 404 ) );
-	}
+		http._status_code = NOT_FOUND;
 	return ( EXIT_SUCCESS );
 }

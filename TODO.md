@@ -1,22 +1,18 @@
-- [ ] chunked requests (es el EOF tambe si)
+- [ ] leaks
+- [ ] leaks: graceful\_stop SIGQUIT
+- [ ] leaks: SIGTERM
+- [ ] test: required directives ( Server check() )
+- [ ] test: wrong number of arguments ( conf )
+- [ ] test: wrong input(s)
+- [ ] test: default values
+- [ ] test: HTTP methods with wrong directory control ( . .. )
 
 ## mpuig-ma
 
-- [ ] filtrar valid (allowed) methods
-- [ ] location \*.php 
-- [ ] timeout
-
-- [ ] tests
-- [ ] set defaults
-- [ ] directory control ( . .. )
-- [x] /test != /test/ != /testy != /test/other
-- [x] Location /test/ == Location /test
-- [x] compare listen directives, so there are no duplicate Connections
 - [ ] compare server blocks so there are no repetitions
-- [x] required directives: listen, root
-- [ ] required directives: automate
-- [ ] server\_name listening to localhost should match server listening to 0.0.0.0 ?
-- [x] target: ending `/' does not imply file or directory; remove for simplification
+- [ ] proper POST
+- [ ] large request, expect: 100 + content-length--
+- [ ] chunked requests (es el EOF tambe si)
 
 ## CLARA
 

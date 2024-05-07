@@ -42,48 +42,66 @@ HTTP::autoindex ( HTTP & http )
 	page.append( http._request.target );
 	page.append( "</title>" );
 	// Add style tags
-	page.append("<style>");
-	page.append("img.icon {");
-	page.append("    vertical-align: middle;");
-	page.append("    margin-right: 8px;");
-	page.append("}");
-	page.append("a.link {");
-	page.append("    vertical-align: middle;");
-	page.append("}");
-	page.append("</style>");
+	page.append( "<style>" );
+	page.append( "img.icon {" );
+	page.append( "    vertical-align: middle;" );
+	page.append( "    margin-right: 8px;" );
+	page.append( "}" );
+	page.append( "a.link {" );
+	page.append( "    vertical-align: middle;" );
+	page.append( "}" );
+	page.append( "</style>" );
 	page.append( "</head>" );
 	page.append( "<body>" );
-	page.append( "<h1>Index of /</h1>" );
-	page.append( "<table>");
+	page.append( "<h1>Index of " );
+	page.append( http._request.target );
+	page.append( "</h1>" );
+	page.append( "<table>" );
 	page.append("<thead>" );
 	page.append( "<tr class=\"header\" ><th tabindex=\"0\" role=\"button\">Name</th></tr></thead>" );
 	page.append( "<tbody>" );
 	for ( struct dirent *ent = readdir( directory );
 			ent != 0x0; ent = readdir( directory ) )
 	{
-		if (std::strcmp(ent->d_name, ".") != 0 && std::strcmp(ent->d_name, "..") != 0)
+		if ( std::strcmp( ent->d_name, "." ) != 0
+				&& std::strcmp( ent->d_name, ".." ) != 0 )
 		{
-			page.append("<tr>");
-			page.append("<td data-value=\"");
-			page.append(ent->d_name);
-			page.append("\">");
-			if (!is_regular_file(ent->d_name)) {
-				page.append("<img src=\"/assets/dir_icon.png\" alt=\"Directory Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
-			} else {
-				page.append("<img src=\"/assets/file_icon.png\" alt=\"File Icon\" style=\"width: 16px; height: 16px; padding-inline-start: 1em; vertical-align:middle; padding-inline-end: 0.7em;\">");
+			page.append( "<tr>" );
+			page.append( "<td data-value=\"" );
+			page.append( ent->d_name );
+			page.append( "\">" );
+			if ( ! is_regular_file( ent->d_name ) )
+			{
+				page.append( "<img src=\"/assets/dir_icon.png\" "
+						"alt=\"Directory Icon\" "
+						"style=\"width: 16px; "
+						"height: 16px; "
+						"padding-inline-start: 1em; "
+						"vertical-align:middle; "
+						"padding-inline-end: 0.7em;\">" );
 			}
-			page.append("<a href=\"http://");
-			page.append(http._request_headers["host"]);
+			else
+			{
+				page.append( "<img src=\"/assets/file_icon.png\" "
+						"alt=\"File Icon\" "
+						"style=\"width: 16px; "
+						"height: 16px; "
+						"padding-inline-start: 1em; "
+						"vertical-align:middle; "
+						"padding-inline-end: 0.7em;\">" );
+			}
+			page.append( "<a href=\"http://" );
+			page.append( http._request_headers["host"] );
 			if ( http._request.target.size() > 1 )
 				page.append( http._request.target );
 			if ( page.back() != '/' )
 				page.append( "/" );
 			page.append( ent->d_name );
-			page.append("\" style=\"vertical-align: middle;\">");
+			page.append( "\" style=\"vertical-align: middle;\">" );
 			page.append( ent->d_name );
 			page.append( "</a>" );
-			page.append("</td>");
-			page.append("</tr>");
+			page.append( "</td>" );
+			page.append( "</tr>" );
 		}
 	}
 	// HTML end tags

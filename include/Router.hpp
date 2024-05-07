@@ -101,7 +101,7 @@ class Router: public IEvent
 				int protocol = IPPROTO_TCP );
 };
 
-int set_allow_methods ( Server &, std::string &, std::string = "" );
+int set_limit_except ( Server &, std::string &, std::string = "" );
 int set_autoindex ( Server &, std::string &, std::string = "" );
 int set_cgi_param ( Server &, std::string &, std::string = "" );
 int set_cgi_pass ( Server &, std::string &, std::string = "" );

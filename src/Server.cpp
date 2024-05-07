@@ -16,6 +16,7 @@ Server::Server ( void ): _good( true )
 	this->_error_pages[413] = "src/err_pages/413.html";
 	this->_error_pages[500] = "src/err_pages/500.html";
 	this->_routes[""].setDefault();
+	this->_routes[""].setRoot( "html" );
 	return ;
 }
 
@@ -33,7 +34,6 @@ Server::operator= ( const Server & instance )
 
 Server::~Server ( void )
 {
-	DEBUG ( "" );
 	return ;
 }
 
@@ -46,20 +46,27 @@ Server::good ( void ) const
 // Locations, a.k.a routes, are stored without ending `/'.
 
 Location &
-Server::getRoute ( std::string & location ) const
+Server::getRoute ( const std::string & location ) const
 {
-	t_route_map::const_iterator it;
-	std::string cmp_str;
-
+	t_route_map::const_iterator		it;
+	std::string						target( location );
+	std::string						cmp_str;
+	
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( location.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
-			return ( const_cast< Location & >( it->second ) );
-		cmp_str.append( "/" );		
-		if ( location.compare( 0, cmp_str.length(), cmp_str ) == 0 )
-			return ( const_cast< Location & >( it->second ) );
+		if ( cmp_str[0] == '*' )
+		{
+			cmp_str.erase( 0, 1 );
+			if ( compare_file_extension( target, cmp_str ) == true )
+				return ( const_cast< Location & >( it->second ) );
+		}
+		else
+		{
+			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
+				return ( const_cast< Location & >( it->second ) );
+		}
 		++it;
 	}
 	return ( getDefaultRoute() );
@@ -84,21 +91,27 @@ Server::getDefaultRoute ( void ) const
 	return ( const_cast< Location & >( it->second ) );
 }
 
-std::string &
-Server::getRouteString ( std::string & location ) const
+const std::string &
+Server::getRouteString ( const std::string & location ) const
 {
 	t_route_map::const_iterator it;
-	std::string cmp_str;
+	std::string cmp_str, target( location );
 
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( location.compare( 0, cmp_str.length() + 1, cmp_str ) == 0 )
-			return ( const_cast< std::string & >( it->first ) );
-		cmp_str.append( "/" );		
-		if ( location.compare( 0, cmp_str.length(), cmp_str ) == 0 )
-			return ( const_cast< std::string & >( it->first ) );
+		if ( cmp_str[0] == '*' )
+		{
+			cmp_str.erase( 0, 1 );
+			if ( compare_file_extension( target, cmp_str ) == true )
+				return ( const_cast< std::string & >( it->first ) );
+		}
+		else
+		{
+			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
+				return ( const_cast< std::string & >( it->first ) );
+		}
 		++it;
 	}
 	--it;
@@ -108,17 +121,19 @@ Server::getRouteString ( std::string & location ) const
 bool
 Server::getFlag ( int mask, std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
-	return ( getRoute( location ).getFlag( mask ) );
+	const Location & loc = this->getRoute( location );
+	bool flag = loc.getFlag( mask );
+	DEBUG( "location=\"" << location << "\" flag=" << std::boolalpha << flag );
+	return ( flag );
 }
 
 std::size_t
 Server::getFlags ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	std::size_t flags = loc.getFlags();
-	DEBUG( "flags=" << flags );
+	DEBUG( "location=\"" << location << "\" flags="
+			<< std::hex << flags << std::dec );
 	return ( flags );
 }
 
@@ -131,10 +146,9 @@ Server::getClientMaxBodySize ( void ) const
 const std::string &
 Server::getCGIparam ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	const std::string & cgi_param = loc.getCGIparam();
-	DEBUG( cgi_param );
+	DEBUG( "location=\"" << location << "\" cgi_param=\"" << cgi_param << "\"" );
 	return ( cgi_param );
 }
 
@@ -150,19 +164,18 @@ const std::pair<int, std::string> & Server::getRedirection ( std::string locatio
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	const std::string & cgi_pass = loc.getCGIpass();
-	DEBUG( "cgi_pass=\"" << cgi_pass << "\"" );
+	DEBUG( "location=\"" << location << "\" cgi_pass=\"" << cgi_pass << "\"" );
 	return ( cgi_pass );
 }
 
 const std::string &
-Server::getUploaded_file ( std::string location ) const
+Server::getUploadFile ( std::string location ) const
 {
 	DEBUG( "uploaded file=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
-	const std::string & uploaded = loc.getUploadfile();
+	const std::string & uploaded = loc.getUploadFile();
 	DEBUG( "uploaded=\"" << uploaded << "\"" );
 	return ( uploaded );
 }
@@ -170,17 +183,16 @@ Server::getUploaded_file ( std::string location ) const
 const std::string &
 Server::getRoot ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	const std::string & root = loc.getRoot();
-	DEBUG( "root=\"" << root << "\"" );
+	DEBUG( "location=\"" << location << "\" root=\"" << root << "\"" );
 	return ( root );
 }
 
-std::vector< std::string > &
+const std::vector< std::string > &
 Server::getServerNames ( void ) const
 {
-	return ( const_cast< std::vector< std::string > & >( this->_server_name ) );
+	return ( this->_server_name );
 }
 
 bool
@@ -198,7 +210,7 @@ Server::hasServerName ( std::string & name ) const
 	return ( false );
 }
 
-std::vector< std::string > &
+const std::vector< std::string > &
 Server::getIndex ( std::string location ) const
 {
 	DEBUG( "location=" << location );
@@ -237,12 +249,14 @@ Server::getListen ( void ) const
 }
 
 int
-Server::setRoute ( std::string & location )
+Server::setRoute ( const std::string & location )
 {
 	std::string mod_location( location );
 
 	while ( mod_location.back() == '/' )
 		mod_location.erase( mod_location.length() - 1, 1 );
+	if ( mod_location.back() != '/' ) 
+		mod_location.append( "/" );
 	if ( this->_routes.find( mod_location ) == this->_routes.end() )
 	{
 		(void) this->_routes[mod_location];
@@ -266,13 +280,13 @@ Server::setClientMaxBodySize ( std::size_t size )
 }
 
 int
-Server::setCGIparam ( std::string & arg, std::string location )
+Server::setCGIparam ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setCGIparam( arg ) );
 }
 
 int
-Server::setCGIpass ( std::string & arg, std::string location )
+Server::setCGIpass ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setCGIpass( arg ) );
 }
@@ -285,13 +299,13 @@ Server::setListen ( struct sockaddr_in & address )
 }
 
 int
-Server::setRoot ( std::string & arg, std::string location )
+Server::setRoot ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setRoot( arg ) );
 }
 
 int
-Server::setServerName ( std::string & arg )
+Server::setServerName ( const std::string & arg )
 {
 	if ( arg.empty() )
 		return ( EXIT_FAILURE );
@@ -309,13 +323,13 @@ Server::setServerName ( std::string & arg )
 }
 
 int
-Server::setIndex ( std::string & arg, std::string location )
+Server::setIndex ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setIndex( arg ) );
 }
 
 int
-Server::setErrorPage ( int n, std::string & path )
+Server::setErrorPage ( int n, const std::string & path )
 {
 	if ( n < 400 || n > 555 )
 	{
@@ -327,20 +341,20 @@ Server::setErrorPage ( int n, std::string & path )
 }
 
 int
-Server::setUploadFiles ( std::string & arg, std::string location )
+Server::setUploadFiles ( const std::string & arg, std::string location )
 {
 	return ( this->getRoute( location ).setUploadFiles( arg ) );
 }
 
 int
-Server::setRedirection ( std::string & arg, std::string location )
+Server::setRedirection ( const std::string & arg, std::string location )
 {
 	
 	return ( this->getRoute( location ).setRedirection( arg ) );
 }
 
 int
-Server::check ( void ) const
+Server::check ( void )
 {
 	if ( this->getPort() == 0 && this->getHost() == 0
 			&& this->_address.sin_family == 0 )
@@ -379,9 +393,11 @@ Server::log_conf ( void ) const
 		LOG( " flags=" << std::hex << it->second.getFlags() << std::dec );
 		LOG( " cgi_pass=" << it->second.getCGIpass() );
 		LOG( " cgi_param=" << it->second.getCGIparam() );
+		LOG( " Redirection=" << it->second.getRedirection().first << " " << it->second.getRedirection().second );
+		LOG( " Upload files=" << it->second.getUploadFile() );
 		for ( std::vector< std::string >::const_iterator index_it = it->second.getIndex().begin();
 				index_it != it->second.getIndex().end(); ++index_it )
 			LOG( " index=" << *index_it );
-	}
+				}
 	return ;
 }

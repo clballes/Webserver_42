@@ -5,6 +5,13 @@
 
 #include "HTTP.hpp"
 
+static int parse_method ( t_request &, std::string & );
+static int parse_target ( t_request &, std::string & );
+static int parse_http_version ( t_request &, std::string & );
+static std::string parse_query ( std::string & );
+static size_t how_many_methods( t_http_method * ptr );
+static size_t get_method_longest_len ( t_http_method * ptr );
+
 void		HTTP::handle_chunk(const std::string& body)
 {
 	std::string::size_type pos = 0;
@@ -50,7 +57,6 @@ HTTP::parse ( void )
 		pos = this->_buffer_recv.length();
 	while ( pos != std::string::npos )
 	{
-	    std::cout << "lineeeeeee2 is: "<< line << std::endl;
 		line = this->_buffer_recv.substr( start, pos - start );
 		if ( start == 0 )
 		{
@@ -104,10 +110,6 @@ HTTP::parse ( void )
 // start-line = request-line / status-line
 // request-line = method SP request-target SP HTTP-version
 
-static int parse_method ( t_request &, std::string & );
-static int parse_target ( t_request &, std::string & );
-static int parse_http_version ( t_request &, std::string & );
-
 int
 HTTP::parse_start_line( std::string & line )
 {
@@ -126,9 +128,6 @@ HTTP::parse_start_line( std::string & line )
 		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
-
-static size_t how_many_methods( t_http_method * ptr );
-static size_t get_method_longest_len ( t_http_method * ptr );
 
 int
 parse_method( t_request & request, std::string & line )
@@ -155,8 +154,6 @@ parse_method( t_request & request, std::string & line )
 	return ( EXIT_SUCCESS );
 }
 
-static std::string parse_query ( std::string & );
-
 // request-target = origin-form
 //
 // No other types of request-target are implemented.
@@ -179,8 +176,12 @@ parse_target( t_request & request, std::string & line )
 	request.query = parse_query( value );
 	if ( request.query.length() > 0 )
 		value.erase( value.length() - request.query.length() );
-	while ( value.length() > 1 && value.back() == '/' )
-		value.erase( value.length() - 1, 1 );
+	if ( value.back() == '/' )
+	{
+		while ( value.back() == '/' )
+			value.erase( value.length() - 1, 1 );
+		value.append( "/" );
+	}
 	request.target = value;
 	urldecode( request.target );
 	return ( EXIT_SUCCESS );

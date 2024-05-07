@@ -10,6 +10,7 @@
 #include <sstream>
 #include <vector>
 #include <cstdlib>		/* EXIT_SUCCESS, EXIT_FAILURE */
+#include "define.hpp"
 #include "log.hpp"
 
 class Location
@@ -21,12 +22,12 @@ class Location
 
 		void setDefault ( void );
 		int setFlag ( int, bool );
-		int setCGIparam ( std::string & );
-		int setCGIpass ( std::string & );
-		int setRoot ( std::string & );
-		int setIndex ( std::string & );
-		int setUploadFiles ( std::string & );
-		int setRedirection ( std::string & );
+		int setCGIparam ( const std::string & );
+		int setCGIpass ( const std::string & );
+		int setRoot ( const std::string & );
+		int setIndex ( const std::string & );
+		int setUploadFiles ( const std::string & );
+		int setRedirection ( const std::string & );
 
 		bool isDefault ( void ) const;
 		bool getFlag ( int ) const;
@@ -35,9 +36,8 @@ class Location
 		const std::pair<int, std::string >& getRedirection ( void ) const;
 		const std::string & getCGIpass ( void ) const;
 		const std::string & getRoot ( void ) const;
-		std::vector< std::string > & getIndex ( void ) const;
-		const std::string & getUploadfile ( void ) const;
-
+		const std::vector< std::string > & getIndex ( void ) const;
+		const std::string & getUploadFile ( void ) const;
 		void log_conf ( void ) const;
 
 	private:

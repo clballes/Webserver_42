@@ -16,11 +16,11 @@ Router::_opts[] =
 	{ CONTEXT, "location", yes, no, "server", 0x0 },
 	{ DIRECTIVE, "server_name", no, no, "server", &set_server_name },
 	{ DIRECTIVE, "listen", no, yes, "server", &set_listen },
-	{ DIRECTIVE, "allow_methods", no, yes, "location", &set_allow_methods },
+	{ DIRECTIVE, "limit_except", no, yes, "location", &set_limit_except },
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, no, "server", &set_index },
 	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
-	{ DIRECTIVE, "cgi_pass", no, yes, "location", &set_cgi_pass },
+	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
 	{ DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
 	{ DIRECTIVE, "client_body", no, no, "server", &set_client_body },
@@ -153,6 +153,42 @@ check_context ( std::string & directive_name, std::string & context,
 }
 
 int
+compare_servers ( std::vector< Server > & servers )
+{
+	std::vector< Server >::const_iterator it;
+	
+	if ( servers.size() <= 1 )
+		return ( EXIT_SUCCESS );
+	it = servers.begin() + 1;
+	while ( it != servers.end() )
+	{
+		const Server & a = *( it - 1 );
+		const Server & b = *it;
+		if ( a.getPort() == b.getPort()
+				&& a.getHost() == b.getHost() )
+		{
+			if ( a.getServerNames().size() == b.getServerNames().size() )
+			{
+				ERROR( "repeated server_names" );
+				return ( EXIT_FAILURE );
+			}
+			const std::vector< std::string > & s_names = a.getServerNames();
+			for ( std::vector< std::string >::const_iterator n = s_names.begin();
+					n != s_names.end(); ++n )
+			{
+				if ( b.hasServerName( const_cast< std::string & >( *n ) ) == true )
+				{
+					ERROR( "server_name \"" << *n << "\" is repeated" );
+					return ( EXIT_FAILURE );
+				}
+			}
+		}
+		++it;
+	}
+	return ( EXIT_SUCCESS );
+}
+
+int
 Router::load ( std::string filename )
 {
 	std::string   buffer, line;
@@ -231,6 +267,8 @@ Router::parse( std::string & buffer )
 					return ( EXIT_FAILURE );
 				}
 				location.assign( directive_value );
+				if ( directive_value.back() != '/' )
+					directive_value.append( "/" );
 				// TODO: check only one argument
 				if ( this->_servers.back().setRoute( directive_value ) ) 
 					return ( EXIT_FAILURE );
@@ -261,10 +299,11 @@ Router::parse( std::string & buffer )
 		ERROR( "context \"" << context.top() << "\" unclosed" );
 		return ( EXIT_FAILURE );
 	}
-	// log servers
-	//for ( std::vector< Server >::const_iterator it = this->_servers.begin();
-	//		it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
-	//
+	if ( compare_servers( this->_servers ) == EXIT_FAILURE )
+		return ( EXIT_FAILURE );
+	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
+			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
+	
 	return ( EXIT_SUCCESS );
 }
 
@@ -308,6 +347,7 @@ Router::listen ( void )
 		}
 		else if ( n_events == 0 )
 			continue ;
+		LOG( "ev=" << ev.ident );
 		instance = static_cast< IEvent * >( ev.udata );
 		instance->dispatch( ev );
 		// TODO: consider EVFILT_SIGNAL
@@ -429,7 +469,7 @@ Router::setConnection ( const struct sockaddr_in & address,
  * These only convert the format, if needed, to be accepted 
  * by the apropiate setter.
  *
- * set_allow_methods()
+ * set_limit_except()
  * set_autoindex()
  * set_cgi_pass()
  * set_cgi_param()
@@ -445,34 +485,38 @@ Router::setConnection ( const struct sockaddr_in & address,
  */
 
 int
-set_allow_methods( Server & instance, std::string & arg, std::string location )
+set_limit_except( Server & instance, std::string & arg, std::string location )
 {
 	//TODO: implement t_methods from HTTP
 	//TODO: return EXIT_FAILURE if setFlag returns EXIT_FAILURE
 	std::istringstream iss( arg );
 	std::string word;
+	std::size_t limit_flag;
 	
 	if ( arg.empty() )
 	{
-		ERROR( "invalid number of arguments in \"allow_methods\"" );
+		ERROR( "invalid number of arguments in \"limit_except\"" );
 		return ( EXIT_FAILURE );
 	}
+	limit_flag = 0x11111111;
+	limit_flag ^= F_AUTOINDEX;
 	while ( iss >> word )
 	{
 		if ( word == "GET" )
-			instance.setFlag( METHOD_GET, true, location );
+			limit_flag ^= HTTP_GET;
 		else if ( word == "PUT" )
-			instance.setFlag( METHOD_PUT, true, location );
+			limit_flag ^= HTTP_PUT;
 		else if ( word == "POST" )
-			instance.setFlag( METHOD_POST, true, location );
+			limit_flag ^= HTTP_POST;
 		else if ( word == "HEAD" )
-			instance.setFlag( METHOD_HEAD, true, location );
+			limit_flag ^= HTTP_HEAD;
 		else
 		{
 			ERROR( "invalid method \"" << word << "\"" );
 			return ( EXIT_FAILURE );
 		}
 	}
+	instance.setFlag( limit_flag, false, location );
 	return ( EXIT_SUCCESS );
 }
 

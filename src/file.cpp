@@ -13,28 +13,17 @@ is_regular_file( const std::string & filename )
 {
 	struct stat file_info;
 
-    if ( stat( filename.c_str(), &file_info ) != 0 )
+    if ( stat( filename.c_str(), &file_info ) == -1 )
         return ( false );
     return ( S_ISREG( file_info.st_mode ) );
 }
 
-bool can_access_file ( const std::string & filename )
+bool
+can_access_file ( const std::string & filename, int mask )
 {
-    if ( !filename.empty() && filename.back() == '/' )
-	{
-        return ( true );
-    }
-    if ( !filename.empty() && filename.back() != '/' && (is_regular_file( filename) == false))
-	{
-        return ( true );
-    }
-    if ( access( filename.c_str(), F_OK ) == 0 )
-	{
-        struct stat file_info;
-        if ( stat( filename.c_str(), &file_info ) == 0
-				&& S_ISREG( file_info.st_mode ) )
+	if ( is_regular_file( filename ) == true
+			&& access( filename.c_str(), mask ) == 0 )
             return ( true );
-    }
     return ( false ); 
 }
 

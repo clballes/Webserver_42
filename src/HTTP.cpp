@@ -12,7 +12,7 @@ HTTP::methods[] = {
 	{ "GET", &HTTP::http_get, HTTP_GET },
 	{ "HEAD", &HTTP::http_head, HTTP_HEAD },
 	{ "POST", &HTTP::http_post, HTTP_POST },
-	// { "PUT", &HTTP::http_put, HTTP_PUT },
+	{ "PUT", &HTTP::http_put, HTTP_PUT },
 	{ "DELETE", &HTTP::http_delete, HTTP_DELETE },
 	{ 0, 0, 0 }
 };
@@ -21,10 +21,14 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_socket_fd( 0 ),
 	_router( router_instance ),
 	_connection( router_instance.getConnection( fd ) ),
-	_server( router_instance.getDefaultServer() )
+	_server( router_instance.getDefaultServer() ),
+	_cgi_ptr( NULL ),
+	_chunk_request( false )
 {
-	this->cgi_ptr = NULL;
-	std::memset( &this->_request, 0x0, sizeof( this->_request ) );
+	this->_request.method = 0x0;
+	std::memset( &this->_request.file_info, 0,
+			sizeof( this->_request.file_info ) );
+	this->_request.http_version = 0;
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1 || fcntl( this->_socket_fd,
@@ -95,7 +99,7 @@ HTTP::request_recv ( int64_t data )
 {
 	ssize_t n;
 
-	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );
+	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );	
 	this->_buffer_recv.resize( data + 1 );
 	this->_buffer_recv.back() = '\0';
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
@@ -110,6 +114,16 @@ HTTP::request_recv ( int64_t data )
 		delete this;
 		return ( EXIT_SUCCESS );
 	}
+
+	if ( this->_chunk_request == true )
+	{
+		LOG_BUFFER( this->_buffer_recv, GREEN );
+		this->_chunk_request = false;
+		this->_request.body.assign( this->_buffer_recv );
+		return ( this->compute_response() );
+		return ( EXIT_SUCCESS );
+	}
+
 	if ( this->parse() == EXIT_FAILURE )
 	{
 		LOG_BUFFER( this->_buffer_recv, RED );
@@ -117,74 +131,118 @@ HTTP::request_recv ( int64_t data )
 		this->_buffer_recv.clear();
 		return ( EXIT_FAILURE );
 	}
+
+	// TODO: this goes into parse_request
 	LOG_BUFFER( this->_buffer_recv, GREEN );
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
 			this->_connection.getHost(), this->_connection.getPort() );
-	this->perform();
-	/*
+
+	// TODO: filtrar allowed methods
+	// if its an http redirection
+	// lcoation block en el compose
+	// append location root change if it fits location the target
+
+	this->_request.file = this->_request.target;
+	std::string location = this->_server.getRouteString( this->_request.target );
+	if ( ! location.empty() )
+	{
+		std::cout << "A" << std::endl;
+		std::string root_location = this->_server.getRoot( location );
+		root_location.append( "/" );
+		this->_request.file.replace( 0 , location.length(), root_location );
+	}
+	else
+	{
+		std::cout << "B" << std::endl;
+
+		std::string root_location = this->_server.getRoot( location );
+		root_location.append( "/" );
+		this->_request.file.replace( 0, 1, root_location );
+		std::cout << "req file: " << this->_request.file << std::endl;
+	}
+	stat( this->_request.file.c_str(), &this->_request.file_info );
+
+	if ( ! this->_request_headers["expect"].empty() )
+	{
+		this->_chunk_request = true;
+		return ( EXIT_SUCCESS );
+	}
+	
+	return ( this->compute_response() );
+}
+
+// There is no need to check if this->_request.method is NULL
+// as this check is done in the parse() call;
+
+int
+HTTP::compute_response ( void )
+{
+	DEBUG( this->_socket_fd << "target: " << this->_request.target);
+	
+	/* for ( t_headers::const_iterator it = this->_request_headers.begin();
+			it != this->_request_headers.end(); ++it )
+		LOG( it->first << "=" << it->second );
+	LOG ( "" ); */
 	if ( S_ISREG( this->_request.file_info.st_mode ) )
-		LOG( YELLOW << this->_request.file << " is regular" );
-	if ( S_ISDIR( this->_request.file_info.st_mode ) )
-		LOG( YELLOW << this->_request.file << " is directory" );
-	*/
+	{ LOG( GREEN << this->_request.file << " is regular" ); }
+	else if ( S_ISDIR( this->_request.file_info.st_mode ) )
+	{ LOG( GREEN << this->_request.file << " is directory" ); }
+	else { LOG( RED << this->_request.file << " is not regular neither directory" ); }
+
+	if ( this->_server.getFlag( this->_request.method->code,
+				this->_request.target ) == false )
+		this->_status_code = METHOD_NOT_ALLOWED;
+	else if ( ! this->_server.getCGIpass( this->_request.target ).empty() )
+	{
+		this->_cgi_ptr = new CGI( *this, this->_server );
+		if ( this->_cgi_ptr->execute() == EXIT_SUCCESS )
+			return ( EXIT_SUCCESS );
+	}
+	else if ( !this->_server.getRedirection(  this->_request.target ).second.empty() )
+	{
+		this->_status_code = this->_server.getRedirection(  this->_request.target ).first;
+		this->_response_headers["Location"] = this->_server.getRedirection(  this->_request.target ).second;
+	}
+	else
+	{
+		(void) this->_request.method->method_func( * this );
+	}
+	(void) this->compose_response();
 	return ( EXIT_SUCCESS );
 }
 
-void
-HTTP::perform ( void )
+int
+HTTP::compose_response ( void )
 {
-	//check if the allowed method is available
-
-	int method = 0;
-	if (strcmp(this->_request.method->method, "GET") == 0) {
-		method = METHOD_GET;
-	} else if (strcmp(this->_request.method->method, "POST") == 0) {
-		method = METHOD_POST;
-	}
-	else if (strcmp(this->_request.method->method, "DELETE") == 0) {
-		method = METHOD_DELETE;
+	DEBUG( "status_code=" << this->_status_code );
+	if ( this->_status_code >= 300 && this->_status_code <= 511 )
+	{
+		load_file( *this, this->_server.getErrorPage( this->_status_code ) );
 	}
 	
-	LOG( YELLOW << "target=" << this->_request.target);
-
-	// check for the location root
-	this->_request.file = this->_request.target;
-	std::string location = this->_server.getRouteString( this->_request.target );
-	std::cout << "location isssss: "<< location << std::endl;
-
-	if ( ! location.empty() )
+	// TODO: replace to_string(); it's not c++98.
+	this->_buffer_send.append( "HTTP/1.1 " );
+	this->_buffer_send.append( std::to_string( this->_status_code ) );
+	this->_buffer_send.append( " \r\n" );
+	this->_response_headers["content-length"] = std::to_string( this->_message_body.size() );
+	// Add response headers if any + ending CRLF.
+	for ( t_headers::iterator it = this->_response_headers.begin();
+			it != this->_response_headers.end(); ++it )
 	{
-		std::string root_location = this->_server.getRoot( location );
-		this->_request.file.replace( 0 , location.length(), root_location );
+		this->_buffer_send.append( it->first );
+		this->_buffer_send.append( ": " );
+		this->_buffer_send.append( it->second );
+		this->_buffer_send.append( "\r\n" );
 	}
-	//localtion / -> substituir pel root location default location default
-	LOG( YELLOW << "file=" << this->_request.file << " loc:" << location);
-	stat( this->_request.file.c_str(), &this->_request.file_info );
+	this->_buffer_send.append( "\r\n" );
+	// Add [message body] if any.
+	this->_buffer_send.append( this->_message_body );
+	this->_message_body.clear();
 
-	// check if the allowed method is allowed to perform the request 
-	// if ( !this->_server.getFlag( method,this->_request.target ) && (_redirection_str.empty() == true)) //revisar perq en la cofig del tiemout quan no hi ha allowed methods definit no entra, clarament, pero veure si esta ok tenim un probelma per limitar els allowed methods i les redirections
-	// {
-	// 	this->_status_code = 405;
-	// 	this->register_send();
-	// 	return;
-	// }
-
-	// check for http redirection
-	const std::pair <int, std::string> &redi = this->_server.getRedirection( location );
-	if (redi.first && redi.second.empty() == false)
-	{
-		this->_status_code = redi.first;
-		this->_redirection_str = redi.second;
-		this->_response_headers["Location"] = redi.second;
-		this->register_send();
-		return ;
-	}
-	// TODO: proper reorder
-	DEBUG( "file=\"" << this->_request.file << "\"" );
-	this->_request.method->method_func( * this );
-	return ;
+	this->request_send();
+	return ( EXIT_SUCCESS );
 }
 
 int
@@ -192,7 +250,6 @@ HTTP::request_send ( void )
 {
 	DEBUG( "fd=" << this->_socket_fd
 			<< " bytes=" << this->_buffer_send.length() );
-	HTTP::compose_response( *this );
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
@@ -206,45 +263,6 @@ HTTP::request_send ( void )
 	this->_request.query.clear();
 	this->_request.body.clear();
 	this->_buffer_send.clear();
-	return ( EXIT_SUCCESS );
-}
-
-int
-HTTP::compose_response ( HTTP & http )
-{
-	if (http._status_code > 309 && http._status_code < 500)
-	{
-		load_file( http, http._server.getErrorPage(http._status_code) );
-	}
-	DEBUG( http._socket_fd );
-	DEBUG( "status_code=" << http._status_code );
-	DEBUG( "status_code=" << http._status_code );
-	// status-line
-	http._buffer_send.append( "HTTP/1.1 " );
-	// TODO replace to_string()
-	http._buffer_send.append( std::to_string( http._status_code ) );
-	http._buffer_send.append( " \r\n" );
-	// TODO: replace to_string(); it's not c++98.
-	//http._response_headers["content-type"] = "text/html";
-	http._response_headers["content-length"] = std::to_string( http._message_body.size() );
-	// Add response headers, if any.
-	// + ending CRLF
-	for ( t_headers::iterator it = http._response_headers.begin();
-			it != http._response_headers.end(); ++it )
-	{
-		http._buffer_send.append( it->first );
-		http._buffer_send.append( ": " );
-		http._buffer_send.append( it->second );
-		http._buffer_send.append( "\r\n" );
-	}
-	std::cout << "priting resonse headers: "<< std::endl;
-	std::cout << http._buffer_send << std::endl;
-
-
-	http._buffer_send.append( "\r\n" );
-	// Add [message body], if any.
-	http._buffer_send.append( http._message_body );
-	http._message_body.clear();
 	return ( EXIT_SUCCESS );
 }
 
@@ -275,7 +293,8 @@ HTTP::load_file( HTTP & http, std::string target )
 int 
 HTTP::check_index ( void )
 {
-	std::vector< std::string > & vec = this->_server.getIndex();
+	const std::vector< std::string > & vec = this->_server.getIndex();
+
 	for ( std::vector< std::string >::const_iterator it = vec.begin();
 			it != vec.end(); ++it )
 	{
@@ -283,14 +302,14 @@ HTTP::check_index ( void )
 		char lastChar = tempTarget.at( tempTarget.size() - 1 );
 		if ( lastChar != '/' )
 		{
-			tempTarget.append("/");
+			tempTarget.append( "/" );
 		}
-		tempTarget.append(*it);
-		if (routeExists(tempTarget))
+		tempTarget.append( *it );
+		if ( routeExists( tempTarget ) )
 		{
-			this->_request.target.append("/");
-			this->_request.target.append(*it);
-			std::cout << "route exists" << this->_request.target << std::endl;
+			this->_request.target.append( "/" );
+			this->_request.target.append( *it );
+			LOG( "route exists" << this->_request.target );
 			return ( OK );
 		}
 		else
@@ -301,18 +320,10 @@ HTTP::check_index ( void )
 	return ( FORBIDDEN );
 }
 
-std::string &
-HTTP::getCGIpass ( void )
+Server &
+HTTP::getServer ( void )
 {
-	return ( const_cast < std::string & >
-			( this->_server.getCGIpass( this->_request.target ) ) );
-}
-
-void
-HTTP::set_message_body ( std::string & message )
-{
-	this->_message_body = message;
-	return ;
+	return ( this->_server );
 }
 
 t_request &
@@ -328,10 +339,18 @@ HTTP::getHeaders ( void )
 }
 
 void
-HTTP::set_response_headers ( std::string arg, std::string value )
+HTTP::setMessageBody ( const std::string & message )
 {
-	this->_response_headers[ arg ] = value;
-	std::cout << "set: " << arg << value << std::endl;
+	this->_message_body.append( message );
+	return ;
+}
+
+void
+HTTP::setResponseHeaders ( const std::string & name,
+		const std::string & value )
+{
+	this->_response_headers[name] = value;
+	LOG( "set: " << name << "=" << value );
 	return ;
 }
 
@@ -339,12 +358,5 @@ void
 HTTP::setStatusCode ( int value )
 {
 	this->_status_code = value;
-	std::cout << "set sttaus code: " << this->_status_code << std::endl;
 	return ;
-}
-
-Server &
-HTTP::getServer ( void )
-{
-	return ( this->_server );
 }

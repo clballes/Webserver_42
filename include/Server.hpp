@@ -14,6 +14,7 @@
 
 #include "Location.hpp"
 #include "define.hpp"
+#include "string.hpp"
 #include "log.hpp"
 
 template <class T> struct longer : std::binary_function <T,T,bool>
@@ -35,42 +36,42 @@ class Server
 		bool good ( void ) const;
 		void log_conf ( void ) const;
 	
+		bool hasServerName ( std::string & ) const;
 		bool getFlag ( int, std::string = "" ) const;
 		std::size_t getFlags ( std::string = "" ) const;
 		std::size_t getClientMaxBodySize ( void ) const;
 		const std::string & getCGIparam ( std::string = "" ) const ;
 		const std::string & getCGIpass ( std::string = "" ) const;
 		const std::string & getRoot ( std::string = "" ) const;
-		std::vector< std::string > & getServerNames ( void ) const;
-		bool hasServerName ( std::string & ) const;
-		std::vector< std::string > & getIndex ( std::string = "" ) const;
+		const std::vector< std::string > & getServerNames ( void ) const;
+		const std::vector< std::string > & getIndex ( std::string = "" ) const;
 		const std::string & getErrorPage ( int );
-		Location & getRoute ( std::string & ) const;
+		Location & getRoute ( const std::string & ) const;
 		Location & getDefaultRoute ( void ) const;
-		std::string & getRouteString ( std::string & ) const;
+		const std::string & getRouteString ( const std::string & ) const;
 		const struct sockaddr_in & getListen ( void ) const;
 		in_addr_t getHost ( void ) const;
 		in_port_t getPort ( void ) const;
 		const std::pair<int, std::string> & getRedirection ( std::string location ) const;
-		const std::string & getUploaded_file ( std::string location ) const;
+		const std::string & getUploadFile ( std::string location ) const;
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
 		int setClientMaxBodySize ( std::size_t );
-		int setCGIparam ( std::string &, std::string = "" );
-		int setCGIpass ( std::string &, std::string = "" );
-		int setRoot ( std::string &, std::string = "" );
-		int setServerName ( std::string & );
-		int setIndex ( std::string &, std::string = "" );
-		int setErrorPage ( int, std::string & );
-		int setRoute ( std::string & );
-		int setUploadFiles ( std::string &, std::string = "" );
-		int setRedirection ( std::string &, std::string = "" );
+		int setCGIparam ( const std::string &, std::string = "" );
+		int setCGIpass ( const std::string &, std::string = "" );
+		int setRoot ( const std::string &, std::string = "" );
+		int setServerName ( const std::string & );
+		int setIndex ( const std::string &, std::string = "" );
+		int setErrorPage ( int, const std::string & );
+		int setRoute ( const std::string & );
+		int setUploadFiles ( const std::string &, std::string = "" );
+		int setRedirection ( const std::string &, std::string = "" );
 
 		typedef std::map< std::string,
 				Location, longer< std::string > > t_route_map;
 
-		int check ( void ) const;
+		int check ( void );
 
 	private:
 	
