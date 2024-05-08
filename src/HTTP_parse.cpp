@@ -201,9 +201,12 @@ parse_http_version ( t_request & request, std::string & line )
 	if ( pos == std::string::npos )
 		return ( BAD_REQUEST );
 	value = line.substr( 0, pos );
-	if ( value.compare( "HTTP/1.1" ) != 0 )
+	if ( value.compare( "HTTP/1.1" ) == 0)
+		request.http_version = HTTP_11;
+	else if ( value.compare( "HTTP/1.0" ) != 0 )
+		request.http_version = HTTP_10;
+	else
 		return ( BAD_REQUEST );
-	request.http_version = HTTP_11;
 	return ( EXIT_SUCCESS );
 }
 

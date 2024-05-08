@@ -27,6 +27,7 @@
 #define HTTP_PUT			0x00000010
 #define HTTP_DELETE			0x00000001
 #define HTTP_HEAD			0x00100000
+#define HTTP_10				0x10
 #define HTTP_11				0x11
 
 #define LF					012

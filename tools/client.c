@@ -70,9 +70,9 @@ main ( int argc, char ** argv )
 	free( buffer_send );
 	int n = getsockopt( socket_fd, SOL_SOCKET, SO_NREAD, 0, 0 );
 	n = 200;
-	printf( "n=%d\n", n );
 	char * buffer_recv = calloc( n + 1, sizeof( char ) );
-	(void) recv( socket_fd, buffer_recv, n, 0 );
+	int rcode = recv( socket_fd, buffer_recv, n, 0 );
+	printf( "rcode=%d\n", rcode );
 	printf( "%s", buffer_recv );
 	printf( "OK\n" );
 	shutdown( socket_fd, 2 );

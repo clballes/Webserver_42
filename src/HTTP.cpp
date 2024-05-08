@@ -37,14 +37,14 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 		ERROR( "HTTP: error creating new client" );
 		return ;
 	}
-	DEBUG( this->_socket_fd );
+	//DEBUG( this->_socket_fd );
 	this->register_recv();
 	return ;
 }
 
 HTTP::~HTTP ( void )
 {
-	DEBUG( this->_socket_fd );
+	//DEBUG( this->_socket_fd );
 	close( this->_socket_fd );
 	return ;
 }
@@ -52,7 +52,7 @@ HTTP::~HTTP ( void )
 void
 HTTP::dispatch ( struct kevent & ev )
 {
-	DEBUG ( "ev=" << ev.ident );
+	//DEBUG ( "ev=" << ev.ident );
 	if ( ev.filter == EVFILT_READ )
 		(void) this->request_recv( ev.data );
 	else if ( ev.filter == EVFILT_WRITE )
@@ -65,7 +65,7 @@ HTTP::register_recv ( void )
 {
 	struct kevent ev;
 
-	DEBUG( this->_socket_fd );
+	//DEBUG( this->_socket_fd );
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
@@ -81,7 +81,7 @@ HTTP::register_send ( void )
 {
 	struct kevent ev;
 
-	DEBUG( this->_socket_fd );
+	//DEBUG( this->_socket_fd );
 	EV_SET( &ev, this->_socket_fd, EVFILT_WRITE,
 			EV_ADD | EV_ENABLE | EV_CLEAR | EV_ONESHOT, 0, 0, (void *) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
@@ -99,7 +99,7 @@ HTTP::request_recv ( int64_t data )
 {
 	ssize_t n;
 
-	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );	
+	//DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );	
 	this->_buffer_recv.resize( data + 1 );
 	this->_buffer_recv.back() = '\0';
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
@@ -146,7 +146,8 @@ HTTP::request_recv ( int64_t data )
 	}
 
 	// TODO: this goes into parse_request
-	LOG_BUFFER( this->_buffer_recv, GREEN );
+	//LOG_BUFFER( this->_buffer_recv, GREEN );
+	LOG_TIME( GREEN << this->_request.method->method << ' ' << std::hex << this->_request.http_version << ' ' << std::dec << this->_request.target );
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
@@ -188,17 +189,17 @@ HTTP::request_recv ( int64_t data )
 int
 HTTP::compute_response ( void )
 {
-	DEBUG( this->_socket_fd << "target: " << this->_request.target);
-	
+	//DEBUG( this->_socket_fd << "target: " << this->_request.target);
 	/* for ( t_headers::const_iterator it = this->_request_headers.begin();
 			it != this->_request_headers.end(); ++it )
 		LOG( it->first << "=" << it->second );
 	LOG ( "" ); */
-	if ( S_ISREG( this->_request.file_info.st_mode ) )
-	{ LOG( GREEN << this->_request.file << " is regular" ); }
-	else if ( S_ISDIR( this->_request.file_info.st_mode ) )
-	{ LOG( GREEN << this->_request.file << " is directory" ); }
-	else { LOG( RED << this->_request.file << " is not regular neither directory" ); }
+	
+	//if ( S_ISREG( this->_request.file_info.st_mode ) )
+	//{ LOG( GREEN << this->_request.file << " is regular" ); }
+	//else if ( S_ISDIR( this->_request.file_info.st_mode ) )
+	//{ LOG( GREEN << this->_request.file << " is directory" ); }
+	//else { LOG( RED << this->_request.file << " is not regular neither directory" ); }
 
 	if ( this->_server.getFlag( this->_request.method->code,
 				this->_request.target ) == false )
@@ -225,7 +226,7 @@ HTTP::compute_response ( void )
 int
 HTTP::compose_response ( void )
 {
-	DEBUG( "status_code=" << this->_status_code );
+	//DEBUG( "status_code=" << this->_status_code );
 	if ( this->_status_code >= 300 && this->_status_code <= 511 )
 	{
 		load_file( *this, this->_server.getErrorPage( this->_status_code ) );
@@ -256,12 +257,18 @@ HTTP::compose_response ( void )
 int
 HTTP::request_send ( void )
 {
-	DEBUG( "fd=" << this->_socket_fd
-			<< " bytes=" << this->_buffer_send.length() );
+	//DEBUG( "fd=" << this->_socket_fd << " bytes=" << this->_buffer_send.length() );
 	::send( this->_socket_fd,
 			this->_buffer_send.c_str(),
 			this->_buffer_send.length(),
 			0x0 );
+	if ( this->_request_headers["connection"] == "close"
+			|| this->_request_headers["connection"] != "keep-alive" )
+	{
+		delete this;
+		return ( EXIT_SUCCESS );
+	}
+
 	this->_status_code = 0;
 	this->_request.host.clear();
 	this->_request.target.clear();
@@ -280,7 +287,7 @@ HTTP::load_file( HTTP & http, std::string target )
 	std::ifstream file;
 	std::ifstream::pos_type pos;
 
-	DEBUG( "file=\"" << target << "\"" );
+	//DEBUG( "file=\"" << target << "\"" );
 	file.open( target, std::ios::in | std::ios::binary | std::ios::ate );
 	if ( file.good() == true && file.eof() == false )
 	{

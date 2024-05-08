@@ -125,7 +125,7 @@ Server::getFlag ( int mask, std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	bool flag = loc.getFlag( mask );
-	DEBUG( "location=\"" << location << "\" flag=" << std::boolalpha << flag );
+	//DEBUG( "location=\"" << location << "\" flag=" << std::boolalpha << flag );
 	return ( flag );
 }
 
@@ -134,8 +134,7 @@ Server::getFlags ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	std::size_t flags = loc.getFlags();
-	DEBUG( "location=\"" << location << "\" flags="
-			<< std::hex << flags << std::dec );
+	//DEBUG( "location=\"" << location << "\" flags=" << std::hex << flags << std::dec );
 	return ( flags );
 }
 
@@ -144,7 +143,7 @@ Server::getClientMaxBodySize (  std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	const std::size_t & client_max_body_size = loc.getClientMaxBodySize();
-    DEBUG("location=\"" << location << "\" clientmaxbodysize=\"" << client_max_body_size << "\"");
+    //DEBUG("location=\"" << location << "\" clientmaxbodysize=\"" << client_max_body_size << "\"");
 	return ( client_max_body_size );
 }
 
@@ -159,10 +158,9 @@ Server::getClientMaxBodySize (  std::string location ) const
 
 const std::pair<int, std::string> & Server::getRedirection ( std::string location ) const
 {
-	DEBUG( "location=\"" << location << "\"" );
 	const Location & loc = this->getRoute( location );
 	const std::pair<int, std::string> & redirection = loc.getRedirection();
-	DEBUG( "redirection status code=\"" << redirection.first << "  url:"<< redirection.second << "\"" );
+	//DEBUG( "location=\"" << location << "\" " << "redirection=" << redirection.first << "=\""<< redirection.second << "\"" );
 	return ( redirection );
 }
 
@@ -171,7 +169,7 @@ Server::getCGIpass ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	const std::string & cgi_pass = loc.getCGIpass();
-	DEBUG( "location=\"" << location << "\" cgi_pass=\"" << cgi_pass << "\"" );
+	//DEBUG( "location=\"" << location << "\" cgi_pass=\"" << cgi_pass << "\"" );
 	return ( cgi_pass );
 }
 
@@ -181,7 +179,7 @@ Server::getRoot ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	const std::string & root = loc.getRoot();
-	DEBUG( "location=\"" << location << "\" root=\"" << root << "\"" );
+	//DEBUG( "location=\"" << location << "\" root=\"" << root << "\"" );
 	return ( root );
 }
 

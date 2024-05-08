@@ -89,6 +89,12 @@
 
 #define LOG(s) { std::clog << s << RESET << ENDL; }
 
+#define LOG_TIME(s) \
+{ \
+	DEBUG_TIME \
+	std::clog << s << RESET << ENDL; \
+}
+
 #define LOG_BUFFER(str,color) \
 { \
 	std::string::const_iterator it = str.begin(); \

@@ -38,7 +38,7 @@ Connection::Connection ( const struct sockaddr_in & address,
 		this->_good = false;
 		return ;
 	}
-	if ( ::listen( this->_socket_fd, 0x0 ) == -1 )
+	if ( ::listen( this->_socket_fd, 0 ) == -1 )
 	{
 		ERROR( "listen: " << std::strerror( errno )
 				<< " (fd=" << this->_socket_fd << ")" );

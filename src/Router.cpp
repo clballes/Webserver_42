@@ -193,7 +193,7 @@ Router::load ( std::string filename )
 	std::string   buffer, line;
 	std::ifstream file;
 
-	DEBUG( filename.c_str() );
+	//DEBUG( filename.c_str() );
 	if ( is_regular_file( filename ) == false )
 	{
 		ERROR( filename << ": Is a directory" );
@@ -300,9 +300,10 @@ Router::parse( std::string & buffer )
 	}
 	if ( compare_servers( this->_servers ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
+	/*
 	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
 			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
-	
+	*/	
 	return ( EXIT_SUCCESS );
 }
 
@@ -333,10 +334,10 @@ Router::listen ( void )
 		if ( this->register_read_socket( *i ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
-	// TODO: graceful_stop(), SIGINT
+	const struct timespec t = {2, 0};
 	while ( this->good() )
 	{
-		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, 0 );
+		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, &t );
 		if ( this->good() == false )
 			return ( EXIT_FAILURE );
 		if ( n_events == -1 )
@@ -345,11 +346,12 @@ Router::listen ( void )
 			break ;
 		}
 		else if ( n_events == 0 )
+		{
+			DEBUG( "continue" );
 			continue ;
-		LOG( "ev=" << ev.ident );
+		}
 		instance = static_cast< IEvent * >( ev.udata );
 		instance->dispatch( ev );
-		// TODO: consider EVFILT_SIGNAL
 	}
 	return ( EXIT_SUCCESS );
 }
@@ -374,7 +376,7 @@ Router::dispatch ( struct kevent & ev )
 {
 	HTTP * client;
 
-	DEBUG ( "ev=" << ev.ident );
+	//DEBUG ( "ev=" << ev.ident );
 	if ( ev.filter != EVFILT_READ )
 	{
 		WARN( "unknown event filter" );
@@ -415,7 +417,7 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 	
 	if ( mod_server_name.find( ':' ) != std::string::npos )
 		mod_server_name.erase( mod_server_name.find( ':' ) );
-	DEBUG( "server_name=\"" << mod_server_name << "\"" );
+	//DEBUG( "server_name=\"" << mod_server_name << "\"" );
 	it = this->_servers.begin();
 	while ( it != this->_servers.end() )
 	{
