@@ -268,9 +268,10 @@ Router::parse( std::string & buffer )
 				if ( directive_value.back() != '/' )
 					directive_value.append( "/" );
 				location.assign( directive_value );
+				LOG( location );
 				// TODO: check only one argument
 				if ( this->_servers.back().setRoute( directive_value ) ) 
-					return ( EXIT_FAILURE );
+					//return ( EXIT_FAILURE );
 				directive_value.clear();
 			}
 			continue ;
@@ -300,10 +301,8 @@ Router::parse( std::string & buffer )
 	}
 	if ( compare_servers( this->_servers ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-	/*
 	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
 			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
-	*/	
 	return ( EXIT_SUCCESS );
 }
 

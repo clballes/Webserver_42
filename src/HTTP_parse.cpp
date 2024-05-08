@@ -12,7 +12,8 @@ static std::string parse_query ( std::string & );
 static size_t how_many_methods( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
 
-void		HTTP::handle_chunk(const std::string& body)
+void
+HTTP::handle_chunk ( const std::string & body )
 {
 	std::string::size_type pos = 0;
     std::string::size_type chunk_length;

@@ -17,10 +17,7 @@
 - [ ] large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)
 - [ ] location extension + '/'
+- [ ] cgi\_tester
 
 ## CLARA
-- [x] compute limit size body len, iniciat a 1MB com diu nginx sempre i implmenteat dintre de location
-- [x] substituir to\_string per my\_to\_string
-- [x] borrar uploaded files
-- [x] cgi comentat
 - [ ] mirar err pages

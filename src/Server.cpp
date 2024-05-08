@@ -240,10 +240,12 @@ Server::setRoute ( const std::string & location )
 {
 	std::string mod_location( location );
 
+	DEBUG( location );
 	while ( mod_location.back() == '/' )
 		mod_location.erase( mod_location.length() - 1, 1 );
 	if ( mod_location.back() != '/' ) 
 		mod_location.append( "/" );
+	DEBUG( mod_location );
 	if ( this->_routes.find( mod_location ) == this->_routes.end() )
 	{
 		(void) this->_routes[mod_location];

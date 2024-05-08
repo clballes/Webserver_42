@@ -43,12 +43,6 @@ HTTP::http_post ( HTTP & http )
 	// LOG_BUFFER ( http._buffer_recv , RED);
 	// LOG_BUFFER ( http._request.body , YELLOW);
 	// regular post, not cgi
-	//if ( http._server.getCGIpass( http._request.target ).empty() )
-	//{
-	//	http._cgi_ptr = new CGI( http , http._server);
-	//	if ( http._cgi_ptr->execute() == EXIT_FAILURE )
-	//		return ( EXIT_FAILURE );
-	//}
 	http._status_code = OK;
 	return ( EXIT_SUCCESS );
 }

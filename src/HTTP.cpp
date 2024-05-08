@@ -138,9 +138,10 @@ HTTP::request_recv ( int64_t data )
 	}
 
 	// limit client size max body check && Setting size to 0 disables checking of client request body size.
-	if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0 && (this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ))
+	if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0
+			&& ( this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ) )
 	{
-		this->setStatusCode(CONTENT_TOO_LARGE);
+		this->setStatusCode( CONTENT_TOO_LARGE );
 		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
@@ -230,7 +231,7 @@ HTTP::compose_response ( void )
 	if ( this->_status_code >= 300 && this->_status_code <= 511 )
 	{
 		load_file( *this, this->_server.getErrorPage( this->_status_code ) );
-		this->_response_headers["Content-Type"] = "text/html"; // perque no el posem?
+		//this->_response_headers["content-type"] = "text/html"; // perque no el posem?
 	}
 	this->_buffer_send.append( "HTTP/1.1 " );
 	this->_buffer_send.append( my_to_string( this->_status_code ) );
