@@ -12,6 +12,39 @@ static std::string parse_query ( std::string & );
 static size_t how_many_methods( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
 
+void		HTTP::handle_chunk(const std::string& body)
+{
+	std::string::size_type pos = 0;
+    std::string::size_type chunk_length;
+
+    while (pos < body.size()) {
+        // Find the position of the next '\r\n'
+        std::string::size_type next_crlf_pos = body.find("\r\n", pos);
+        if (next_crlf_pos == std::string::npos) {
+            std::cerr << "Invalid chunked data format\n";
+            return;
+        }
+
+        std::string chunk_length_hex = body.substr(pos, next_crlf_pos - pos);
+        chunk_length = strtol(chunk_length_hex.c_str(), NULL, 16);
+
+        // Move past the '\r\n' to the start of the chunk data
+        pos = next_crlf_pos + 2;
+
+        // Extract the chunk data
+        std::string chunk_data = body.substr(pos, chunk_length);
+		//store the extracted chunks in the body requested
+		this->_request.body += chunk_data;
+        pos += chunk_length + 2;
+
+		if (chunk_length == 0)
+		{
+			std::cout << " WE ARE AT THE END OF THE LINE "<< std::endl;
+			//nose si cal afegir despres els trailer que son additional headers
+		}
+    }
+}
+
 int
 HTTP::parse ( void )
 {
@@ -47,15 +80,29 @@ HTTP::parse ( void )
 	}
 
 	// TODO: byte control from "content-length"
-	// TODO: chunked request
+	// chunked request
 	// We return if the method does not require to read
 	// the contents of a potential message body.
-	if ( this->_request.method->code != HTTP_POST
-			&& this->_request.method->code != HTTP_PUT )
-		return ( EXIT_SUCCESS );
+	// if ( this->_request.method->code != HTTP_POST
+	// 		&& this->_request.method->code != HTTP_PUT )
+	// 	return ( EXIT_SUCCESS );
 	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
+	{
 		this->_request.body = this->_buffer_recv.substr( pos );
-	return ( EXIT_SUCCESS );
+		std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
+		if (iter != _request_headers.end()) {
+			if (iter->second == "chunked") {
+				//li sumo 4 perque em tregui el 3f
+				std::string body = this->_buffer_recv.substr( pos + 4 );
+				std::cout << "hay chunks" << std::endl;
+				handle_chunk( body );
+			}
+			else
+				std::cout << "request not supported!!" << std::endl;
+		}
+		return EXIT_SUCCESS;
+	}
+	return EXIT_SUCCESS;
 }
 
 // From RFT9112:

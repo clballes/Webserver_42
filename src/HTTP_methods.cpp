@@ -40,6 +40,8 @@ HTTP::http_post ( HTTP & http )
 {
 	DEBUG( "target=\"" << http._request.file << "\"" );
 	LOG( http._request_headers["content-type"] );
+	// LOG_BUFFER ( http._buffer_recv , RED);
+	// LOG_BUFFER ( http._request.body , YELLOW);
 	// regular post, not cgi
 	//if ( http._server.getCGIpass( http._request.target ).empty() )
 	//{
@@ -56,6 +58,7 @@ HTTP::http_put ( HTTP & http )
 {
 	std::ofstream file;
 
+	DEBUG ( http._request.file );
 	if ( S_ISREG( http._request.file_info.st_mode )
 			|| S_ISDIR( http._request.file_info.st_mode ) )
 	{

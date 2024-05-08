@@ -15,6 +15,8 @@ Server::Server ( void ): _good( true )
 	this->_error_pages[410] = "src/err_pages/410.html";
 	this->_error_pages[413] = "src/err_pages/413.html";
 	this->_error_pages[500] = "src/err_pages/500.html";
+	// in nginx the default value for client_max is 1MB, then 1,048,576bytes
+	this->_client_max_body_size = 1 * 1024 * 1204; 
 	this->_routes[""].setDefault();
 	this->_routes[""].setRoot( "html" );
 	return ;
@@ -137,19 +139,31 @@ Server::getFlags ( std::string location ) const
 	return ( flags );
 }
 
-std::size_t
-Server::getClientMaxBodySize ( void ) const
-{
-	return ( this->_client_max_body_size );
-}
-
-const std::string &
-Server::getCGIparam ( std::string location ) const
+const std::size_t &
+Server::getClientMaxBodySize (  std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
-	const std::string & cgi_param = loc.getCGIparam();
-	DEBUG( "location=\"" << location << "\" cgi_param=\"" << cgi_param << "\"" );
-	return ( cgi_param );
+	const std::size_t & client_max_body_size = loc.getClientMaxBodySize();
+    DEBUG("location=\"" << location << "\" clientmaxbodysize=\"" << client_max_body_size << "\"");
+	return ( client_max_body_size );
+}
+
+// const std::string &
+// Server::getCGIparam ( std::string location ) const
+// {
+// 	const Location & loc = this->getRoute( location );
+// 	const std::string & cgi_param = loc.getCGIparam();
+// 	DEBUG( "location=\"" << location << "\" cgi_param=\"" << cgi_param << "\"" );
+// 	return ( cgi_param );
+// }
+
+const std::pair<int, std::string> & Server::getRedirection ( std::string location ) const
+{
+	DEBUG( "location=\"" << location << "\"" );
+	const Location & loc = this->getRoute( location );
+	const std::pair<int, std::string> & redirection = loc.getRedirection();
+	DEBUG( "redirection status code=\"" << redirection.first << "  url:"<< redirection.second << "\"" );
+	return ( redirection );
 }
 
 const std::string &
@@ -160,6 +174,7 @@ Server::getCGIpass ( std::string location ) const
 	DEBUG( "location=\"" << location << "\" cgi_pass=\"" << cgi_pass << "\"" );
 	return ( cgi_pass );
 }
+
 
 const std::string &
 Server::getRoot ( std::string location ) const
@@ -247,17 +262,16 @@ Server::setFlag ( int flag, bool enable, std::string location )
 }
 
 int
-Server::setClientMaxBodySize ( std::size_t size )
+Server::setClientMaxBodySize ( const std::string & arg, std::string location )
 {
-	this->_client_max_body_size = size;
-	return ( EXIT_SUCCESS );
+	return ( this->getRoute( location ).setClientMaxBodySize( arg ) );
 }
 
-int
-Server::setCGIparam ( const std::string & arg, std::string location )
-{
-	return ( this->getRoute( location ).setCGIparam( arg ) );
-}
+// int
+// Server::setCGIparam ( const std::string & arg, std::string location )
+// {
+// 	return ( this->getRoute( location ).setCGIparam( arg ) );
+// }
 
 int
 Server::setCGIpass ( const std::string & arg, std::string location )
@@ -315,14 +329,9 @@ Server::setErrorPage ( int n, const std::string & path )
 }
 
 int
-Server::setUploadFiles ( const std::string & arg, std::string location )
-{
-	return ( this->getRoute( location ).setUploadFiles( arg ) );
-}
-
-int
 Server::setRedirection ( const std::string & arg, std::string location )
 {
+	
 	return ( this->getRoute( location ).setRedirection( arg ) );
 }
 
@@ -365,10 +374,12 @@ Server::log_conf ( void ) const
 		LOG( " isDefault=" << it->second.isDefault() );
 		LOG( " flags=" << std::hex << it->second.getFlags() << std::dec );
 		LOG( " cgi_pass=" << it->second.getCGIpass() );
-		LOG( " cgi_param=" << it->second.getCGIparam() );
+		// LOG( " cgi_param=" << it->second.getCGIparam() );
+		LOG( " Redirection=" << it->second.getRedirection().first << " " << it->second.getRedirection().second );
+		LOG(" Client max body size=" << it->second.getClientMaxBodySize() );
 		for ( std::vector< std::string >::const_iterator index_it = it->second.getIndex().begin();
 				index_it != it->second.getIndex().end(); ++index_it )
 			LOG( " index=" << *index_it );
-	}
+				}
 	return ;
 }

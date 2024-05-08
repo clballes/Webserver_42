@@ -129,6 +129,16 @@ HTTP::request_recv ( int64_t data )
 		LOG_BUFFER( this->_buffer_recv, RED );
 		WARN( "HTTP request does not comply with HTTP/1.1 specification." );
 		this->_buffer_recv.clear();
+		this->setStatusCode( NOT_IMPLEMENTED );
+		this->compose_response();
+		return ( EXIT_FAILURE );
+	}
+
+	// limit client size max body check && Setting size to 0 disables checking of client request body size.
+	if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0 && (this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ))
+	{
+		this->setStatusCode(CONTENT_TOO_LARGE);
+		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
 
@@ -175,7 +185,8 @@ HTTP::request_recv ( int64_t data )
 int
 HTTP::compute_response ( void )
 {
-	DEBUG( this->_socket_fd );
+	DEBUG( this->_socket_fd << "target: " << this->_request.target);
+	
 	/* for ( t_headers::const_iterator it = this->_request_headers.begin();
 			it != this->_request_headers.end(); ++it )
 		LOG( it->first << "=" << it->second );
@@ -195,8 +206,15 @@ HTTP::compute_response ( void )
 		if ( this->_cgi_ptr->execute() == EXIT_SUCCESS )
 			return ( EXIT_SUCCESS );
 	}
+	else if ( !this->_server.getRedirection(  this->_request.target ).second.empty() )
+	{
+		this->_status_code = this->_server.getRedirection(  this->_request.target ).first;
+		this->_response_headers["Location"] = this->_server.getRedirection(  this->_request.target ).second;
+	}
 	else
+	{
 		(void) this->_request.method->method_func( * this );
+	}
 	(void) this->compose_response();
 	return ( EXIT_SUCCESS );
 }
@@ -208,13 +226,12 @@ HTTP::compose_response ( void )
 	if ( this->_status_code >= 300 && this->_status_code <= 511 )
 	{
 		load_file( *this, this->_server.getErrorPage( this->_status_code ) );
+		this->_response_headers["Content-Type"] = "text/html"; // perque no el posem?
 	}
-	
-	// TODO: replace to_string(); it's not c++98.
 	this->_buffer_send.append( "HTTP/1.1 " );
-	this->_buffer_send.append( std::to_string( this->_status_code ) );
+	this->_buffer_send.append( my_to_string( this->_status_code ) );
 	this->_buffer_send.append( " \r\n" );
-	this->_response_headers["content-length"] = std::to_string( this->_message_body.size() );
+	this->_response_headers["content-length"] = my_to_string( this->_message_body.size() );
 	// Add response headers if any + ending CRLF.
 	for ( t_headers::iterator it = this->_response_headers.begin();
 			it != this->_response_headers.end(); ++it )

@@ -46,7 +46,7 @@ CGI::setmap ( void )
 	this->_envMap["REQUEST_METHOD"] = request.method->method;
 	this->_envMap["QUERY_STRING"] = request.query;
 	this->_envMap["CONTENT_TYPE"] = headers["content-type"];
-	this->_envMap["CONTENT_LENGTH"] = std::to_string( request.body.length() );
+	this->_envMap["CONTENT_LENGTH"] = my_to_string( request.body.length() );
 	this->_envMap["REMOTE_IDENT"] = headers["authorization"];
 	this->_envMap["REMOTE_USER"] = headers["authorization"];
 	// TODO: scriptname i filename mirar del tot
@@ -58,7 +58,7 @@ CGI::setmap ( void )
 	if ( headers.find( "host" ) != headers.end() )
 		this->_envMap["SERVER_NAME"] = headers["host"];
 	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
-	this->_envMap["SERVER_PORT"] = std::to_string( _server.getPort() );
+	this->_envMap["SERVER_PORT"] = my_to_string( _server.getPort() );
 	return ;
 }
 

@@ -1,4 +1,5 @@
 - [ ] leaks
+- [ ] SIEGE
 - [ ] leaks: graceful\_stop SIGQUIT
 - [ ] leaks: SIGTERM
 - [ ] test: required directives ( Server check() )
@@ -8,15 +9,17 @@
 - [ ] test: HTTP methods with wrong directory control ( . .. )
 
 ## mpuig-ma
-
+- set default index ( i buscar primer els index abans que el autodirectory )
 - [ ] compare server blocks so there are no repetitions
 - [ ] proper POST
 - [ ] large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)
+- [ ] location extension + '/'
 
 ## CLARA
-
-- [ ] directive: upload\_files
-- [ ] directive: redirect - mirar q getroute li passi be els params
-- [ ] mirar lu de www/ checkindex
-- [ ] cgi\_param insert in the env
+- [ x ] compute limit size body len, iniciat a 1MB com diu nginx sempre i implmenteat dintre de location
+- [ x ] substituir to_string per my_to_string
+- [ x ] borrar uploaded files
+- [ x ] cgi comentat
+- [ ] mirara err pages
+- [ ] config tests

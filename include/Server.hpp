@@ -39,8 +39,8 @@ class Server
 		bool hasServerName ( std::string & ) const;
 		bool getFlag ( int, std::string = "" ) const;
 		std::size_t getFlags ( std::string = "" ) const;
-		std::size_t getClientMaxBodySize ( void ) const;
-		const std::string & getCGIparam ( std::string = "" ) const ;
+		const std::size_t & getClientMaxBodySize ( std::string = ""  ) const;
+		// const std::string & getCGIparam ( std::string = "" ) const ;
 		const std::string & getCGIpass ( std::string = "" ) const;
 		const std::string & getRoot ( std::string = "" ) const;
 		const std::vector< std::string > & getServerNames ( void ) const;
@@ -52,18 +52,18 @@ class Server
 		const struct sockaddr_in & getListen ( void ) const;
 		in_addr_t getHost ( void ) const;
 		in_port_t getPort ( void ) const;
+		const std::pair<int, std::string> & getRedirection ( std::string location ) const;
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
-		int setClientMaxBodySize ( std::size_t );
-		int setCGIparam ( const std::string &, std::string = "" );
+		// int setCGIparam ( const std::string &, std::string = "" );
+		int setClientMaxBodySize ( const std::string &, std::string = "" );
 		int setCGIpass ( const std::string &, std::string = "" );
 		int setRoot ( const std::string &, std::string = "" );
 		int setServerName ( const std::string & );
 		int setIndex ( const std::string &, std::string = "" );
 		int setErrorPage ( int, const std::string & );
 		int setRoute ( const std::string & );
-		int setUploadFiles ( const std::string &, std::string = "" );
 		int setRedirection ( const std::string &, std::string = "" );
 
 		typedef std::map< std::string,

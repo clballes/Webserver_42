@@ -103,15 +103,14 @@ class Router: public IEvent
 
 int set_limit_except ( Server &, std::string &, std::string = "" );
 int set_autoindex ( Server &, std::string &, std::string = "" );
-int set_cgi_param ( Server &, std::string &, std::string = "" );
+// int set_cgi_param ( Server &, std::string &, std::string = "" );
 int set_cgi_pass ( Server &, std::string &, std::string = "" );
-int set_client_body ( Server &, std::string &, std::string = "" );
+int set_client_max_body_size ( Server &, std::string &, std::string = "" );
 int set_error_page ( Server &, std::string &, std::string = "" );
 int set_index ( Server &, std::string &, std::string = "" );
 int set_listen( Server &, std::string &, std::string = "" );
 int set_root ( Server &, std::string &, std::string = "" );
 int set_server_name ( Server &, std::string &, std::string = "" );
-int set_upload_files ( Server &, std::string &, std::string = "" );
 int set_redirection ( Server &, std::string &, std::string = "" );
 
 #endif // ! _ROUTER_HPP_

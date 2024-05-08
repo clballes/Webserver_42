@@ -39,7 +39,6 @@ typedef struct s_http_method
 	const char * method;
 	int ( *method_func )( HTTP & );
 	int code;
-
 } t_http_method;
 
 typedef struct s_request
@@ -112,6 +111,7 @@ class HTTP: public IEvent
 		static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
 		static int autoindex ( HTTP & );
+		void	handle_chunk(const std::string& );
 };
 
 #endif /* !_HTTP_HPP_ */
