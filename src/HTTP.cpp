@@ -105,7 +105,8 @@ HTTP::request_recv ( int64_t data )
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 	if ( n == -1 )
 	{
-		WARN( "fd=" << this->_socket_fd << ": " << std::strerror( errno ) );
+		INFO( std::strerror( errno ) );
+		delete this;
 		return ( EXIT_FAILURE );
 	}
 	else if ( n == 0 )
@@ -115,11 +116,13 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_SUCCESS );
 	}
 
+	// this is not really chunk request
+	// this is multipart/form-data
 	if ( this->_chunk_request == true )
 	{
 		LOG_BUFFER( this->_buffer_recv, GREEN );
 		this->_chunk_request = false;
-		this->_request.body.assign( this->_buffer_recv );
+		this->_request.body.append( this->_buffer_recv );
 		return ( this->compute_response() );
 		return ( EXIT_SUCCESS );
 	}
