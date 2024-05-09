@@ -27,7 +27,8 @@ SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/CGI.cpp \
 					$(SRC_DIR)/string.cpp \
 					$(SRC_DIR)/file.cpp \
-					$(SRC_DIR)/autoindex.cpp
+					$(SRC_DIR)/autoindex.cpp \
+					$(SRC_DIR)/log.cpp 
 
 OBJ_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 DEP_FILES		=	$(SRC_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
