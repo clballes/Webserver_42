@@ -33,7 +33,7 @@ CGI::setmap ( void )
 {
 	std::map< std::string, std::string > & headers = _http.getHeaders();
 	const t_request & request = this->_http.getRequest();
-	const std::string & cgi_pass = this->_server.getCGIpass( request.file );
+	const std::string & cgi_pass = this->_server.getCGIpass( request.target );
 
 	DEBUG ( "Creating the map" );
 	if ( headers.find( "auth-scheme" ) != headers.end()
@@ -52,6 +52,7 @@ CGI::setmap ( void )
 	// TODO: scriptname i filename mirar del tot
 	this->_envMap["SCRIPT_NAME"] = request.file;
 	this->_envMap["SCRIPT_FILENAME"] = request.file;
+	LOG( cgi_pass );
 	this->_envMap["PATH_INFO"] = cgi_pass;
 	this->_envMap["PATH_TRANSLATED"] = cgi_pass;
 	this->_envMap["REQUEST_URI"] =  cgi_pass + request.query;

@@ -8,7 +8,7 @@
 int
 HTTP::http_head ( HTTP & http )
 {
-	//DEBUG( "target=\"" << http._request.target << "\"" );
+	DEBUG( "target=\"" << http._request.target << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode )
 			|| S_ISREG( http._request.file_info.st_mode ) )
 		http._status_code = OK;
@@ -20,7 +20,7 @@ HTTP::http_head ( HTTP & http )
 int
 HTTP::http_get ( HTTP & http )
 {
-	//DEBUG( "target=\"" << http._request.file << "\"" );
+	DEBUG( "target=\"" << http._request.file << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode ) )
 	{
 		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )

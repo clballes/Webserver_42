@@ -130,14 +130,15 @@ HTTP::request_recv ( int64_t data )
 	if ( this->parse() == EXIT_FAILURE )
 	{
 		LOG_BUFFER( this->_buffer_recv, RED );
-		WARN( "HTTP request does not comply with HTTP/1.1 specification." );
+		WARN( "HTTP request does not comply with HTTP/1.x specification." );
 		this->_buffer_recv.clear();
 		this->setStatusCode( NOT_IMPLEMENTED );
 		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
 
-	// limit client size max body check && Setting size to 0 disables checking of client request body size.
+	// limit client size max body check
+	// && Setting size to 0 disables checking of client request body size.
 	if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0
 			&& ( this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ) )
 	{
@@ -206,7 +207,7 @@ HTTP::request_recv ( int64_t data )
 int
 HTTP::compute_response ( void )
 {
-	DEBUG( this->_socket_fd << "target: " << this->_request.target);
+	DEBUG( this->_socket_fd << "target: " << this->_request.target );
 	if ( this->_server.getFlag( this->_request.method->code,
 				this->_request.target ) == false )
 		this->_status_code = METHOD_NOT_ALLOWED;
@@ -216,7 +217,7 @@ HTTP::compute_response ( void )
 		if ( this->_cgi_ptr->execute() == EXIT_SUCCESS )
 			return ( EXIT_SUCCESS );
 	}
-	else if ( !this->_server.getRedirection(  this->_request.target ).second.empty() )
+	else if ( !this->_server.getRedirection( this->_request.target ).second.empty() )
 	{
 		this->_status_code = this->_server.getRedirection(  this->_request.target ).first;
 		this->_response_headers["Location"] = this->_server.getRedirection(  this->_request.target ).second;
