@@ -303,8 +303,8 @@ Router::parse( std::string & buffer )
 	}
 	if ( compare_servers( this->_servers ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-	//for ( std::vector< Server >::const_iterator it = this->_servers.begin();
-	//		it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
+	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
+			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
 	return ( EXIT_SUCCESS );
 }
 
