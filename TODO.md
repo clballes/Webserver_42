@@ -18,4 +18,6 @@
 - [ ] location extension + '/'
 
 ## CLARA
+- [x] quan poso nomes una / peta localñhost:90/
 - [ ] mirar err pages
+- [ ] config tests
