@@ -162,9 +162,11 @@ HTTP::request_recv ( int64_t data )
 	// lcoation block en el compose
 	// append location root change if it fits location the target
 
+	LOG( YELLOW << this->_request.target );
 	this->_request.file = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
-	if ( ! location.empty() )
+	LOG( YELLOW << location );
+	if ( ! location.empty() && location[0] != '*' )
 	{
 		std::string root_location = this->_server.getRoot( location );
 		root_location.append( "/" );
@@ -176,6 +178,7 @@ HTTP::request_recv ( int64_t data )
 		root_location.append( "/" );
 		this->_request.file.replace( 0, 1, root_location );
 	}
+	LOG( GREEN << this->_request.file );
 	stat( this->_request.file.c_str(), &this->_request.file_info );
 	std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
 	if (iter != _request_headers.end()) {
@@ -207,7 +210,7 @@ HTTP::request_recv ( int64_t data )
 int
 HTTP::compute_response ( void )
 {
-	DEBUG( this->_socket_fd << "target: " << this->_request.target );
+	DEBUG( this->_socket_fd << " target=" << this->_request.target );
 	if ( this->_server.getFlag( this->_request.method->code,
 				this->_request.target ) == false )
 		this->_status_code = METHOD_NOT_ALLOWED;

@@ -266,10 +266,11 @@ Router::parse( std::string & buffer )
 					ERROR( "unnamed \"location\"." );
 					return ( EXIT_FAILURE );
 				}
-				if ( directive_value.back() != '/' )
+				if ( directive_value.back() != '/' 
+						&& directive_value.size() > 1
+						&& directive_value[0] != '*' )
 					directive_value.append( "/" );
 				location.assign( directive_value );
-				// TODO: check only one argument
 				if ( this->_servers.back().setRoute( directive_value ) ) 
 					return ( EXIT_FAILURE );
 				directive_value.clear();
@@ -663,6 +664,11 @@ set_root ( Server & instance, std::string & arg, std::string location )
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"root\"" );
+		return ( EXIT_FAILURE );
+	}
+	if ( arg[0] != '/' )
+	{
+		ERROR( "root must be an absolute path" );
 		return ( EXIT_FAILURE );
 	}
 	return ( instance.setRoot( arg, location ) );

@@ -65,8 +65,13 @@ Server::getRoute ( const std::string & location ) const
 		else
 		{
 			cmp_str.erase( 0, 1 );
+			if ( cmp_str.length() > 1 && cmp_str.back() == '/' )
+				cmp_str.erase( cmp_str.length() - 1, 1 );
 			if ( compare_file_extension( target, cmp_str ) == true )
+			{
+				LOG( "ext=" << cmp_str << " match" );
 				return ( const_cast< Location & >( it->second ) );
+			}
 		}
 		++it;
 	}
@@ -238,6 +243,8 @@ Server::setRoute ( const std::string & location )
 		mod_location.erase( mod_location.length() - 1, 1 );
 	if ( mod_location.back() != '/' ) 
 		mod_location.append( "/" );
+	if ( mod_location.size() > 1 && mod_location[0] == '*' )
+		mod_location.erase( mod_location.length() - 1, 1 );
 	DEBUG( mod_location );
 	for ( t_route_map::const_iterator it = this->_routes.begin();
 			it != this->_routes.end(); ++it )
@@ -346,6 +353,18 @@ Server::check ( void )
 		ERROR( "directive \"root\" required" );
 		return ( EXIT_FAILURE );
 	}
+
+	for ( t_route_map::const_iterator it = this->_routes.begin();
+			it != this->_routes.end(); ++it )
+	{
+		if ( it->second.getRoot().empty() )
+		{
+			ERROR( "directive \"root\" required in location "
+				<< "\"" << it->first << "\"" );
+			return ( EXIT_FAILURE );
+		}
+	}
+
 	return ( EXIT_SUCCESS );
 }
 

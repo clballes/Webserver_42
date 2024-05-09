@@ -12,12 +12,15 @@
 ## mpuig-ma
 - [ ] set default index ( i buscar primer els index abans que el autodirectory )
 - [ ] compare server blocks so there are no repetitions
+- [x] location extension + '/'
+- [x] root: should always be an absolute path
+- [x] root (location) required
+- [x] location '\' al principi
+
 - [ ] proper POST
 - [ ] large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)
-- [ ] location extension + '/'
 
 ## CLARA
-- [x] quan poso nomes una / peta localñhost:90/
 - [ ] mirar err pages
 - [ ] config tests
