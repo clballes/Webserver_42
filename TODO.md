@@ -1,6 +1,6 @@
 - [ ] siege
 - [ ] leaks
-- [ ] leaks: graceful\_stop SIGQUIT
+- [ ] leaks: graceful_stop SIGQUIT
 - [ ] leaks: SIGTERM
 - [ ] test: required directives ( Server check() )
 - [ ] test: wrong number of arguments ( conf )
@@ -10,6 +10,7 @@
 - [ ] test: config
 
 ## mpuig-ma
+
 - [ ] set default index ( i buscar primer els index abans que el autodirectory )
 - [ ] compare server blocks so there are no repetitions
 - [ ] proper POST
@@ -18,6 +19,8 @@
 - [ ] location extension + '/'
 
 ## CLARA
-- [x] quan poso nomes una / peta localñhost:90/
+
 - [ ] mirar err pages
 - [ ] config tests
+- [ ] upload some file to the server
+- [ ] headers CGI

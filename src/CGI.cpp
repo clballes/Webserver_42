@@ -163,8 +163,6 @@ CGI::dispatch ( struct kevent & ev )
 	return ;
 }
 
-// TODO: timeout
-
 int
 CGI::execute ( void )
 {
