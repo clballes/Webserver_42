@@ -178,12 +178,14 @@ parse_target( t_request & request, std::string & line )
 		value.erase( value.length() - request.query.length() );
 	if ( value.back() == '/' )
 	{
-		while ( value.back() == '/' )
+		while ( !value.empty() && value.back() == '/' )
+		{
 			value.erase( value.length() - 1, 1 );
+		}
 		value.append( "/" );
-	}
-	request.target = value;
-	urldecode( request.target );
+	}	
+	request.target = value;	
+	urldecode( request.target );	
 	return ( EXIT_SUCCESS );
 }
 

@@ -169,9 +169,23 @@ HTTP::request_recv ( int64_t data )
 		this->_request.file.replace( 0, 1, root_location );
 	}
 	stat( this->_request.file.c_str(), &this->_request.file_info );
-
-	if ( ! this->_request_headers["expect"].empty() )
+	std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
+	if (iter != _request_headers.end()) {
+			if (iter->second == "chunked")
+			{
+				std::cout << "HAY CHUNKSSSSSS" << std::endl;
+				this->_chunk_request = true;
+				return ( EXIT_SUCCESS );
+				// this->_chunk_request = true;
+				// //li sumo 4 perque em tregui el 3f
+				// std::string body = this->_buffer_recv.substr( pos + 4 );
+				// std::cout << "hay chunks" << std::endl;
+				// handle_chunk( body );
+			}
+	}
+	if ( ! this->_request_headers["expect"].empty())
 	{
+		// handle chunk
 		this->_chunk_request = true;
 		return ( EXIT_SUCCESS );
 	}
