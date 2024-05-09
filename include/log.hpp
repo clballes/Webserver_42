@@ -76,7 +76,7 @@ int _webserv_verbose_level;
 		else if ( *it == '\r' ) { std::clog << "\\r"; ++counter; } \
 		/*if ( counter >= 80 ) { std::clog << ENDL; counter = 0; } */\
 		++it; \
-		++counter; \
+		++counter; (void) counter; \
 		if ( it == str.end() ) { std::clog << ENDL; } \
 	} \
 	std::clog << RESET; \
