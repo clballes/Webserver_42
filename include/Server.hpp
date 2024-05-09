@@ -17,14 +17,6 @@
 #include "string.hpp"
 #include "log.hpp"
 
-template <class T> struct longer : std::binary_function <T,T,bool>
-{
-	bool operator() (const T& x, const T& y) const
-	{
-		return x.length()>y.length();
-	}
-};
-
 class Server
 {
 	public:
@@ -40,7 +32,6 @@ class Server
 		bool getFlag ( int, std::string = "" ) const;
 		std::size_t getFlags ( std::string = "" ) const;
 		const std::size_t & getClientMaxBodySize ( std::string = ""  ) const;
-		// const std::string & getCGIparam ( std::string = "" ) const ;
 		const std::string & getCGIpass ( std::string = "" ) const;
 		const std::string & getRoot ( std::string = "" ) const;
 		const std::vector< std::string > & getServerNames ( void ) const;
@@ -56,7 +47,6 @@ class Server
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );
-		// int setCGIparam ( const std::string &, std::string = "" );
 		int setClientMaxBodySize ( const std::string &, std::string = "" );
 		int setCGIpass ( const std::string &, std::string = "" );
 		int setRoot ( const std::string &, std::string = "" );
@@ -67,7 +57,7 @@ class Server
 		int setRedirection ( const std::string &, std::string = "" );
 
 		typedef std::map< std::string,
-				Location, longer< std::string > > t_route_map;
+				Location, std::greater< std::string > > t_route_map;
 
 		int check ( void );
 
@@ -76,7 +66,6 @@ class Server
 		bool								_good;
 		struct sockaddr_in					_address;
 		std::vector< std::string >			_server_name;
-		std::size_t							_client_max_body_size;
 		std::map< int, std::string >		_error_pages;
 		t_route_map							_routes;
 
