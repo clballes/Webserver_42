@@ -19,7 +19,6 @@
         var chunkSize = 5;
         var chunks = [];
 
-        // Split data into chunks
         for (var i = 0; i < formData.length; i += chunkSize) {
           chunks.push(formData.substr(i, chunkSize));
         }
@@ -27,9 +26,7 @@
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/www", true);
         xhr.setRequestHeader("Content-Type", "text/plain");
-        xhr.setRequestHeader("Transfer-Encoding", "chunked"); // Adding this header to indicate chunked encoding
-
-        // Listen for changes in readyState to detect when the request is complete
+        xhr.setRequestHeader("Transfer-Encoding", "chunked");
         xhr.onreadystatechange = function () {
           if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {

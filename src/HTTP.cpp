@@ -138,6 +138,7 @@ HTTP::request_recv ( int64_t data )
 		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
+	LOG_BUFFER (this->_buffer_recv, RED);
 
 	// limit client size max body check
 	// && Setting size to 0 disables checking of client request body size.

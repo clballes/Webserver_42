@@ -220,7 +220,7 @@ CGI::execute ( void )
     close( _pipefd[WRITE] );
 	for ( std::size_t i = 0; env[i] != 0x0; ++i )
 		delete ( env[i] );
-	// delete ( env );
+	delete ( env );
 	this->register_process();
 	return ( EXIT_SUCCESS );
 }

@@ -16,12 +16,11 @@
 - [ ] proper POST
 - [ ] large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)
-- [ ] location extension + '/'
 
 ## CLARA
 
 - [ ] mirar err pages
 - [ ] config tests
-- [ ] upload some file to the server
-- [ ] headers CGI
+- [ ] upload some file to the server test
+- [ ] headers CGI acabar parsing - fer per dilluns
 - [ ] quan no acaba en punt coma en el config, posa error nye
