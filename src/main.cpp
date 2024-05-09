@@ -11,9 +11,14 @@ int
 main ( int argc, char * const * argv )
 {
 	Router router;
-	
+
+	_webserv_verbose_level = _MODE_INFO;
+	INFO( "verbose_level=" << _webserv_verbose_level );
 	if ( argc > 2 )
+	{
+		LOG( "usage: " << EXEC_NAME << " [configuration file]" );
 		return ( EXIT_FAILURE );
+	}
 	router.load( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] );
 	return ( router.good() == false ? EXIT_FAILURE : router.listen() );
 }
