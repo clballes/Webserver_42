@@ -35,7 +35,7 @@ CGI::setmap ( void )
 	const t_request & request = this->_http.getRequest();
 	const std::string & cgi_pass = this->_server.getCGIpass( request.file );
 
-	DEBUG ("Creating the map");
+	DEBUG ( "Creating the map" );
 	if ( headers.find( "auth-scheme" ) != headers.end()
 			&& headers["auth-scheme"] != "" )
 		this->_envMap["AUTH_TYPE"] = headers["authorization"];

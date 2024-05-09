@@ -193,7 +193,7 @@ Router::load ( std::string filename )
 	std::string   buffer, line;
 	std::ifstream file;
 
-	//DEBUG( filename.c_str() );
+	DEBUG( filename.c_str() );
 	if ( is_regular_file( filename ) == false )
 	{
 		ERROR( filename << ": Is a directory" );
@@ -229,6 +229,7 @@ Router::parse( std::string & buffer )
 	std::string					location( "" );
 	std::size_t					directive_len, position = 0;
 
+	DEBUG( "" );
 	context.push( "main" );
 	while ( position < buffer.length() )
 	{
@@ -268,12 +269,13 @@ Router::parse( std::string & buffer )
 				if ( directive_value.back() != '/' )
 					directive_value.append( "/" );
 				location.assign( directive_value );
-				LOG( location );
 				// TODO: check only one argument
 				if ( this->_servers.back().setRoute( directive_value ) ) 
-					//return ( EXIT_FAILURE );
+					return ( EXIT_FAILURE );
 				directive_value.clear();
 			}
+			else
+				context.pop();
 			continue ;
 		}
 		else if ( directive == "}" )
@@ -301,8 +303,8 @@ Router::parse( std::string & buffer )
 	}
 	if ( compare_servers( this->_servers ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
-			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
+	//for ( std::vector< Server >::const_iterator it = this->_servers.begin();
+	//		it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
 	return ( EXIT_SUCCESS );
 }
 
@@ -313,6 +315,7 @@ Router::listen ( void )
 	struct kevent ev;
 	IEvent * instance;
 
+	DEBUG( "" );
 	for ( std::vector< Server >::iterator i = this->_servers.begin();
 			i != this->_servers.end(); ++i )
 	{
@@ -346,7 +349,6 @@ Router::listen ( void )
 		}
 		else if ( n_events == 0 )
 		{
-			DEBUG( "continue" );
 			continue ;
 		}
 		instance = static_cast< IEvent * >( ev.udata );
@@ -454,10 +456,14 @@ int
 Router::setConnection ( const struct sockaddr_in & address,
 		int domain, int type, int protocol )
 {
+	DEBUG( "" );
 	this->_connections.push_back( Connection( address,
 				domain, type, protocol ) );
 	if ( this->_connections.back().good() == false )
 		return ( EXIT_FAILURE );
+	INFO( "listening to "
+			<< std::hex << this->_connections.back().getHost()
+			<< std::dec << ":" << this->_connections.back().getPort() );
 	return ( EXIT_SUCCESS );
 }
 
@@ -644,7 +650,10 @@ set_listen( Server & instance, std::string & arg, std::string )
 		freeaddrinfo( result );
 	}
 	if ( address == NULL || ecode == EXIT_FAILURE )
+	{
+		LOG( "HERE" );
 		return ( EXIT_FAILURE );
+	}
 	return ( EXIT_SUCCESS );
 }
 
