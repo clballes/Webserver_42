@@ -30,7 +30,7 @@
 #define _MODE_ERROR		1
 
 #define DEBUG(item)		_WEBSERV_LOG( _MODE_DEBUG, item )
-#define INFO(item)		_WEBSERV_LOG( _MODE_INFO, BLUE << item )
+#define INFO(item)		_WEBSERV_LOG( _MODE_INFO, item )
 #define NOTICE(item)	_WEBSERV_LOG( _MODE_NOTICE, YELLOW << item )
 #define WARN(item)		_WEBSERV_LOG( _MODE_WARN, YELLOW << item )
 #define ERROR(item)		_WEBSERV_LOG( _MODE_ERROR, RED << item )
@@ -55,7 +55,10 @@ int _webserv_verbose_level;
 	if ( m <= _webserv_verbose_level ) \
 	{ \
 		_WEBSERV_LOG_TIME \
-		std::clog << item2log << RESET << ENDL; \
+		if ( m == _MODE_DEBUG ) \
+		{ std::clog << __FN__ << " [" << item2log << "]"; } \
+		else { std::clog << item2log; } \
+		std::clog << RESET << ENDL; \
 	} \
 }
 #define LOG_BUFFER(str,color) \
