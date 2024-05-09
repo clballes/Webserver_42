@@ -148,7 +148,9 @@ HTTP::request_recv ( int64_t data )
 
 	// TODO: this goes into parse_request
 	//LOG_BUFFER( this->_buffer_recv, GREEN );
-	LOG_TIME( GREEN << this->_request.method->method << ' ' << std::hex << this->_request.http_version << ' ' << std::dec << this->_request.target );
+	LOG( GREEN << this->_request.method->method << ' '
+			<< std::hex << this->_request.http_version << ' '
+			<< std::dec << this->_request.target );
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
