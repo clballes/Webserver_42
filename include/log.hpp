@@ -56,9 +56,9 @@ int _webserv_verbose_level;
 	if ( m <= _webserv_verbose_level ) \
 	{ \
 		if ( m != _MODE_LOG ) { _WEBSERV_LOG_TIME } \
-		if ( m == _MODE_DEBUG ) { std::clog << __FN__ << " [" << item2log << "]"; } \
-		else { std::clog << item2log; } \
-		std::clog << RESET << ENDL; \
+		if ( m == _MODE_DEBUG ) \
+		{ std::clog << __FN__ << " [" << item2log << RESET << "]" << ENDL; } \
+		else { std::clog << item2log << RESET << ENDL; } \
 	} \
 }
 #define LOG_BUFFER(str,color) \
