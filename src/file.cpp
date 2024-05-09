@@ -32,13 +32,15 @@ bool routeExists( const std::string & route )
     return ( access( route.c_str(), 0 ) == 0 );
 }
 
-template<typename T>
-std::string my_to_string(const T& value) {
+template< typename T >
+std::string my_to_string ( const T & value )
+{
     std::stringstream ss;
+
     ss << value;
-    return ss.str();
+    return ( ss.str() );
 }
 
-template std::string my_to_string<int>(const int& value);
-template std::string my_to_string<unsigned long>(const unsigned long& value);
-template std::string my_to_string<unsigned short>(const unsigned short& value);
+template std::string my_to_string< int > ( const int & );
+template std::string my_to_string< unsigned long > ( const unsigned long & );
+template std::string my_to_string< unsigned short > ( const unsigned short & );
