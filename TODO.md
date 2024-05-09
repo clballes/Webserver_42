@@ -1,6 +1,6 @@
 - [ ] siege
 - [ ] leaks
-- [ ] leaks: graceful_stop SIGQUIT
+- [ ] leaks: graceful\_stop SIGQUIT
 - [ ] leaks: SIGTERM
 - [ ] test: required directives ( Server check() )
 - [ ] test: wrong number of arguments ( conf )
@@ -8,6 +8,7 @@
 - [ ] test: default values
 - [ ] test: HTTP methods with wrong directory control ( . .. )
 - [ ] test: config
+- [ ] test: multiple (lots of) servers
 
 ## mpuig-ma
 
