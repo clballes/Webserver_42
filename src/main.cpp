@@ -12,7 +12,7 @@ main ( int argc, char * const * argv )
 {
 	Router router;
 
-	_webserv_verbose_level = _MODE_INFO;
+	_webserv_verbose_level = _MODE_LOG;
 	INFO( "verbose_level=" << _webserv_verbose_level );
 	if ( argc > 2 )
 	{

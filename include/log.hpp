@@ -23,7 +23,8 @@
 #define RESET	"\033[0m"
 #define ENDL	"\n"
 
-#define _MODE_DEBUG		5
+#define _MODE_DEBUG		6
+#define _MODE_LOG		5
 #define _MODE_INFO		4
 #define _MODE_NOTICE	3
 #define _MODE_WARN		2
@@ -34,7 +35,7 @@
 #define NOTICE(item)	_WEBSERV_LOG( _MODE_NOTICE, YELLOW << item )
 #define WARN(item)		_WEBSERV_LOG( _MODE_WARN, YELLOW << item )
 #define ERROR(item)		_WEBSERV_LOG( _MODE_ERROR, RED << item )
-#define LOG(item)		{ std::clog << item << RESET << ENDL; }
+#define LOG(item)		_WEBSERV_LOG( _MODE_LOG, item )
 
 __BEGIN_DECLS
 extern int * __w_verbose_level(void);
@@ -54,9 +55,8 @@ int _webserv_verbose_level;
 	int m = mode; \
 	if ( m <= _webserv_verbose_level ) \
 	{ \
-		_WEBSERV_LOG_TIME \
-		if ( m == _MODE_DEBUG ) \
-		{ std::clog << __FN__ << " [" << item2log << "]"; } \
+		if ( m != _MODE_LOG ) { _WEBSERV_LOG_TIME } \
+		if ( m == _MODE_DEBUG ) { std::clog << __FN__ << " [" << item2log << "]"; } \
 		else { std::clog << item2log; } \
 		std::clog << RESET << ENDL; \
 	} \
