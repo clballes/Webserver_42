@@ -1,6 +1,6 @@
 - [ ] siege
 - [ ] leaks
-- [ ] leaks: graceful\_stop SIGQUIT
+- [ ] leaks: graceful_stop SIGQUIT
 - [ ] leaks: SIGTERM
 - [ ] test: required directives ( Server check() )
 - [ ] test: wrong number of arguments ( conf )
@@ -10,6 +10,7 @@
 - [ ] test: config
 
 ## mpuig-ma
+
 - [ ] set default index ( i buscar primer els index abans que el autodirectory )
 - [ ] compare server blocks so there are no repetitions
 - [ ] HTTP\_parse proper body parse
@@ -21,3 +22,6 @@
 ## CLARA
 - [ ] mirar err pages
 - [ ] config tests
+- [ ] upload some file to the server
+- [ ] headers CGI
+- [ ] quan no acaba en punt coma en el config, posa error nye
