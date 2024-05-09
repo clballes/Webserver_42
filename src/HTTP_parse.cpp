@@ -87,7 +87,7 @@ HTTP::parse ( void )
 	// if ( this->_request.method->code != HTTP_POST
 	// 		&& this->_request.method->code != HTTP_PUT )
 	// 	return ( EXIT_SUCCESS );
-	if ( pos != std::string::npos && pos < this->_buffer_recv.length() )
+	if ( pos != std::string::npos && (pos < this->_buffer_recv.length() - 1) )
 	{
 		this->_request.body = this->_buffer_recv.substr( pos );
 		std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");

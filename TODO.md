@@ -24,3 +24,4 @@
 - [ ] config tests
 - [ ] upload some file to the server
 - [ ] headers CGI
+- [ ] quan no acaba en punt coma en el config, posa error nye

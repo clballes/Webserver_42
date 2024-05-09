@@ -122,7 +122,9 @@ HTTP::request_recv ( int64_t data )
 	{
 		LOG_BUFFER( this->_buffer_recv, GREEN );
 		this->_chunk_request = false;
+		std::cout << "AAAAAAA chunekde:"<< this->_request.body << " b "<<this->_request.body.length() <<  std::endl;
 		this->_request.body.append( this->_buffer_recv );
+		std::cout << "AAAAAAA chunekde:"<< this->_request.body << " b "<<this->_request.body.length() <<  std::endl;
 		return ( this->compute_response() );
 		return ( EXIT_SUCCESS );
 	}
