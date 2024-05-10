@@ -7,12 +7,40 @@
 #include "Router.hpp"	/* class Router */
 #include "define.hpp"	/* DEFAULT_CONF */
 
+void
+set_verbose_level ( char * const * envp )
+{
+	const char		env_var[] = "DEBUG_LEVEL=";
+	const size_t	len = std::strlen( env_var );
+	size_t			iterator;
+	char *			pos;
+
+	#ifdef DEBUG_LEVEL
+		_webserv_verbose_level = DEBUG_LEVEL;
+	#endif
+	iterator = 0;
+	while ( envp != NULL && envp[iterator] != NULL )
+	{
+		pos = std::strchr( envp[iterator], '=' );
+		if ( pos != NULL
+				&& std::strncmp( envp[iterator], env_var, len ) == 0 )
+		{
+			if ( *( envp[iterator] + len ) == '\0' )
+				_webserv_verbose_level = _MODE_NOTICE;
+			else
+				_webserv_verbose_level = std::atoi( envp[iterator] + len );
+		}
+		++iterator;
+	}
+	return ;
+}
+
 int
-main ( int argc, char * const * argv )
+main ( int argc, char * const * argv, char * const * envp )
 {
 	Router router;
 
-	_webserv_verbose_level = _MODE_DEBUG;
+	set_verbose_level( envp );
 	INFO( "verbose_level=" << _webserv_verbose_level );
 	if ( argc > 2 )
 	{

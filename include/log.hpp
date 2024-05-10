@@ -23,12 +23,12 @@
 #define RESET	"\033[0m"
 #define ENDL	"\n"
 
-#define _MODE_DEBUG		6
-#define _MODE_LOG		5
-#define _MODE_INFO		4
-#define _MODE_NOTICE	3
-#define _MODE_WARN		2
-#define _MODE_ERROR		1
+#define _MODE_DEBUG		5
+#define _MODE_LOG		4
+#define _MODE_INFO		3
+#define _MODE_NOTICE	2
+#define _MODE_WARN		1
+#define _MODE_ERROR		0
 
 #define DEBUG(item)		_WEBSERV_LOG( _MODE_DEBUG, item )
 #define INFO(item)		_WEBSERV_LOG( _MODE_INFO, item )
