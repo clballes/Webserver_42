@@ -8,7 +8,7 @@
 int
 HTTP::http_head ( HTTP & http )
 {
-	DEBUG( "target=\"" << http._request.target << "\"" );
+	DEBUG( "path=\"" << http._request.file << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode )
 			|| S_ISREG( http._request.file_info.st_mode ) )
 		http._status_code = OK;
@@ -20,7 +20,7 @@ HTTP::http_head ( HTTP & http )
 int
 HTTP::http_get ( HTTP & http )
 {
-	DEBUG( "target=\"" << http._request.file << "\"" );
+	DEBUG( "path=\"" << http._request.file << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode ) )
 	{
 		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )
@@ -38,7 +38,7 @@ HTTP::http_get ( HTTP & http )
 int
 HTTP::http_post ( HTTP & http )
 {
-	//DEBUG( "target=\"" << http._request.file << "\"" );
+	//DEBUG( "path=\"" << http._request.file << "\"" );
 	LOG( http._request_headers["content-type"] );
 	// LOG_BUFFER ( http._buffer_recv , RED);
 	// LOG_BUFFER ( http._request.body , YELLOW);
@@ -52,7 +52,7 @@ HTTP::http_put ( HTTP & http )
 {
 	std::ofstream file;
 
-	//DEBUG ( http._request.file );
+	DEBUG ( "path=\"" << http._request.file << "\"" );
 	if ( S_ISREG( http._request.file_info.st_mode )
 			|| S_ISDIR( http._request.file_info.st_mode ) )
 	{

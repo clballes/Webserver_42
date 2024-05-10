@@ -18,7 +18,7 @@ Router::_opts[] =
 	{ DIRECTIVE, "listen", no, yes, "server", &set_listen },
 	{ DIRECTIVE, "limit_except", no, yes, "location", &set_limit_except },
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
-	{ DIRECTIVE, "index", no, no, "server", &set_index },
+	{ DIRECTIVE, "index", no, no, "server,location", &set_index },
 	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
 	// { DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
