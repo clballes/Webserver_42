@@ -12,7 +12,6 @@
 
 ## mpuig-ma
 
-- [ ] set default index ( i buscar primer els index abans que el autodirectory )
 - [ ] compare server blocks so there are no repetitions
 - [ ] HTTP\_parse proper body parse
 
