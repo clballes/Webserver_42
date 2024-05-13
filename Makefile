@@ -14,7 +14,7 @@ CPPFLAGS		:=	-MMD
 CPPFLAGS		+=	-I$(INC_DIR)
 CPPFLAGS		+=	-g -fsanitize='address,undefined'
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
-CXXFLAGS		+=	-DDEBUG_MODE=info -DREUSE_SOCKET
+CXXFLAGS		+=	-DDEBUG_LEVEL=10 -DREUSE_SOCKET
 
 SRC_FILES		:=	$(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/Router.cpp \

@@ -23,12 +23,12 @@
 #define RESET	"\033[0m"
 #define ENDL	"\n"
 
-#define _MODE_DEBUG		6
-#define _MODE_LOG		5
-#define _MODE_INFO		4
-#define _MODE_NOTICE	3
-#define _MODE_WARN		2
-#define _MODE_ERROR		1
+#define _MODE_DEBUG		5
+#define _MODE_LOG		4
+#define _MODE_INFO		3
+#define _MODE_NOTICE	2
+#define _MODE_WARN		1
+#define _MODE_ERROR		0
 
 #define DEBUG(item)		_WEBSERV_LOG( _MODE_DEBUG, item )
 #define INFO(item)		_WEBSERV_LOG( _MODE_INFO, item )
@@ -56,9 +56,9 @@ int _webserv_verbose_level;
 	if ( m <= _webserv_verbose_level ) \
 	{ \
 		if ( m != _MODE_LOG ) { _WEBSERV_LOG_TIME } \
-		if ( m == _MODE_DEBUG ) { std::clog << __FN__ << " [" << item2log << "]"; } \
-		else { std::clog << item2log; } \
-		std::clog << RESET << ENDL; \
+		if ( m == _MODE_DEBUG ) \
+		{ std::clog << __FN__ << " [" << item2log << RESET << "]" << ENDL; } \
+		else { std::clog << item2log << RESET << ENDL; } \
 	} \
 }
 #define LOG_BUFFER(str,color) \

@@ -18,7 +18,7 @@ Router::_opts[] =
 	{ DIRECTIVE, "listen", no, yes, "server", &set_listen },
 	{ DIRECTIVE, "limit_except", no, yes, "location", &set_limit_except },
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
-	{ DIRECTIVE, "index", no, no, "server", &set_index },
+	{ DIRECTIVE, "index", no, no, "server,location", &set_index },
 	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
 	// { DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
@@ -163,19 +163,13 @@ compare_servers ( std::vector< Server > & servers )
 	{
 		const Server & a = *( it - 1 );
 		const Server & b = *it;
-		if ( a.getPort() == b.getPort()
-				&& a.getHost() == b.getHost() )
+		if ( a.getPort() == b.getPort() && a.getHost() == b.getHost() )
 		{
-			if ( a.getServerNames().size() == b.getServerNames().size() )
-			{
-				ERROR( "repeated server_names" );
-				return ( EXIT_FAILURE );
-			}
 			const std::vector< std::string > & s_names = a.getServerNames();
 			for ( std::vector< std::string >::const_iterator n = s_names.begin();
 					n != s_names.end(); ++n )
 			{
-				if ( b.hasServerName( const_cast< std::string & >( *n ) ) == true )
+				if ( b.hasServerName( const_cast< std::string & >( *n ) ) )
 				{
 					ERROR( "server_name \"" << *n << "\" is repeated" );
 					return ( EXIT_FAILURE );
@@ -213,7 +207,7 @@ Router::load ( std::string filename )
 	}
 	trim_f( buffer, &std::isspace );
 	file.close();
-	if ( parse( buffer ) == EXIT_FAILURE )
+	if ( this->parse( buffer ) == EXIT_FAILURE )
 	{
 		this->_good = false;
 		return ( EXIT_FAILURE );
@@ -229,7 +223,6 @@ Router::parse( std::string & buffer )
 	std::string					location( "" );
 	std::size_t					directive_len, position = 0;
 
-	DEBUG( "" );
 	context.push( "main" );
 	while ( position < buffer.length() )
 	{
@@ -266,10 +259,11 @@ Router::parse( std::string & buffer )
 					ERROR( "unnamed \"location\"." );
 					return ( EXIT_FAILURE );
 				}
-				if ( directive_value.back() != '/' )
+				if ( directive_value.back() != '/' 
+						&& directive_value.size() > 1
+						&& directive_value[0] != '*' )
 					directive_value.append( "/" );
 				location.assign( directive_value );
-				// TODO: check only one argument
 				if ( this->_servers.back().setRoute( directive_value ) ) 
 					return ( EXIT_FAILURE );
 				directive_value.clear();
@@ -315,7 +309,6 @@ Router::listen ( void )
 	struct kevent ev;
 	IEvent * instance;
 
-	DEBUG( "" );
 	for ( std::vector< Server >::iterator i = this->_servers.begin();
 			i != this->_servers.end(); ++i )
 	{
@@ -377,7 +370,6 @@ Router::dispatch ( struct kevent & ev )
 {
 	HTTP * client;
 
-	//DEBUG ( "ev=" << ev.ident );
 	if ( ev.filter != EVFILT_READ )
 	{
 		WARN( "unknown event filter" );
@@ -418,7 +410,6 @@ Router::getServer ( std::string & server_name, in_addr_t host, in_port_t port )
 	
 	if ( mod_server_name.find( ':' ) != std::string::npos )
 		mod_server_name.erase( mod_server_name.find( ':' ) );
-	//DEBUG( "server_name=\"" << mod_server_name << "\"" );
 	it = this->_servers.begin();
 	while ( it != this->_servers.end() )
 	{
@@ -456,7 +447,6 @@ int
 Router::setConnection ( const struct sockaddr_in & address,
 		int domain, int type, int protocol )
 {
-	DEBUG( "" );
 	this->_connections.push_back( Connection( address,
 				domain, type, protocol ) );
 	if ( this->_connections.back().good() == false )
@@ -663,6 +653,11 @@ set_root ( Server & instance, std::string & arg, std::string location )
 	if ( arg.empty() || arg.find( " " ) != std::string::npos )
 	{
 		ERROR( "invalid number of arguments in \"root\"" );
+		return ( EXIT_FAILURE );
+	}
+	if ( arg[0] != '/' )
+	{
+		ERROR( "root must be an absolute path" );
 		return ( EXIT_FAILURE );
 	}
 	return ( instance.setRoot( arg, location ) );

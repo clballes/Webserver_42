@@ -34,7 +34,8 @@ CGI::setmap ( void )
 	std::map< std::string, std::string > & headers = _http.getHeaders();
 	const t_request & request = this->_http.getRequest();
 	const std::string & cgi_pass = this->_server.getCGIpass( request.target );
-	DEBUG ( "Creating the map" );
+	
+	DEBUG ( "" );
 	if ( headers.find( "auth-scheme" ) != headers.end()
 			&& headers["auth-scheme"] != "" )
 		this->_envMap["AUTH_TYPE"] = headers["authorization"];
@@ -46,14 +47,10 @@ CGI::setmap ( void )
 	this->_envMap["QUERY_STRING"] = request.query;
 	this->_envMap["CONTENT_TYPE"] = headers["content-type"];
 	if ( !request.body.empty() )
-	{
 		this->_envMap["CONTENT_LENGTH"] = my_to_string( request.body.length() );
-	}
-	this->_envMap["REMOTE_IDENT"] = headers["authorization"];
-	this->_envMap["REMOTE_USER"] = headers["authorization"];
 	// TODO: scriptname i filename mirar del tot
-	this->_envMap["SCRIPT_NAME"] = request.file;
-	this->_envMap["SCRIPT_FILENAME"] = request.file;
+	//this->_envMap["SCRIPT_NAME"] = request.file;
+	//this->_envMap["SCRIPT_FILENAME"] = request.file;
 	this->_envMap["PATH_INFO"] = cgi_pass;
 	this->_envMap["PATH_TRANSLATED"] = cgi_pass;
 	this->_envMap["REQUEST_URI"] =  cgi_pass + request.query;
@@ -129,10 +126,10 @@ CGI::dispatch ( struct kevent & ev )
 	{
 		this->deregister_timer();
 		char buf[1024];
+
 		bytes_read = read( this->_pipefd[READ], buf, sizeof( buf ) );
 		while ( bytes_read > 0 )
 		{
-			std::cout << "bytes: "<< bytes_read << "buf:"<< buf << std::endl;
 			buffer.append( buf, bytes_read );
 			bytes_read = read( this->_pipefd[READ], buf, sizeof( buf ) );
 		}
@@ -196,7 +193,7 @@ CGI::execute ( void )
 		this->_http.setStatusCode( NOT_FOUND );
 		return ( EXIT_FAILURE );
     }
-    if ( pipe( _pipefd ) == -1 )
+    if ( pipe( this->_pipefd ) == -1 )
 	{
         ERROR( "pipe: " << strerror( errno ) );
 		return ( EXIT_FAILURE );
@@ -213,7 +210,7 @@ CGI::execute ( void )
 		dup2( _pipefd[WRITE], STDOUT_FILENO );
         dup2( fdopen, STDIN_FILENO );
 		close( _pipefd[WRITE] );
-        execve( cgi.c_str() , NULL, (char * const *)env );
+        execve( cgi.c_str() , NULL, (char * const *) env );
 		ERROR( cgi << ": " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
     }

@@ -150,8 +150,6 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_FAILURE );
 	}
 
-	// TODO: this goes into parse_request
-	//LOG_BUFFER( this->_buffer_recv, GREEN );
 	LOG( this->_request.method->method << ' '
 			<< std::hex << this->_request.http_version << ' '
 			<< std::dec << this->_request.target );
@@ -160,14 +158,13 @@ HTTP::request_recv ( int64_t data )
 	this->_server = this->_router.getServer( this->_request.host,
 			this->_connection.getHost(), this->_connection.getPort() );
 
-	// TODO: filtrar allowed methods
 	// if its an http redirection
 	// lcoation block en el compose
 	// append location root change if it fits location the target
 
 	this->_request.file = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
-	if ( ! location.empty() )
+	if ( ! location.empty() && location[0] != '*' )
 	{
 		std::string root_location = this->_server.getRoot( location );
 		root_location.append( "/" );
@@ -179,7 +176,10 @@ HTTP::request_recv ( int64_t data )
 		root_location.append( "/" );
 		this->_request.file.replace( 0, 1, root_location );
 	}
+	if ( this->_request.file.back() == '/' )
+		this->check_index();
 	stat( this->_request.file.c_str(), &this->_request.file_info );
+	
 	std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
 	if (iter != _request_headers.end()) {
 			if (iter->second == "chunked")
@@ -210,7 +210,7 @@ HTTP::request_recv ( int64_t data )
 int
 HTTP::compute_response ( void )
 {
-	DEBUG( this->_socket_fd << "target: " << this->_request.target );
+	DEBUG( "target=" << this->_request.target );
 	if ( this->_server.getFlag( this->_request.method->code,
 				this->_request.target ) == false )
 		this->_status_code = METHOD_NOT_ALLOWED;
@@ -318,29 +318,22 @@ HTTP::load_file( HTTP & http, std::string target )
 int 
 HTTP::check_index ( void )
 {
-	const std::vector< std::string > & vec = this->_server.getIndex();
+	const std::vector< std::string > & vec = this->_server.getIndex( this->_request.target );
+	std::string	temp;
 
 	DEBUG( "" );
 	for ( std::vector< std::string >::const_iterator it = vec.begin();
 			it != vec.end(); ++it )
 	{
-		std::string tempTarget = this->_request.target;
-		char lastChar = tempTarget.at( tempTarget.size() - 1 );
-		if ( lastChar != '/' )
-		{
-			tempTarget.append( "/" );
-		}
-		tempTarget.append( *it );
-		if ( routeExists( tempTarget ) )
+		temp = this->_request.file;
+		if ( temp.back() != '/' )
+			temp.append( "/" );
+		temp.append( *it );
+		if ( routeExists( temp ) )
 		{
 			this->_request.target.append( "/" );
-			this->_request.target.append( *it );
-			LOG( "route exists" << this->_request.target );
+			this->_request.file.append( *it );
 			return ( OK );
-		}
-		else
-		{
-			tempTarget.clear();
 		}
 	}
 	return ( FORBIDDEN );

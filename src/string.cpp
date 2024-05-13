@@ -171,15 +171,19 @@ get_word ( const std::string & str, std::string delimiter )
 bool
 compare_file_extension( const std::string & a, const std::string & b )
 {
-	std::string::size_type position, extension_length;
+	std::string::size_type position;
+	std::string ext_a, ext_b;
 
-	if ( how_many_characters_of(  a, '.' ) == 0 || a.empty() || b.empty() )
+	if ( a.empty() || b.empty() )
+		return ( false );
+	if ( how_many_characters_of( a, '.' ) == 0
+			|| how_many_characters_of( b, '.' ) == 0 )
 		return ( false );
 	position = a.find_last_of( "." );
-	extension_length = a.length() - position;
-	if ( a.compare( a.length() - extension_length,
-				extension_length, b, b.length() - extension_length,
-				extension_length ) == 0 )
+	ext_a = a.substr( position, std::string::npos );
+	position = b.find_last_of( "." );
+	ext_b = b.substr( position, std::string::npos );
+	if ( ext_a == ext_b )
 		return ( true );
 	return ( false );
 }
