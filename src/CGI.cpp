@@ -148,7 +148,6 @@ CGI::dispatch ( struct kevent & ev )
 		{
 			this->_http.setStatusCode( INTERNAL_SERVER_ERROR );
 		}
-		// this->_http.setMessageBody( buffer );
 		this->_http.compose_response();
 		delete this;
 	}
@@ -232,15 +231,20 @@ CGI::kill ( void )
 	return ;
 }
 
-int
-CGI::check_headers ( void )
+int CGI::check_headers()
 {
-	std::map< std::string, std::string > & headers = _http.getHeaders( 1 );
-	for ( std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it )
-	{
-		std::cout << "check: "<<  it->first << " : " << it->second << std::endl;
-	}
-	return ( EXIT_SUCCESS );
+    std::map<std::string, std::string>& headers = _http.getHeaders(1);
+    int flag = 0;
+    if (headers.find("status") != headers.end()) {
+        ++flag;
+    }
+    if (headers.find("content-type") != headers.end()) {
+        ++flag;
+    }
+    if (headers.find("location") != headers.end()) {
+        ++flag;
+    }
+    return (flag == 0) ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
 int
@@ -249,92 +253,48 @@ CGI::parse_headers( std::string & line )
 	std::map <std::string, std::string> mapHeaders;
 	std::string::size_type  start, pos;
 	std::string             sub_line;
-	std::string				str2;
 
 	start = 0;
 	pos = line.find_first_of( LF, start );
 	if ( pos == std::string::npos )
 		pos = line.length();
-	while ( pos != std::string::npos )
+	while (pos != std::string::npos)
 	{
-		std::cout << "line: " << line << " --------- "<< std::endl;
-		sub_line = line.substr( start, pos - start );
-		sub_line = normalize(sub_line);
-		// + passar a minuscules
-		size_t pos_point = sub_line.find(":", start);
-		if (pos_point != std::string::npos)
-		{
-			std::string str = sub_line.substr(start, pos_point);
-			if (str.compare("Status") == 0){
-				str2 = sub_line.substr(pos_point + 2, 3);
-			}
-			else
-				str2 = sub_line.substr(pos_point + 2, sub_line.length() - 1 );
-			mapHeaders[ str ] = str2;
-		}
-		else if ( sub_line.empty() || ( sub_line.length() == 1 && sub_line[0] == '\r' ) )
-		{
-			std::cout << "en el empty" << pos << line.length() << sub_line << std::endl;
-			++pos;
-			break ;
-		}
+            std::string sub_line = line.substr(start, pos - start);
+            // Trim leading and trailing whitespaces
+            sub_line = normalize(sub_line);
+			sub_line = tolower_string(sub_line);
+            size_t pos_point = sub_line.find(":");
+            if (pos_point != std::string::npos)
+			{
+                std::string str = sub_line.substr(0, pos_point);
+                std::string str2;
+                if (str.compare("Status") == 0) {
+                    str2 = sub_line.substr(pos_point + 2, 3);
+                } else {
+                    str2 = sub_line.substr(pos_point + 2);
+                }
+                str2 = normalize(str2);
+                mapHeaders[str] = str2;
+            } else if (sub_line.empty() || (sub_line.length() == 1 && sub_line[0] == '\r'))
+			{
+				if (pos + 1 != line.length() )
+				{
+					std::string body = line.substr(pos +1, line.length());
+					this->_http.setMessageBody( body );
+				}	
+				break;
+            }
 		start = pos + 1;
 		pos = line.find_first_of( LF, start );
 	}
-
 	for ( std::map<std::string, std::string>::iterator it = mapHeaders.begin();
 			it != mapHeaders.end(); ++it )
-			{
-				std::cout << "enb el map: " << it->first << ":" << it->second << std::endl;
-			}
-// 		this->_http.setResponseHeaders ( it->first, it->second );
-	std::cout <<"aaaaS" << std::endl;
+	{
+		this->_http.setResponseHeaders ( it->first, it->second );
+	}
 	return (EXIT_SUCCESS);
 }
-
-// int
-// CGI::parse_headers ( std::string & line )
-// {
-// 	std::map <std::string, std::string> mapHeaders;
-//     size_t pos_final = line.find("\n\n");
-
-//     std::string headers, body;
-//     if (pos_final != std::string::npos) {
-//         headers = line.substr(0, pos_final);
-//         body = line.substr(pos_final + 2);
-// 		this->_http.setMessageBody ( body );
-//     }
-// 	else
-// 		headers = line;
-
-// 	std::transform(headers.begin(), headers.end(), headers.begin(), ::tolower);
-// 	headers = normalize(headers);
-// 	size_t i = 0;
-//     while (i < headers.length()) {
-//         size_t pos = headers.find(":", i);
-//         if (pos != std::string::npos) {
-//             std::string str = headers.substr(i, pos - i);
-//             size_t pos_sp = headers.find(" ", pos + 2);
-//             std::string str2;
-//             if (pos_sp != std::string::npos) {
-//                 str2 = headers.substr(pos + 2, pos_sp - pos - 2);
-//             } else {
-//                 str2 = headers.substr(pos + 2);
-//             }
-//             mapHeaders[str] = str2;
-// 			std::cout << "str" << str << std::endl;
-// 			std::cout << "str2" << str2 << std::endl;
-//             i = pos_sp != std::string::npos ? pos_sp + 1 : pos + 1;
-//         } else {
-//             break;
-//         }
-//     }
-// 	// guarda els headers
-// 	for ( std::map<std::string, std::string>::iterator it = mapHeaders.begin();
-// 			it != mapHeaders.end(); ++it )
-// 		this->_http.setResponseHeaders ( it->first, it->second );
-// 	return ( EXIT_SUCCESS );
-// }
 
 static char **
 map2array ( const std::map< std::string, std::string > & envMap )

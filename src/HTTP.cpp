@@ -373,7 +373,6 @@ HTTP::setResponseHeaders ( const std::string & name,
 		const std::string & value )
 {
 	this->_response_headers[name] = value;
-	LOG( "set: " << name << "=" << value );
 	if (name == "status")
 	{
 		this->_status_code = std::atoi(value.c_str());

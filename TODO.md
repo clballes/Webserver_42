@@ -17,6 +17,6 @@
 - [ ] chunked requests (es el EOF tambe si)
 
 ## CLARA
-- [  ] mirar err pages - si no existeix no tira error, que hauriem de fer???? / ruta relativa o abs ?
 - [  ] config tests
 - [  ] upload some file to the server test
+- [ ] proper POST basic html

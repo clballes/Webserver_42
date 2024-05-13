@@ -43,6 +43,7 @@ HTTP::http_post ( HTTP & http )
 	// LOG_BUFFER ( http._buffer_recv , RED);
 	// LOG_BUFFER ( http._request.body , YELLOW);
 	// regular post, not cgi
+	generate_html( http );
 	http._status_code = OK;
 	return ( EXIT_SUCCESS );
 }
