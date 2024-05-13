@@ -13,8 +13,7 @@
 ## mpuig-ma
 - [ ] HTTP parse proper body parse
 - [ ] proper POST
-- [ ] large request, expect: 100 + content-length--
-- [ ] chunked requests (es el EOF tambe si)
+- [ ] chunked requests (es el EOF tambe si) / multipart form 
 
 ## CLARA
 - [  ] config tests

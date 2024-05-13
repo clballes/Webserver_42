@@ -8,43 +8,10 @@
 static int parse_method ( t_request &, std::string & );
 static int parse_target ( t_request &, std::string & );
 static int parse_http_version ( t_request &, std::string & );
+static int parse_body( HTTP & http, const std::string &, std::size_t );
 static std::string parse_query ( std::string & );
 static size_t how_many_methods( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
-
-void
-HTTP::handle_chunk ( const std::string & body )
-{
-	std::string::size_type pos = 0;
-    std::string::size_type chunk_length;
-
-    while (pos < body.size()) {
-        // Find the position of the next '\r\n'
-        std::string::size_type next_crlf_pos = body.find("\r\n", pos);
-        if (next_crlf_pos == std::string::npos) {
-            std::cerr << "Invalid chunked data format\n";
-            return;
-        }
-
-        std::string chunk_length_hex = body.substr(pos, next_crlf_pos - pos);
-        chunk_length = strtol(chunk_length_hex.c_str(), NULL, 16);
-
-        // Move past the '\r\n' to the start of the chunk data
-        pos = next_crlf_pos + 2;
-
-        // Extract the chunk data
-        std::string chunk_data = body.substr(pos, chunk_length);
-		//store the extracted chunks in the body requested
-		this->_request.body += chunk_data;
-        pos += chunk_length + 2;
-
-		if (chunk_length == 0)
-		{
-			std::cout << " WE ARE AT THE END OF THE LINE "<< std::endl;
-			//nose si cal afegir despres els trailer que son additional headers
-		}
-    }
-}
 
 int
 HTTP::parse ( void )
@@ -66,6 +33,8 @@ HTTP::parse ( void )
 		}
 		else if ( line.empty() || ( line.length() == 1 && line[0] == '\r' ) )
 		{
+			// Once found an empty line or containing a single CR
+			// header parsing is over.
 			++pos;
 			break ;
 		}
@@ -79,31 +48,7 @@ HTTP::parse ( void )
 		start = pos + 1;
 		pos = this->_buffer_recv.find_first_of( LF, start );
 	}
-
-	// TODO: byte control from "content-length"
-	// chunked request
-	// We return if the method does not require to read
-	// the contents of a potential message body.
-	// if ( this->_request.method->code != HTTP_POST
-	// 		&& this->_request.method->code != HTTP_PUT )
-	// 	return ( EXIT_SUCCESS );
-	if ( pos != std::string::npos && (pos < this->_buffer_recv.length() - 1) )
-	{
-		this->_request.body = this->_buffer_recv.substr( pos );
-		std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
-		if (iter != _request_headers.end()) {
-			if (iter->second == "chunked") {
-				//li sumo 4 perque em tregui el 3f
-				std::string body = this->_buffer_recv.substr( pos + 4 );
-				std::cout << "hay chunks" << std::endl;
-				handle_chunk( body );
-			}
-			else
-				std::cout << "request not supported!!" << std::endl;
-		}
-		return EXIT_SUCCESS;
-	}
-	return EXIT_SUCCESS;
+	return ( parse_body( *this, this->_buffer_recv, pos ) );
 }
 
 // From RFT9112:
@@ -274,6 +219,77 @@ HTTP::parse_field_line ( std::string & line )
 	}
 	this->_request_headers.insert( this->_request_headers.end(),
 			std::pair< std::string, std::string> ( field_name, field_value ) );
+	return ( EXIT_SUCCESS );
+}
+
+static int handle_chunk ( std::string & );
+
+static int
+parse_body ( HTTP & http, const std::string & buffer, size_t pos )
+{
+	const t_headers &	headers = http.getHeaders();
+	t_request &			request = http.getRequest();
+	std::size_t			len;
+	
+	len = 0;
+	if ( pos >= buffer.length() )
+		return ( EXIT_SUCCESS );
+	if ( headers.find( "content-length" ) != headers.end() )
+	{
+		len = std::atoi( headers.at( "content-length" ).c_str() );
+		request.body.assign( buffer.c_str(), pos, len );
+	}
+	if ( headers.find( "transfer-encoding" ) != headers.end() )
+	{
+		request.body.assign( buffer.c_str(), pos, std::string::npos );
+		if ( headers.at( "transfer-encoding" ) == "chunked" )
+		{
+			handle_chunk( request.body );
+			return ( EXIT_SUCCESS );
+		}
+	}
+	return ( EXIT_SUCCESS );
+}
+
+static int
+handle_chunk ( std::string & body )
+{
+	std::string::size_type	pos;
+    std::string::size_type	chunk_length;
+
+	// TODO: unchunk chunked request
+	(void) pos; (void) chunk_length; (void) body;
+	/*
+	pos = 0;
+    while ( pos < body.size() )
+	{
+        // Find the position of the next '\r\n'
+        std::string::size_type next_crlf_pos = body.find( "\r\n", pos );
+        if ( next_crlf_pos == std::string::npos )
+		{
+            ERROR( "Invalid chunked data format" );
+            return ( EXIT_FAILURE );
+        }
+
+        std::string chunk_length_hex = body.substr( pos, next_crlf_pos - pos );
+        chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
+
+        // Move past the '\r\n' to the start of the chunk data
+        pos = next_crlf_pos + 2;
+
+        // Extract the chunk data
+        std::string chunk_data = body.substr( pos, chunk_length );
+		//store the extracted chunks in the body requested
+		body += chunk_data;
+        pos += chunk_length + 2;
+
+		if ( chunk_length == 0 )
+		{
+			LOG( " WE ARE AT THE END OF THE LINE " );
+			//nose si cal afegir despres els trailer que son additional headers
+		}
+    }
+	*/
 	return ( EXIT_SUCCESS );
 }
 

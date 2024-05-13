@@ -99,7 +99,7 @@ class HTTP: public IEvent
 		std::string				_message_body;
 		t_request				_request;
 		bool					_keep_alive;
-		bool					_chunk_request;
+		bool					_expect;
 
 		int parse ( void );
 		int parse_start_line ( std::string & );
@@ -111,7 +111,6 @@ class HTTP: public IEvent
 		static int http_put ( HTTP & );
 		static int http_delete ( HTTP & );
 		static int autoindex ( HTTP & );
-		void handle_chunk( const std::string & );
 };
 
 #endif /* !_HTTP_HPP_ */
