@@ -72,7 +72,7 @@ class HTTP: public IEvent
 
 		Server & getServer();
 		t_request & getRequest( void );
-		t_headers & getHeaders( void );
+		t_headers & getHeaders( int flag );
 		
 		void setMessageBody( const std::string & );
 		void setStatusCode( int );

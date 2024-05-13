@@ -37,6 +37,7 @@ class CGI : public IEvent
 		void kill ( void );
 		int parse_headers ( std::string & );
 		void setmap ( void );
+		int check_headers (void );
 
 	protected:
 

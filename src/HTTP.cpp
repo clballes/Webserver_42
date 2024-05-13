@@ -352,9 +352,12 @@ HTTP::getRequest ( void )
 }
 
 t_headers &
-HTTP::getHeaders ( void )
+HTTP::getHeaders ( int flag )
 {
-	return ( this->_request_headers );
+	if ( flag == 0)
+		return ( this->_request_headers );
+	else
+		return ( this->_response_headers );
 }
 
 void
@@ -370,6 +373,10 @@ HTTP::setResponseHeaders ( const std::string & name,
 {
 	this->_response_headers[name] = value;
 	LOG( "set: " << name << "=" << value );
+	if (name == "status")
+	{
+		this->_status_code = std::atoi(value.c_str());
+	}
 	return ;
 }
 

@@ -11,14 +11,12 @@
 - [ ] test: multiple (lots of) servers
 
 ## mpuig-ma
-- [ ] HTTP\_parse proper body parse
+- [ ] HTTP parse proper body parse
 - [ ] proper POST
 - [ ] large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)
 
 ## CLARA
-- [ ] mirar err pages
-- [ ] config tests
-- [ ] upload some file to the server test
-- [ ] headers CGI acabar parsing - fer per dilluns
-- [ ] quan no acaba en punt coma en el config, posa error nye
+- [  ] mirar err pages - si no existeix no tira error, que hauriem de fer???? / ruta relativa o abs ?
+- [  ] config tests
+- [  ] upload some file to the server test

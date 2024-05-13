@@ -31,7 +31,7 @@ CGI::~CGI ( void )
 void
 CGI::setmap ( void )
 {
-	std::map< std::string, std::string > & headers = _http.getHeaders();
+	std::map< std::string, std::string > & headers = _http.getHeaders( 0 );
 	const t_request & request = this->_http.getRequest();
 	const std::string & cgi_pass = this->_server.getCGIpass( request.target );
 	
@@ -48,9 +48,6 @@ CGI::setmap ( void )
 	this->_envMap["CONTENT_TYPE"] = headers["content-type"];
 	if ( !request.body.empty() )
 		this->_envMap["CONTENT_LENGTH"] = my_to_string( request.body.length() );
-	// TODO: scriptname i filename mirar del tot
-	//this->_envMap["SCRIPT_NAME"] = request.file;
-	//this->_envMap["SCRIPT_FILENAME"] = request.file;
 	this->_envMap["PATH_INFO"] = cgi_pass;
 	this->_envMap["PATH_TRANSLATED"] = cgi_pass;
 	this->_envMap["REQUEST_URI"] =  cgi_pass + request.query;
@@ -147,7 +144,11 @@ CGI::dispatch ( struct kevent & ev )
 		{
 			this->_http.setStatusCode( BAD_GATEWAY );
 		}
-		this->_http.setMessageBody( buffer );
+		if ( check_headers() == EXIT_FAILURE )
+		{
+			this->_http.setStatusCode( INTERNAL_SERVER_ERROR );
+		}
+		// this->_http.setMessageBody( buffer );
 		this->_http.compose_response();
 		delete this;
 	}
@@ -232,47 +233,65 @@ CGI::kill ( void )
 }
 
 int
-CGI::parse_headers ( std::string & line )
+CGI::check_headers ( void )
 {
-	std::map <std::string, std::string> mapHeaders;
-    size_t pos_final = line.find("\n\n");
-
-    // Separate headers and body
-    std::string headers, body;
-    if (pos_final != std::string::npos) {
-        headers = line.substr(0, pos_final);
-        body = line.substr(pos_final + 2);
-		this->_http.setMessageBody ( body );
-    }
-	else
-		headers = line;
-
-	std::transform(headers.begin(), headers.end(), headers.begin(), ::tolower);
-	headers = normalize(headers);
-	size_t i = 0;
-    while (i < headers.length()) {
-        size_t pos = headers.find(":", i);
-        if (pos != std::string::npos) {
-            std::string str = headers.substr(i, pos - i);
-            size_t pos_sp = headers.find(" ", pos + 2);
-            std::string str2;
-            if (pos_sp != std::string::npos) {
-                str2 = headers.substr(pos + 2, pos_sp - pos - 2);
-            } else {
-                str2 = headers.substr(pos + 2);
-            }
-            mapHeaders[str] = str2;
-            i = pos_sp != std::string::npos ? pos_sp + 1 : pos + 1;
-        } else {
-            break;
-        }
-    }
-	for ( std::map<std::string, std::string>::iterator it = mapHeaders.begin();
-			it != mapHeaders.end(); ++it )
-		this->_http.setResponseHeaders ( it->first, it->second );
+	std::map< std::string, std::string > & headers = _http.getHeaders( 1 );
+	for ( std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it )
+	{
+		std::cout << "check: "<<  it->first << " : " << it->second << std::endl;
+	}
 	return ( EXIT_SUCCESS );
-
 }
+
+int
+CGI::parse_headers( std::string & line )
+{
+	
+}
+
+// int
+// CGI::parse_headers ( std::string & line )
+// {
+// 	std::map <std::string, std::string> mapHeaders;
+//     size_t pos_final = line.find("\n\n");
+
+//     std::string headers, body;
+//     if (pos_final != std::string::npos) {
+//         headers = line.substr(0, pos_final);
+//         body = line.substr(pos_final + 2);
+// 		this->_http.setMessageBody ( body );
+//     }
+// 	else
+// 		headers = line;
+
+// 	std::transform(headers.begin(), headers.end(), headers.begin(), ::tolower);
+// 	headers = normalize(headers);
+// 	size_t i = 0;
+//     while (i < headers.length()) {
+//         size_t pos = headers.find(":", i);
+//         if (pos != std::string::npos) {
+//             std::string str = headers.substr(i, pos - i);
+//             size_t pos_sp = headers.find(" ", pos + 2);
+//             std::string str2;
+//             if (pos_sp != std::string::npos) {
+//                 str2 = headers.substr(pos + 2, pos_sp - pos - 2);
+//             } else {
+//                 str2 = headers.substr(pos + 2);
+//             }
+//             mapHeaders[str] = str2;
+// 			std::cout << "str" << str << std::endl;
+// 			std::cout << "str2" << str2 << std::endl;
+//             i = pos_sp != std::string::npos ? pos_sp + 1 : pos + 1;
+//         } else {
+//             break;
+//         }
+//     }
+// 	// guarda els headers
+// 	for ( std::map<std::string, std::string>::iterator it = mapHeaders.begin();
+// 			it != mapHeaders.end(); ++it )
+// 		this->_http.setResponseHeaders ( it->first, it->second );
+// 	return ( EXIT_SUCCESS );
+// }
 
 static char **
 map2array ( const std::map< std::string, std::string > & envMap )
