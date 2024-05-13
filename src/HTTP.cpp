@@ -99,9 +99,7 @@ HTTP::request_recv ( int64_t data )
 {
 	ssize_t n;
 
-	DEBUG( "fd=" << this->_socket_fd << " bytes=" << data );	
-	this->_buffer_recv.resize( data + 1 );
-	this->_buffer_recv.back() = '\0';
+	this->_buffer_recv.resize( data );
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 	if ( n == -1 )
 	{
@@ -118,6 +116,7 @@ HTTP::request_recv ( int64_t data )
 
 	// this is not really chunk request
 	// this is multipart/form-data
+	// or could be both
 	if ( this->_chunk_request == true )
 	{
 		LOG_BUFFER( this->_buffer_recv, GREEN );

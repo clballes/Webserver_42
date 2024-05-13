@@ -11,10 +11,8 @@
 - [ ] test: multiple (lots of) servers
 
 ## mpuig-ma
-- [ ] HTTP\_parse proper body parse
 - [ ] proper POST
-- [ ] large request, expect: 100 + content-length--
-- [ ] chunked requests (es el EOF tambe si)
+- [ ] chunked requests (es el EOF tambe si) / multipart form 
 
 ## CLARA
 - [ ] mirar err pages
