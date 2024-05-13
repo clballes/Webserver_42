@@ -17,7 +17,8 @@ Server::Server ( void ): _good( true )
 	this->_error_pages[500] = "src/err_pages/500.html";
 	// in nginx the default value for client_max is 1MB, then 1,048,576bytes
 	this->_routes[""].setDefault();
-	this->_routes[""].setRoot( "html" );
+	this->getDefaultRoute().setRoot( "/html" );
+	this->getDefaultRoute().setFlag( F_AUTOINDEX, false );
 	return ;
 }
 
@@ -57,7 +58,6 @@ Server::getRoute ( const std::string & location ) const
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		LOG( "cmp_str=" << cmp_str );
 		if ( cmp_str[0] == '*' )
 		{
 			cmp_str.erase( 0, 1 );
@@ -275,12 +275,6 @@ Server::setClientMaxBodySize ( const std::string & arg, std::string location )
 	return ( this->getRoute( location ).setClientMaxBodySize( arg ) );
 }
 
-// int
-// Server::setCGIparam ( const std::string & arg, std::string location )
-// {
-// 	return ( this->getRoute( location ).setCGIparam( arg ) );
-// }
-
 int
 Server::setCGIpass ( const std::string & arg, std::string location )
 {
@@ -346,6 +340,8 @@ Server::setRedirection ( const std::string & arg, std::string location )
 int
 Server::check ( void )
 {
+	if ( this->_server_name.empty() == true )
+		this->_server_name.push_back( "" );
 	if ( this->getPort() == 0 && this->getHost() == 0
 			&& this->_address.sin_family == 0 )
 	{
@@ -393,9 +389,9 @@ Server::log_conf ( void ) const
 		LOG( " isDefault=" << it->second.isDefault() );
 		LOG( " flags=" << std::hex << it->second.getFlags() << std::dec );
 		LOG( " cgi_pass=" << it->second.getCGIpass() );
-		LOG( " Redirection=" << it->second.getRedirection().first
+		LOG( " redirection=" << it->second.getRedirection().first
 				<< " " << it->second.getRedirection().second );
-		LOG(" Client max body size=" << it->second.getClientMaxBodySize() );
+		LOG(" client_max_body_size=" << it->second.getClientMaxBodySize() );
 		for ( std::vector< std::string >::const_iterator index_it = it->second.getIndex().begin();
 				index_it != it->second.getIndex().end(); ++index_it )
 			LOG( " index=" << *index_it );

@@ -11,10 +11,7 @@
 - [ ] test: multiple (lots of) servers
 
 ## mpuig-ma
-
-- [ ] compare server blocks so there are no repetitions
 - [ ] HTTP\_parse proper body parse
-
 - [ ] proper POST
 - [ ] large request, expect: 100 + content-length--
 - [ ] chunked requests (es el EOF tambe si)

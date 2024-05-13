@@ -167,7 +167,7 @@ Location::setRoot ( const std::string & arg )
 	// TODO: validate
 	std::string mod_arg( arg );
 
-	while ( mod_arg.back() == '/' )
+	while ( mod_arg.size() > 1 && mod_arg.back() == '/' )
 		mod_arg.erase( mod_arg.length() - 1, 1 );
 	this->_root.assign( mod_arg );
 	return ( EXIT_SUCCESS );
