@@ -57,22 +57,23 @@ Server::getRoute ( const std::string & location ) const
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( cmp_str[0] != '*' )
-		{
-			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
-				return ( const_cast< Location & >( it->second ) );
-		}
-		else
+		LOG( "cmp_str=" << cmp_str );
+		if ( cmp_str[0] == '*' )
 		{
 			cmp_str.erase( 0, 1 );
 			if ( cmp_str.length() > 1 && cmp_str.back() == '/' )
 				cmp_str.erase( cmp_str.length() - 1, 1 );
 			if ( compare_file_extension( target, cmp_str ) == true )
-			{
-				LOG( "ext=" << cmp_str << " match" );
 				return ( const_cast< Location & >( it->second ) );
-			}
 		}
+		++it;
+	}
+	it = this->_routes.begin();
+	while ( it != this->_routes.end() )
+	{
+		cmp_str.assign( it->first );
+		if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
+			return ( const_cast< Location & >( it->second ) );
 		++it;
 	}
 	return ( getDefaultRoute() );
@@ -109,17 +110,20 @@ Server::getRouteString ( const std::string & location ) const
 	while ( it != this->_routes.end() )
 	{
 		cmp_str.assign( it->first );
-		if ( cmp_str[0] != '*' )
-		{
-			if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
-				return ( const_cast< std::string & >( it->first ) );
-		}
-		else
+		if ( cmp_str[0] == '*' )
 		{
 			cmp_str.erase( 0, 1 );
 			if ( compare_file_extension( target, cmp_str ) == true )
 				return ( const_cast< std::string & >( it->first ) );
 		}
+		++it;
+	}
+	it = this->_routes.begin();
+	while ( it != this->_routes.end() )
+	{
+		cmp_str.assign( it->first );
+		if ( target.compare( 0, cmp_str.length(), cmp_str ) == 0 )
+			return ( const_cast< std::string & >( it->first ) );
 		++it;
 	}
 	--it;
