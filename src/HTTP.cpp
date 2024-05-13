@@ -357,6 +357,7 @@ HTTP::getHeaders ( int flag )
 	if ( flag == 0)
 		return ( this->_request_headers );
 	else
+		
 		return ( this->_response_headers );
 }
 
