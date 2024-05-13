@@ -23,7 +23,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_connection( router_instance.getConnection( fd ) ),
 	_server( router_instance.getDefaultServer() ),
 	_cgi_ptr( NULL ),
-	_chunk_request( false )
+	_expect( false )
 {
 	this->_request.method = 0x0;
 	std::memset( &this->_request.file_info, 0,
@@ -114,26 +114,18 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_SUCCESS );
 	}
 
-	// this is not really chunk request
-	// this is multipart/form-data
-	// or could be both
-	if ( this->_chunk_request == true )
+	if ( this->_expect == true )
 	{
-		LOG_BUFFER( this->_buffer_recv, GREEN );
-		this->_chunk_request = false;
-		std::cout << "AAAAAAA chunekde:"<< this->_request.body << " b "<<this->_request.body.length() <<  std::endl;
 		this->_request.body.append( this->_buffer_recv );
-		std::cout << "AAAAAAA chunekde:"<< this->_request.body << " b "<<this->_request.body.length() <<  std::endl;
-		return ( this->compute_response() );
-		return ( EXIT_SUCCESS );
-	}
+		this->_expect = false;
 
-	if ( this->parse() == EXIT_FAILURE )
+	}
+	else if ( this->parse() == EXIT_FAILURE )
 	{
-		LOG_BUFFER( this->_buffer_recv, RED );
 		WARN( "HTTP request does not comply with HTTP/1.x specification." );
 		this->_buffer_recv.clear();
 		this->setStatusCode( NOT_IMPLEMENTED );
+		// or this->setStatusCode( BAD_REQUEST );
 		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
@@ -148,9 +140,6 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_FAILURE );
 	}
 
-	LOG( this->_request.method->method << ' '
-			<< std::hex << this->_request.http_version << ' '
-			<< std::dec << this->_request.target );
 	if ( this->_request_headers.find( "host" ) != this->_request_headers.end() )
 		this->_request.host = this->_request_headers["host"];
 	this->_server = this->_router.getServer( this->_request.host,
@@ -177,27 +166,15 @@ HTTP::request_recv ( int64_t data )
 	if ( this->_request.file.back() == '/' )
 		this->check_index();
 	stat( this->_request.file.c_str(), &this->_request.file_info );
-	
-	std::map<std::string, std::string>::iterator iter = _request_headers.find("transfer-encoding");
-	if (iter != _request_headers.end()) {
-			if (iter->second == "chunked")
-			{
-				std::cout << "HAY CHUNKSSSSSS" << std::endl;
-				this->_chunk_request = true;
-				return ( EXIT_SUCCESS );
-				// this->_chunk_request = true;
-				// //li sumo 4 perque em tregui el 3f
-				// std::string body = this->_buffer_recv.substr( pos + 4 );
-				// std::cout << "hay chunks" << std::endl;
-				// handle_chunk( body );
-			}
-	}
-	if ( ! this->_request_headers["expect"].empty())
+
+	if ( this->_request_headers.find( "expect" ) != this->_request_headers.end()
+			&& this->_request_headers.at( "expect" ).empty() == false )
 	{
-		// handle chunk
-		this->_chunk_request = true;
+		this->_expect = true;
 		return ( EXIT_SUCCESS );
 	}
+	else
+		this->_expect = false;
 	
 	return ( this->compute_response() );
 }

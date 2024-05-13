@@ -239,7 +239,7 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 		len = std::atoi( headers.at( "content-length" ).c_str() );
 		request.body.assign( buffer.c_str(), pos, len );
 	}
-	else if ( headers.find( "transfer-encoding" ) != headers.end() )
+	if ( headers.find( "transfer-encoding" ) != headers.end() )
 	{
 		request.body.assign( buffer.c_str(), pos, std::string::npos );
 		if ( headers.at( "transfer-encoding" ) == "chunked" )

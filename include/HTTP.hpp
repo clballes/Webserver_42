@@ -99,7 +99,7 @@ class HTTP: public IEvent
 		std::string				_message_body;
 		t_request				_request;
 		bool					_keep_alive;
-		bool					_chunk_request;
+		bool					_expect;
 
 		int parse ( void );
 		int parse_start_line ( std::string & );
