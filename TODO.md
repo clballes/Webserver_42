@@ -18,4 +18,5 @@
 ## CLARA
 - [  ] config tests
 - [  ] upload some file to the server test
-- [ ] proper POST basic html
+- [ x ] POST basic html & parsing
+- [ ] chunked requests (es el EOF tambe si) / multipart form 

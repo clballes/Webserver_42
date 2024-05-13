@@ -223,11 +223,12 @@ HTTP::parse_field_line ( std::string & line )
 }
 
 static int handle_chunk ( std::string & );
+// static int handle_chunk2 ( std::string & );
 
 static int
 parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 {
-	const t_headers &	headers = http.getHeaders();
+	const t_headers &	headers = http.getHeaders( 0 );
 	t_request &			request = http.getRequest();
 	std::size_t			len;
 	
@@ -251,7 +252,42 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 	return ( EXIT_SUCCESS );
 }
 
-static int
+int
+HTTP::handle_chunk_expect ( HTTP & http )
+{
+	std::string::size_type	pos;
+	std::string body = http._request.body;
+	std::string body_temp;
+    std::string::size_type	chunk_length;
+
+	pos = 0;
+    while ( pos < body.size() )
+	{
+        std::string::size_type next_crlf_pos = body.find( "\r\n", pos );
+        if ( next_crlf_pos == std::string::npos )
+		{
+            ERROR( "Invalid chunked data format" );
+            return ( EXIT_FAILURE );
+        }
+        std::string chunk_length_hex = body.substr( pos, next_crlf_pos - pos );
+        chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
+        pos = next_crlf_pos + 2;
+        std::string chunk_data = body.substr( pos, chunk_length );
+		body_temp += chunk_data;
+        pos += chunk_length + 2;
+		if ( chunk_length == 0 )
+		{
+			http._request.body.clear();
+			// perque meessage body en la repsonseee?? per fer el compose pero nye
+			http._message_body = body_temp;
+			http.compose_response();
+		}
+    }
+	return ( EXIT_SUCCESS );
+}
+
+
+int
 handle_chunk ( std::string & body )
 {
 	std::string::size_type	pos;
@@ -259,37 +295,34 @@ handle_chunk ( std::string & body )
 
 	// TODO: unchunk chunked request
 	(void) pos; (void) chunk_length; (void) body;
-	/*
-	pos = 0;
-    while ( pos < body.size() )
-	{
-        // Find the position of the next '\r\n'
-        std::string::size_type next_crlf_pos = body.find( "\r\n", pos );
-        if ( next_crlf_pos == std::string::npos )
-		{
-            ERROR( "Invalid chunked data format" );
-            return ( EXIT_FAILURE );
-        }
+	// pos = 0;
+    // while ( pos < body.size() )
+	// {
+    //     // Find the position of the next '\r\n'
+    //     std::string::size_type next_crlf_pos = body.find( "\r\n", pos );
+    //     if ( next_crlf_pos == std::string::npos )
+	// 	{
+    //         ERROR( "Invalid chunked data format" );
+    //         return ( EXIT_FAILURE );
+    //     }
 
-        std::string chunk_length_hex = body.substr( pos, next_crlf_pos - pos );
-        chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
+    //     std::string chunk_length_hex = body.substr( pos, next_crlf_pos - pos );
+    //     chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
 
-        // Move past the '\r\n' to the start of the chunk data
-        pos = next_crlf_pos + 2;
+    //     // Move past the '\r\n' to the start of the chunk data
+    //     pos = next_crlf_pos + 2;
 
-        // Extract the chunk data
-        std::string chunk_data = body.substr( pos, chunk_length );
-		//store the extracted chunks in the body requested
-		body += chunk_data;
-        pos += chunk_length + 2;
-
-		if ( chunk_length == 0 )
-		{
-			LOG( " WE ARE AT THE END OF THE LINE " );
-			//nose si cal afegir despres els trailer que son additional headers
-		}
-    }
-	*/
+    //     // Extract the chunk data
+    //     std::string chunk_data = body.substr( pos, chunk_length );
+	// 	//store the extracted chunks in the body requested
+	// 	body += chunk_data;
+    //     pos += chunk_length + 2;
+	// 	if ( chunk_length == 0 )
+	// 	{
+	// 		LOG( " WE ARE AT THE END OF THE LINE " );
+	// 		//nose si cal afegir despres els trailer que son additional headers
+	// 	}
+    // }
 	return ( EXIT_SUCCESS );
 }
 

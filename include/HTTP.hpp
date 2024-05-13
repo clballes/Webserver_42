@@ -80,6 +80,7 @@ class HTTP: public IEvent
 		
 		static int load_file ( HTTP &, std::string );
 		static t_http_method methods[];
+		static int handle_chunk_expect ( HTTP & http  );
 
 	private:
 

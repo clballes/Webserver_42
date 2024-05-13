@@ -116,8 +116,13 @@ HTTP::request_recv ( int64_t data )
 
 	if ( this->_expect == true )
 	{
+		std::cout << "entro en el expect" << std::endl;
 		this->_request.body.append( this->_buffer_recv );
+		// std::cout << "body:"<<  this->_request.body << std::endl;
 		this->_expect = false;
+		// std::cout << "body:"<< std::endl;
+
+		handle_chunk_expect( *this );
 
 	}
 	else if ( this->parse() == EXIT_FAILURE )
@@ -129,7 +134,7 @@ HTTP::request_recv ( int64_t data )
 		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
-	LOG_BUFFER (this->_buffer_recv, RED);
+	// LOG_BUFFER (this->_buffer_recv, RED);
 
 	// limit client size max body check
 	// && Setting size to 0 disables checking of client request body size.
@@ -235,8 +240,8 @@ HTTP::compose_response ( void )
 	// Add [message body] if any.
 	this->_buffer_send.append( this->_message_body );
 	this->_message_body.clear();
-
-	this->request_send();
+	
+	// this->request_send();
 	return ( EXIT_SUCCESS );
 }
 

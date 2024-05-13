@@ -42,7 +42,7 @@ HTTP::http_post ( HTTP & http )
 	LOG( http._request_headers["content-type"] );
 	// LOG_BUFFER ( http._buffer_recv , RED);
 	// LOG_BUFFER ( http._request.body , YELLOW);
-	// regular post, not cgi
+	// regular post, not cgi, sempre torna exit success
 	generate_html( http );
 	http._status_code = OK;
 	return ( EXIT_SUCCESS );
