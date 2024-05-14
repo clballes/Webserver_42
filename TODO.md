@@ -9,8 +9,12 @@
 - [ ] test: HTTP methods with wrong directory control ( . .. )
 - [ ] test: config
 - [ ] test: multiple (lots of) servers
+- [ ] test: chunked requests
+- [ ] test: post (multiform)
+- [ ] test: expect: 100-continue header
+- [ ] test: chunk request with more than 3 requests/connection
+- [ ] test: multipart-form with more than 3 requests/connection
 
-- [x] puyma: HTTP parse proper body parse
 - [ ] puyma: chunked requests (es el EOF tambe si) / multipart form 
 
 - [ ] clballes: config tests
