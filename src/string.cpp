@@ -100,7 +100,7 @@ urldecode ( std::string & url )
 	while ( pos != std::string::npos )
 	{
 		if ( pos + 2 >= url.length() )
-			LOG( "SHOULD ABORT" );
+			break ;
 		num = url.substr( pos + 1, 2 );
 		n = std::stoi( num, 0, 16 );
 		url.replace( pos, 3, sizeof( char ), static_cast<char>( n ) );
@@ -166,6 +166,30 @@ get_word ( const std::string & str, std::string delimiter )
 	if ( str.find_first_of( delimiter ) != std::string::npos )
 		word.assign( str.substr( 0, str.find_first_of( delimiter ) ) );
 	return ( word );
+}
+
+int
+unchunk ( const std::string & src, std::string & dst )
+{
+	std::string::size_type	pos, next_crlf_pos, chunk_length;
+	std::string				temp, chunk_length_hex;
+
+	pos = 0;
+	while ( pos < src.length() )
+	{
+		next_crlf_pos = src.find( "\r\n", pos );
+		if ( next_crlf_pos == std::string::npos )
+			return ( EXIT_FAILURE );
+		chunk_length_hex = src.substr( pos, next_crlf_pos - pos );
+		chunk_length = std::strtol( chunk_length_hex.c_str(), NULL, 16 );
+		pos = next_crlf_pos + 2;
+		temp.append( src.substr( pos, chunk_length ) );
+		pos += chunk_length + 2;
+		if ( chunk_length == 0 )
+			break ;
+	}
+	dst.append( temp );
+	return ( EXIT_SUCCESS );
 }
 
 bool

@@ -6,7 +6,18 @@
 #pragma once
 
 #include <string>
-#include "log.hpp"
+
+#ifndef LF
+#define LF					012
+#endif
+
+#ifndef CR
+#define CR					015
+#endif
+
+#ifndef SP
+#define SP 					040
+#endif
 
 std::string & normalize ( std::string & );
 std::string & trim_comments ( std::string &, const char * );
@@ -22,5 +33,7 @@ std::string & strtolower ( std::string & );
 std::size_t how_many_words ( const std::string & );
 std::size_t how_many_characters_of ( const std::string & str, char c );
 std::string get_word ( const std::string &, std::string delimiter );
+
+int unchunk ( const std::string &, std::string & );
 
 bool compare_file_extension( const std::string & a, const std::string & b );
