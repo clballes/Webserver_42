@@ -47,17 +47,31 @@ template std::string my_to_string< int > ( const int & );
 template std::string my_to_string< unsigned long > ( const unsigned long & );
 template std::string my_to_string< unsigned short > ( const unsigned short & );
 
-std::string tolower_string(const std::string& str)
+int
+load_file ( std::string & message_body, const std::string & target )
 {
-    // Convert string to lowercase
-    std::string result = str;
-    for (size_t i = 0; i < result.length(); ++i) {
-        result[i] = std::tolower(result[i]);
-    }
-    return result;
+	std::ifstream file;
+	std::ifstream::pos_type pos;
+
+	file.open( target, std::ios::in | std::ios::binary | std::ios::ate );
+	if ( file.good() == true && file.eof() == false )
+	{
+		// TODO: sanity checks
+		pos = file.tellg();
+		file.seekg( 0, std::ios::beg );
+		message_body.resize( pos );
+		file.read( (char *) message_body.data(), pos );
+	}
+	if ( file.good() == false )
+	{
+		WARN( target << ": " << std::strerror( errno ) );
+		return ( FORBIDDEN );
+	}
+	return ( OK );
 }
 
-std::vector<std::pair<std::string, std::string> > parse_string(const std::string& input)
+static std::vector< std::pair< std::string, std::string > >
+parse_string( const std::string & input )
 {
     std::vector<std::pair<std::string, std::string> > result;
     std::istringstream iss(input);
@@ -70,12 +84,11 @@ std::vector<std::pair<std::string, std::string> > parse_string(const std::string
             result.push_back(std::make_pair(key, value));
         }
     }
-    return result;
+    return ( result );
 }
 
-
-
-int generate_html( HTTP & http )
+int
+generate_html ( HTTP & http )
 {
     std::ostringstream html;
     html << "<!DOCTYPE html>\n";
