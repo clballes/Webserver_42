@@ -44,7 +44,7 @@ main ( int argc, char * const * argv, char * const * envp )
 	INFO( "verbose_level=" << _webserv_verbose_level );
 	if ( argc > 2 )
 	{
-		LOG( "usage: " << EXEC_NAME << " [configuration file]" );
+		std::cerr << "usage: " << EXEC_NAME << " [configuration file]\n";
 		return ( EXIT_FAILURE );
 	}
 	router.load( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] );
