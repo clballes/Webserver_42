@@ -27,7 +27,6 @@ HTTP::autoindex ( HTTP & http )
 	std::string directory_name;
 	DIR*        directory;
 
-	DEBUG( http._request.file );
 	directory_name = http._request.file;
 	directory = opendir( directory_name.c_str() );
 	if ( directory == NULL )

@@ -26,7 +26,6 @@ class Server
 		~Server ( void );
 		
 		bool good ( void ) const;
-		void log_conf ( void ) const;
 	
 		bool hasServerName ( std::string & ) const;
 		bool getFlag ( int, std::string = "" ) const;

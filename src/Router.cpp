@@ -33,7 +33,6 @@ Router::_opts[] =
 Router::Router ( void ): _good( true )
 {
 	IEvent::kq = ::kqueue();
-	DEBUG ( IEvent::kq );
 	if ( IEvent::kq == -1 )
 	{
 		ERROR( "kqueue: " << std::strerror( errno ) );
@@ -187,7 +186,6 @@ Router::load ( std::string filename )
 	std::string   buffer, line;
 	std::ifstream file;
 
-	DEBUG( filename.c_str() );
 	if ( is_regular_file( filename ) == false )
 	{
 		ERROR( filename << ": Is a directory" );
@@ -297,8 +295,6 @@ Router::parse( std::string & buffer )
 	}
 	if ( compare_servers( this->_servers ) == EXIT_FAILURE )
 		return ( EXIT_FAILURE );
-	for ( std::vector< Server >::const_iterator it = this->_servers.begin();
-			it != this->_servers.end(); it++ ) { LOG( "" ); it->log_conf(); } LOG( "" );
 	return ( EXIT_SUCCESS );
 }
 

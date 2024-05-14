@@ -38,7 +38,6 @@ class Location
 		const size_t & getClientMaxBodySize ( void ) const;
 		const std::string & getRoot ( void ) const;
 		const std::vector< std::string > & getIndex ( void ) const;
-		void log_conf ( void ) const;
 
 	private:
 

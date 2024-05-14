@@ -23,7 +23,6 @@ Location::~Location ( void )
 void
 Location::setDefault ( void )
 {
-	//DEBUG( "" );
 	this->_isDefault = true;
 	this->_flags = 0x11111111;
 	// in nginx the default value for client_max is 1MB, then 1,048,576bytes
@@ -88,13 +87,10 @@ Location::isDefault ( void ) const
 int
 Location::setFlag ( int flag, bool enable )
 {
-	//DEBUG( "flag=" << std::hex << flag << std::dec << " " << std::boolalpha << enable );
-	//DEBUG( std::hex << this->_flags << std::dec );
 	if ( enable == true )
 		this->_flags |= flag;
 	else
 		this->_flags ^= flag;
-	//DEBUG( std::hex << this->_flags << std::dec );
 	return ( EXIT_SUCCESS );
 }
 
@@ -198,16 +194,4 @@ Location::setRedirection ( const std::string & arg )
     std::string route = arg.substr(spacePos + 1);
 	this->_redirection = std::make_pair(statusCode, route);
 	return ( EXIT_SUCCESS );
-}
-
-void
-Location::log_conf ( void ) const
-{
-	LOG( BLUE << "root=" << this->getRoot() );
-	LOG( BLUE << "isDefault=" << this->isDefault() );
-	LOG( BLUE << "flags=" << std::hex << this->getFlags() << std::dec );
-	LOG( BLUE << "cgi_pass=" << this->getCGIpass() );
-	// LOG( BLUE << "cgi_param=" << this->getCGIparam() );
-	LOG( BLUE << "client_max_body_size=" << this->getClientMaxBodySize() );
-	return ;
 }

@@ -53,7 +53,6 @@ Server::getRoute ( const std::string & location ) const
 	std::string						target( location );
 	std::string						cmp_str;
 	
-	DEBUG( location );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -86,7 +85,6 @@ Server::getDefaultRoute ( void ) const
 {
 	t_route_map::const_iterator it;
 
-	DEBUG( "" );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -105,7 +103,6 @@ Server::getRouteString ( const std::string & location ) const
 	t_route_map::const_iterator it;
 	std::string cmp_str, target( location );
 
-	DEBUG( location );
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -135,7 +132,6 @@ Server::getFlag ( int mask, std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	bool flag = loc.getFlag( mask );
-	DEBUG( "location=\"" << location << "\" flag=" << std::boolalpha << flag );
 	return ( flag );
 }
 
@@ -144,7 +140,6 @@ Server::getFlags ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	std::size_t flags = loc.getFlags();
-	DEBUG( "location=\"" << location << "\" flags=" << std::hex << flags << std::dec );
 	return ( flags );
 }
 
@@ -153,7 +148,6 @@ Server::getClientMaxBodySize (  std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	const std::size_t & client_max_body_size = loc.getClientMaxBodySize();
-    DEBUG("location=\"" << location << "\" clientmaxbodysize=\"" << client_max_body_size << "\"");
 	return ( client_max_body_size );
 }
 
@@ -161,7 +155,6 @@ const std::pair<int, std::string> & Server::getRedirection ( std::string locatio
 {
 	const Location & loc = this->getRoute( location );
 	const std::pair<int, std::string> & redirection = loc.getRedirection();
-	DEBUG( "location=\"" << location << "\" " << "redirection=" << redirection.first << "=\""<< redirection.second << "\"" );
 	return ( redirection );
 }
 
@@ -170,7 +163,6 @@ Server::getCGIpass ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	const std::string & cgi_pass = loc.getCGIpass();
-	DEBUG( "location=\"" << location << "\" cgi_pass=\"" << cgi_pass << "\"" );
 	return ( cgi_pass );
 }
 
@@ -180,14 +172,12 @@ Server::getRoot ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
 	const std::string & root = loc.getRoot();
-	DEBUG( "location=\"" << location << "\" root=\"" << root << "\"" );
 	return ( root );
 }
 
 const std::vector< std::string > &
 Server::getServerNames ( void ) const
 {
-	DEBUG( "" );
 	return ( this->_server_name );
 }
 
@@ -196,7 +186,6 @@ Server::hasServerName ( std::string & name ) const
 {
 	std::vector< std::string >::const_iterator it;
 
-	DEBUG( name );
 	it = this->_server_name.begin();
 	while ( it != this->_server_name.end() )
 	{
@@ -210,7 +199,6 @@ Server::hasServerName ( std::string & name ) const
 const std::vector< std::string > &
 Server::getIndex ( std::string location ) const
 {
-	DEBUG( "location=" << location );
 	return ( getRoute( location ).getIndex() );
 }
 
@@ -249,7 +237,6 @@ Server::setRoute ( const std::string & location )
 		mod_location.append( "/" );
 	if ( mod_location.size() > 1 && mod_location[0] == '*' )
 		mod_location.erase( mod_location.length() - 1, 1 );
-	DEBUG( mod_location );
 	for ( t_route_map::const_iterator it = this->_routes.begin();
 			it != this->_routes.end(); ++it )
 	{
@@ -366,35 +353,4 @@ Server::check ( void )
 	}
 
 	return ( EXIT_SUCCESS );
-}
-
-void
-Server::log_conf ( void ) const 
-{
-	LOG( "Server 0x" << std::hex << this->getHost()
-			<< ":" << std::dec << this->getPort()
-			<< ", good=" << std::boolalpha << this->good() );
-	for ( std::vector< std::string >::const_iterator it = this->_server_name.begin();
-			it != this->_server_name.end(); ++it )
-		LOG( "server_name=" << *it );
-	for ( std::map< int, std::string >::const_iterator it = this->_error_pages.begin();
-			it != this->_error_pages.end(); ++it )
-		LOG( "error_page=" << it->first << "=" << it->second );
-	for ( t_route_map::const_iterator it = this->_routes.begin();
-			it != this->_routes.end(); ++it )
-	{
-		LOG( "" );
-		LOG( " Location \"" << it->first << "\"" );
-		LOG( " root=" << it->second.getRoot() );
-		LOG( " isDefault=" << it->second.isDefault() );
-		LOG( " flags=" << std::hex << it->second.getFlags() << std::dec );
-		LOG( " cgi_pass=" << it->second.getCGIpass() );
-		LOG( " redirection=" << it->second.getRedirection().first
-				<< " " << it->second.getRedirection().second );
-		LOG(" client_max_body_size=" << it->second.getClientMaxBodySize() );
-		for ( std::vector< std::string >::const_iterator index_it = it->second.getIndex().begin();
-				index_it != it->second.getIndex().end(); ++index_it )
-			LOG( " index=" << *index_it );
-	}
-	return ;
 }
