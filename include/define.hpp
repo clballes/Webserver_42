@@ -30,9 +30,17 @@
 #define HTTP_10				0x10
 #define HTTP_11				0x11
 
+#ifndef LF
 #define LF					012
+#endif
+
+#ifndef CR
 #define CR					015
+#endif
+
+#ifndef SP
 #define SP 					040
+#endif
 
 #define CGI_TIMEOUT			8
 
