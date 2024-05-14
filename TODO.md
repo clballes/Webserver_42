@@ -10,13 +10,9 @@
 - [ ] test: config
 - [ ] test: multiple (lots of) servers
 
-## mpuig-ma
-- [ ] HTTP parse proper body parse
-- [ ] proper POST
-- [ ] chunked requests (es el EOF tambe si) / multipart form 
+- [x] puyma: HTTP parse proper body parse
+- [ ] puyma: chunked requests (es el EOF tambe si) / multipart form 
 
-## CLARA
-- [  ] config tests
-- [  ] upload some file to the server test
-- [ x ] POST basic html & parsing
-- [ ] chunked requests (es el EOF tambe si) / multipart form 
+- [ ] clballes: config tests
+- [ ] clballes: upload some file to the server test
+- [x] clballes: POST basic html & parsing
