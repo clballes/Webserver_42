@@ -16,7 +16,6 @@ static char ** map2array ( const std::map< std::string, std::string > & );
 CGI::CGI ( HTTP & http , Server & server):
 	_http( http ), _server ( server )
 {
-	DEBUG( "" );
 	this->_timer_id = CGI::timer_id_threshold++;
 	this->setmap();
 	return ;
@@ -24,37 +23,35 @@ CGI::CGI ( HTTP & http , Server & server):
 
 CGI::~CGI ( void )
 {
-	DEBUG( "" );
 	return ;
 }
 
 void
 CGI::setmap ( void )
 {
-	std::map< std::string, std::string > & headers = _http.getHeaders( 0 );
+	t_headers & headers = _http.getRequestHeaders();
 	const t_request & request = this->_http.getRequest();
 	const std::string & cgi_pass = this->_server.getCGIpass( request.target );
 	
-	DEBUG ( "" );
 	if ( headers.find( "auth-scheme" ) != headers.end()
 			&& headers["auth-scheme"] != "" )
-		this->_envMap["AUTH_TYPE"] = headers["authorization"];
-	this->_envMap["REDIRECT_STATUS"] = "200";
-	this->_envMap["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_envMap["SERVER_PROTOCOL"] = "HTTP/1.1";
-	this->_envMap["SERVER_SOFTWARE"] = WEBSERV_VER;
-	this->_envMap["REQUEST_METHOD"] = request.method->method;
-	this->_envMap["QUERY_STRING"] = request.query;
-	this->_envMap["CONTENT_TYPE"] = headers["content-type"];
+		this->_env["AUTH_TYPE"] = headers["authorization"];
+	this->_env["REDIRECT_STATUS"] = "200";
+	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	this->_env["SERVER_SOFTWARE"] = WEBSERV_VER;
+	this->_env["REQUEST_METHOD"] = request.method->method;
+	this->_env["QUERY_STRING"] = request.query;
+	this->_env["CONTENT_TYPE"] = headers["content-type"];
 	if ( !request.body.empty() )
-		this->_envMap["CONTENT_LENGTH"] = my_to_string( request.body.length() );
-	this->_envMap["PATH_INFO"] = cgi_pass;
-	this->_envMap["PATH_TRANSLATED"] = cgi_pass;
-	this->_envMap["REQUEST_URI"] =  cgi_pass + request.query;
+		this->_env["CONTENT_LENGTH"] = my_to_string( request.body.length() );
+	this->_env["PATH_INFO"] = cgi_pass;
+	this->_env["PATH_TRANSLATED"] = cgi_pass;
+	this->_env["REQUEST_URI"] =  cgi_pass + request.query;
 	if ( headers.find( "host" ) != headers.end() )
-		this->_envMap["SERVER_NAME"] = headers["host"];
-	this->_envMap["REMOTEaddr"] = this->_envMap["SERVER_NAME"];
-	this->_envMap["SERVER_PORT"] = my_to_string( _server.getPort() );
+		this->_env["SERVER_NAME"] = headers["host"];
+	this->_env["REMOTEaddr"] = this->_env["SERVER_NAME"];
+	this->_env["SERVER_PORT"] = my_to_string( _server.getPort() );
 	return ;
 }
 
@@ -63,7 +60,6 @@ CGI::register_process ( void )
 {
     struct kevent ev;
 
-	DEBUG( this->_pid );
 	EV_SET( &ev, this->_pid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
 		   NOTE_EXIT | NOTE_EXITSTATUS, 0, (void *) this );
     if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
@@ -86,7 +82,6 @@ CGI::deregister_process( void )
 {
 	struct kevent ev;
 
-	DEBUG ( this->_pid );
 	EV_SET( &ev, this->_pid, EVFILT_PROC, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
@@ -101,7 +96,6 @@ CGI::deregister_timer ( void )
 {
 	struct kevent ev;
 
-	DEBUG ( this->_pid );
 	EV_SET( &ev, this->_timer_id, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
@@ -118,7 +112,6 @@ CGI::dispatch ( struct kevent & ev )
 	std::string buffer;
 	int bytes_read;
 
-	DEBUG( ev.ident );
 	if ( ev.filter == EVFILT_PROC )
 	{
 		this->deregister_timer();
@@ -138,7 +131,6 @@ CGI::dispatch ( struct kevent & ev )
 			delete this;
 			return ;
 		}
-		LOG_BUFFER( buffer, YELLOW );
 		close( this->_pipefd[READ] );
 		if ( parse_headers( buffer ) == EXIT_FAILURE )
 		{
@@ -167,19 +159,17 @@ int
 CGI::execute ( void )
 {
 	const t_request &	request = this->_http.getRequest();
-	char **				env;
+	char **				temp_env;
 	std::string			cgi;
 	int					fdopen;
 
-	env = map2array( this->_envMap );
-	if ( env == NULL )
+	temp_env = map2array( this->_env );
+	if ( temp_env == NULL )
 	{
 		ERROR( PROGRAM_NAME << ": could not allocate memory" );
 		return ( EXIT_FAILURE );
 	}
 	cgi = this->_server.getRoute( request.target ).getCGIpass();
-	DEBUG( "cgi_pass=\"" << cgi << "\"" );
-	DEBUG( "file=\"" << request.file << "\"" );
 	if ( can_access_file( cgi, X_OK ) == false )
 	{
 		ERROR( cgi << ": " << std::strerror( errno ) );
@@ -210,14 +200,14 @@ CGI::execute ( void )
 		dup2( _pipefd[WRITE], STDOUT_FILENO );
         dup2( fdopen, STDIN_FILENO );
 		close( _pipefd[WRITE] );
-        execve( cgi.c_str() , NULL, (char * const *) env );
+        execve( cgi.c_str() , NULL, (char * const *) temp_env );
 		ERROR( cgi << ": " << ::strerror( errno ) );
         exit( EXIT_FAILURE );
     }
     close( _pipefd[WRITE] );
-	for ( std::size_t i = 0; env[i] != 0x0; ++i )
-		delete ( env[i] );
-	delete ( env );
+	for ( std::size_t i = 0; temp_env[i] != 0x0; ++i )
+		delete ( temp_env[i] );
+	delete ( temp_env );
 	this->register_process();
 	return ( EXIT_SUCCESS );
 }
@@ -231,69 +221,68 @@ CGI::kill ( void )
 	return ;
 }
 
-int CGI::check_headers()
+int
+CGI::check_headers ( void )
 {
-    std::map<std::string, std::string>& headers = _http.getHeaders(1);
-    int flag = 0;
-    if (headers.find("status") != headers.end()) {
+	int flag;
+    t_headers & headers = _http.getResponseHeaders();
+
+    flag = 0;
+    if ( headers.find( "status" ) != headers.end() )
         ++flag;
-    }
-    if (headers.find("content-type") != headers.end()) {
+    if ( headers.find( "content-type" ) != headers.end() )
         ++flag;
-    }
-    if (headers.find("location") != headers.end()) {
+    if ( headers.find( "location" ) != headers.end() )
         ++flag;
-    }
-    return (flag == 0) ? EXIT_FAILURE : EXIT_SUCCESS;
+    return ( ( flag == 0 ) ? EXIT_FAILURE : EXIT_SUCCESS );
 }
 
 int
-CGI::parse_headers( std::string & line )
+CGI::parse_headers ( std::string & line )
 {
-	std::map <std::string, std::string> mapHeaders;
-	std::string::size_type  start, pos;
-	std::string             sub_line;
+	t_headers								headers;
+	std::string::size_type					start, pos, pos_point;
+	std::string								sub_line;
 
 	start = 0;
 	pos = line.find_first_of( LF, start );
 	if ( pos == std::string::npos )
 		pos = line.length();
-	while (pos != std::string::npos)
+	while ( pos != std::string::npos )
 	{
-            std::string sub_line = line.substr(start, pos - start);
+            sub_line = line.substr( start, pos - start );
             // Trim leading and trailing whitespaces
-            sub_line = normalize(sub_line);
-			sub_line = tolower_string(sub_line);
-            size_t pos_point = sub_line.find(":");
-            if (pos_point != std::string::npos)
+            (void) trim_f( sub_line, &std::isspace );
+			(void) strtolower( sub_line );
+            pos_point = sub_line.find( ":" );
+            if ( pos_point != std::string::npos )
 			{
-                std::string str = sub_line.substr(0, pos_point);
+                std::string str = sub_line.substr( 0, pos_point );
                 std::string str2;
-                if (str.compare("Status") == 0) {
-                    str2 = sub_line.substr(pos_point + 2, 3);
-                } else {
-                    str2 = sub_line.substr(pos_point + 2);
-                }
-                str2 = normalize(str2);
-                mapHeaders[str] = str2;
-            } else if (sub_line.empty() || (sub_line.length() == 1 && sub_line[0] == '\r'))
+                if ( str.compare( "Status" ) == 0 )
+                    str2 = sub_line.substr( pos_point + 2, 3 );
+				else
+                    str2 = sub_line.substr( pos_point + 2 );
+                str2 = normalize( str2 );
+                headers[str] = str2;
+            }
+			else if ( sub_line.empty()
+					|| ( sub_line.length() == 1 && sub_line[0] == '\r' ) )
 			{
-				if (pos + 1 != line.length() )
+				if ( pos + 1 != line.length() )
 				{
-					std::string body = line.substr(pos +1, line.length());
+					std::string body = line.substr( pos + 1, line.length() );
 					this->_http.setMessageBody( body );
 				}	
 				break;
             }
-		start = pos + 1;
-		pos = line.find_first_of( LF, start );
+			start = pos + 1;
+			pos = line.find_first_of( LF, start );
 	}
-	for ( std::map<std::string, std::string>::iterator it = mapHeaders.begin();
-			it != mapHeaders.end(); ++it )
-	{
+	for ( std::map<std::string, std::string>::iterator it = headers.begin();
+			it != headers.end(); ++it )
 		this->_http.setResponseHeaders ( it->first, it->second );
-	}
-	return (EXIT_SUCCESS);
+	return ( EXIT_SUCCESS );
 }
 
 static char **
