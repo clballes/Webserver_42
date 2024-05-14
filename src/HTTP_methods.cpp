@@ -36,7 +36,6 @@ HTTP::http_get ( HTTP & http )
 int
 HTTP::http_post ( HTTP & http )
 {
-	LOG( http._request_headers["content-type"] );
 	// regular post, not cgi, sempre torna exit success
 	generate_html( http );
 	http._status_code = OK;

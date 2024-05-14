@@ -5,8 +5,6 @@
 
 #include "HTTP.hpp"
 
-bool routeExists(const std::string& route);
-
 t_http_method
 HTTP::methods[] = {
 	{ "GET", &HTTP::http_get, HTTP_GET },
@@ -95,6 +93,7 @@ HTTP::request_recv ( int64_t data )
 {
 	ssize_t n;
 
+	// Receive content from socket.
 	this->_buffer_recv.resize( data );
 	n = recv( this->_socket_fd, (char *) this->_buffer_recv.data(), data, 0 );
 	if ( n == -1 )
@@ -110,11 +109,13 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_SUCCESS );
 	}
 
+	// If request sent "expect: 100-continue" header
 	if ( this->_expect == true )
 	{
 		this->_request.body.append( this->_buffer_recv );
 		// TODO: will need to check if end expect
 		this->_expect = false;
+		this->_request_headers.erase( "expect" );
 		if ( this->_request_headers.find( "transfer-encoding" ) != this->_request_headers.end()
 				&& this->_request_headers.at( "transfer-encoding" ) == "chunked" )
 		{
@@ -143,8 +144,8 @@ HTTP::request_recv ( int64_t data )
 		return ( EXIT_FAILURE );
 	}
 
-	// limit client size max body check
-	// && Setting size to 0 disables checking of client request body size.
+	// Check client_max_body_size limit
+	// 0 == unlimited
 	if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0
 			&& ( this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ) )
 	{
@@ -162,6 +163,7 @@ HTTP::request_recv ( int64_t data )
 	// lcoation block en el compose
 	// append location root change if it fits location the target
 
+	// Map request to internal server path.
 	this->_request.file = this->_request.target;
 	std::string location = this->_server.getRouteString( this->_request.target );
 	if ( ! location.empty() && location[0] != '*' )
@@ -180,14 +182,14 @@ HTTP::request_recv ( int64_t data )
 		this->check_index();
 	stat( this->_request.file.c_str(), &this->_request.file_info );
 
+	// Tells HTTP next content coming from socket 
+	// is the body from this request.
 	if ( this->_request_headers.find( "expect" ) != this->_request_headers.end()
 			&& this->_request_headers.at( "expect" ).empty() == false )
 	{
 		this->_expect = true;
 		return ( EXIT_SUCCESS );
 	}
-	else
-		this->_expect = false;
 	
 	return ( this->compute_response() );
 }
