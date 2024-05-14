@@ -23,6 +23,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_connection( router_instance.getConnection( fd ) ),
 	_server( router_instance.getDefaultServer() ),
 	_cgi_ptr( NULL ),
+	_status_code( 0 ),
 	_expect( false )
 {
 	this->_request.method = 0x0;
@@ -37,22 +38,19 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 		ERROR( "HTTP: error creating new client" );
 		return ;
 	}
-	DEBUG( this->_socket_fd );
 	this->register_recv();
 	return ;
 }
 
 HTTP::~HTTP ( void )
 {
-	DEBUG( this->_socket_fd );
-	close( this->_socket_fd );
+	(void) close( this->_socket_fd );
 	return ;
 }
 
 void
 HTTP::dispatch ( struct kevent & ev )
 {
-	DEBUG ( "ev=" << ev.ident );
 	if ( ev.filter == EVFILT_READ )
 		(void) this->request_recv( ev.data );
 	else if ( ev.filter == EVFILT_WRITE )
@@ -65,7 +63,6 @@ HTTP::register_recv ( void )
 {
 	struct kevent ev;
 
-	DEBUG( this->_socket_fd );
 	EV_SET( &ev, this->_socket_fd, EVFILT_READ,
 			EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, (void * ) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
@@ -81,7 +78,6 @@ HTTP::register_send ( void )
 {
 	struct kevent ev;
 
-	DEBUG( this->_socket_fd );
 	EV_SET( &ev, this->_socket_fd, EVFILT_WRITE,
 			EV_ADD | EV_ENABLE | EV_CLEAR | EV_ONESHOT, 0, 0, (void *) this );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
@@ -116,25 +112,36 @@ HTTP::request_recv ( int64_t data )
 
 	if ( this->_expect == true )
 	{
-		std::cout << "entro en el expect" << std::endl;
 		this->_request.body.append( this->_buffer_recv );
-		// std::cout << "body:"<<  this->_request.body << std::endl;
+		// TODO: will need to check if end expect
 		this->_expect = false;
-		// std::cout << "body:"<< std::endl;
+		if ( this->_request_headers.find( "transfer-encoding" ) != this->_request_headers.end()
+				&& this->_request_headers.at( "transfer-encoding" ) == "chunked" )
+		{
+			if ( unchunk( this->_request.body, this->_message_body ) == EXIT_FAILURE )
+			{
+				ERROR( "Invalid chunked data format" );
 
-		handle_chunk_expect( *this );
-
+				// bad request ?
+				// delete this
+				return ( EXIT_FAILURE );
+			}
+			else
+			{
+				this->_request_headers.erase( "transfer-encoding" );
+				this->compose_response();
+			}
+		}
 	}
 	else if ( this->parse() == EXIT_FAILURE )
 	{
 		WARN( "HTTP request does not comply with HTTP/1.x specification." );
 		this->_buffer_recv.clear();
-		this->setStatusCode( NOT_IMPLEMENTED );
-		// or this->setStatusCode( BAD_REQUEST );
+		if ( this->_status_code == 0 )
+			this->setStatusCode( BAD_REQUEST );
 		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
-	// LOG_BUFFER (this->_buffer_recv, RED);
 
 	// limit client size max body check
 	// && Setting size to 0 disables checking of client request body size.
@@ -191,7 +198,6 @@ HTTP::request_recv ( int64_t data )
 int
 HTTP::compute_response ( void )
 {
-	DEBUG( "target=" << this->_request.target );
 	if ( this->_server.getFlag( this->_request.method->code,
 				this->_request.target ) == false )
 		this->_status_code = METHOD_NOT_ALLOWED;
@@ -203,13 +209,11 @@ HTTP::compute_response ( void )
 	}
 	else if ( !this->_server.getRedirection( this->_request.target ).second.empty() )
 	{
-		this->_status_code = this->_server.getRedirection(  this->_request.target ).first;
-		this->_response_headers["Location"] = this->_server.getRedirection(  this->_request.target ).second;
+		this->_status_code = this->_server.getRedirection( this->_request.target ).first;
+		this->_response_headers["location"] = this->_server.getRedirection( this->_request.target ).second;
 	}
 	else
-	{
 		(void) this->_request.method->method_func( * this );
-	}
 	(void) this->compose_response();
 	return ( EXIT_SUCCESS );
 }
@@ -217,12 +221,8 @@ HTTP::compute_response ( void )
 int
 HTTP::compose_response ( void )
 {
-	DEBUG( "status_code=" << this->_status_code );
 	if ( this->_status_code >= 300 && this->_status_code <= 511 )
-	{
-		load_file( *this, this->_server.getErrorPage( this->_status_code ) );
-		//this->_response_headers["content-type"] = "text/html"; // perque no el posem?
-	}
+		load_file( this->_message_body, this->_server.getErrorPage( this->_status_code ) );
 	this->_buffer_send.append( "HTTP/1.1 " );
 	this->_buffer_send.append( my_to_string( this->_status_code ) );
 	this->_buffer_send.append( " \r\n" );
@@ -240,26 +240,27 @@ HTTP::compose_response ( void )
 	// Add [message body] if any.
 	this->_buffer_send.append( this->_message_body );
 	this->_message_body.clear();
-	
-	// this->request_send();
+	this->request_send();
 	return ( EXIT_SUCCESS );
 }
 
 int
 HTTP::request_send ( void )
 {
-	DEBUG( "fd=" << this->_socket_fd << " bytes=" << this->_buffer_send.length() );
-	::send( this->_socket_fd,
-			this->_buffer_send.c_str(),
-			this->_buffer_send.length(),
-			0x0 );
-	if ( this->_request_headers["connection"] == "close"
-			|| this->_request_headers["connection"] != "keep-alive" )
+	::send( this->_socket_fd, this->_buffer_send.c_str(),
+			this->_buffer_send.length(), 0x0 );
+	if ( this->_request_headers.find( "connection" ) != this->_request_headers.end()
+			&& this->_request_headers.at( "connection" ) != "keep-alive" )
 	{
 		delete this;
 		return ( EXIT_SUCCESS );
 	}
-
+	if ( this->_response_headers.find( "connection" ) != this->_response_headers.end()
+			&& this->_response_headers.at( "connection" ) == "close" )
+	{
+		delete this;
+		return ( EXIT_SUCCESS );
+	}
 	this->_status_code = 0;
 	this->_request.host.clear();
 	this->_request.target.clear();
@@ -272,37 +273,12 @@ HTTP::request_send ( void )
 	return ( EXIT_SUCCESS );
 }
 
-int
-HTTP::load_file( HTTP & http, std::string target )
-{
-	std::ifstream file;
-	std::ifstream::pos_type pos;
-
-	DEBUG( "file=\"" << target << "\"" );
-	file.open( target, std::ios::in | std::ios::binary | std::ios::ate );
-	if ( file.good() == true && file.eof() == false )
-	{
-		// TODO: sanity checks
-		pos = file.tellg();
-		file.seekg( 0, std::ios::beg );
-		http._message_body.resize( pos );
-		file.read( (char *) http._message_body.data(), pos );
-	}
-	if ( file.good() == false )
-	{
-		WARN( target << ": " << std::strerror( errno ) );
-		return ( FORBIDDEN );
-	}
-	return ( OK );
-}
-
 int 
 HTTP::check_index ( void )
 {
 	const std::vector< std::string > & vec = this->_server.getIndex( this->_request.target );
 	std::string	temp;
 
-	DEBUG( "" );
 	for ( std::vector< std::string >::const_iterator it = vec.begin();
 			it != vec.end(); ++it )
 	{
@@ -333,13 +309,15 @@ HTTP::getRequest ( void )
 }
 
 t_headers &
-HTTP::getHeaders ( int flag )
+HTTP::getRequestHeaders ( void )
 {
-	if ( flag == 0)
-		return ( this->_request_headers );
-	else
-		
-		return ( this->_response_headers );
+	return ( this->_request_headers );
+}
+
+t_headers &
+HTTP::getResponseHeaders ( void )
+{
+	return ( this->_response_headers );
 }
 
 void
@@ -354,10 +332,9 @@ HTTP::setResponseHeaders ( const std::string & name,
 		const std::string & value )
 {
 	this->_response_headers[name] = value;
-	if (name == "status")
-	{
-		this->_status_code = std::atoi(value.c_str());
-	}
+	//TODO: what is this for ???
+	//if ( name == "status" )
+	//	this->setStatusCode( std::atoi( value.c_str() ) );
 	return ;
 }
 

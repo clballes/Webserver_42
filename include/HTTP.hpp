@@ -66,21 +66,21 @@ class HTTP: public IEvent
 		int register_send ( void );
 		int request_recv ( int64_t );
 		int request_send ( void );
-		int compute_response ( void );
 		int compose_response ( void );
-		int check_index();
+		int compute_response ( void );
+		int check_index ( void ); // can be made in-file static
 
-		Server & getServer();
-		t_request & getRequest( void );
-		t_headers & getHeaders( int flag );
+		Server & getServer ( void );
+		t_request & getRequest ( void );
+		t_headers & getRequestHeaders ( void );
+		t_headers & getResponseHeaders ( void );
 		
 		void setMessageBody( const std::string & );
 		void setStatusCode( int );
 		void setResponseHeaders( const std::string &, const std::string & );
 		
-		static int load_file ( HTTP &, std::string );
 		static t_http_method methods[];
-		static int handle_chunk_expect ( HTTP & http  );
+		static int handle_chunk_expect ( HTTP & ); // can be made in-file static
 
 	private:
 
@@ -103,8 +103,8 @@ class HTTP: public IEvent
 		bool					_expect;
 
 		int parse ( void );
-		int parse_start_line ( std::string & );
-		int parse_field_line ( std::string & );
+		int parse_start_line ( std::string & ); // can be made in-file static
+		int parse_field_line ( std::string & ); // can be made in-file static
 		
 		static int http_get ( HTTP & );
 		static int http_head ( HTTP & );

@@ -8,7 +8,6 @@
 int
 HTTP::http_head ( HTTP & http )
 {
-	DEBUG( "path=\"" << http._request.file << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode )
 			|| S_ISREG( http._request.file_info.st_mode ) )
 		http._status_code = OK;
@@ -20,7 +19,6 @@ HTTP::http_head ( HTTP & http )
 int
 HTTP::http_get ( HTTP & http )
 {
-	DEBUG( "path=\"" << http._request.file << "\"" );
 	if ( S_ISDIR( http._request.file_info.st_mode ) )
 	{
 		if ( http._server.getFlag( F_AUTOINDEX, http._request.target ) )
@@ -29,7 +27,7 @@ HTTP::http_get ( HTTP & http )
 			http._status_code = FORBIDDEN;
 	}
 	else if ( S_ISREG( http._request.file_info.st_mode ) )
-		http._status_code = HTTP::load_file( http, http._request.file );
+		http._status_code = load_file( http._message_body, http._request.file );
 	else
 		http._status_code = NOT_FOUND;
 	return ( EXIT_SUCCESS );
@@ -38,10 +36,7 @@ HTTP::http_get ( HTTP & http )
 int
 HTTP::http_post ( HTTP & http )
 {
-	//DEBUG( "path=\"" << http._request.file << "\"" );
 	LOG( http._request_headers["content-type"] );
-	// LOG_BUFFER ( http._buffer_recv , RED);
-	// LOG_BUFFER ( http._request.body , YELLOW);
 	// regular post, not cgi, sempre torna exit success
 	generate_html( http );
 	http._status_code = OK;
@@ -53,7 +48,6 @@ HTTP::http_put ( HTTP & http )
 {
 	std::ofstream file;
 
-	DEBUG ( "path=\"" << http._request.file << "\"" );
 	if ( S_ISREG( http._request.file_info.st_mode )
 			|| S_ISDIR( http._request.file_info.st_mode ) )
 	{
@@ -77,7 +71,6 @@ HTTP::http_put ( HTTP & http )
 int
 HTTP::http_delete ( HTTP & http )
 {
-	//DEBUG( "target=\"" << http._request.file << "\"" );
 	if ( S_ISREG( http._request.file_info.st_mode ) )
 	{
 		if ( remove( http._request.target.c_str() ) == 0 )

@@ -10,6 +10,7 @@ static int parse_target ( t_request &, std::string & );
 static int parse_http_version ( t_request &, std::string & );
 static int parse_body( HTTP & http, const std::string &, std::size_t );
 static std::string parse_query ( std::string & );
+static int handle_chunk ( std::string & );
 static size_t how_many_methods( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
 
@@ -222,13 +223,10 @@ HTTP::parse_field_line ( std::string & line )
 	return ( EXIT_SUCCESS );
 }
 
-static int handle_chunk ( std::string & );
-// static int handle_chunk2 ( std::string & );
-
 static int
 parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 {
-	const t_headers &	headers = http.getHeaders( 0 );
+	const t_headers &	headers = http.getRequestHeaders();
 	t_request &			request = http.getRequest();
 	std::size_t			len;
 	
@@ -240,7 +238,7 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 		len = std::atoi( headers.at( "content-length" ).c_str() );
 		request.body.assign( buffer.c_str(), pos, len );
 	}
-	if ( headers.find( "transfer-encoding" ) != headers.end() )
+	else if ( headers.find( "transfer-encoding" ) != headers.end() )
 	{
 		request.body.assign( buffer.c_str(), pos, std::string::npos );
 		if ( headers.at( "transfer-encoding" ) == "chunked" )
@@ -249,43 +247,13 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 			return ( EXIT_SUCCESS );
 		}
 	}
-	return ( EXIT_SUCCESS );
-}
-
-int
-HTTP::handle_chunk_expect ( HTTP & http )
-{
-	std::string::size_type	pos;
-	std::string body = http._request.body;
-	std::string body_temp;
-    std::string::size_type	chunk_length;
-
-	pos = 0;
-    while ( pos < body.size() )
+	else
 	{
-        std::string::size_type next_crlf_pos = body.find( "\r\n", pos );
-        if ( next_crlf_pos == std::string::npos )
-		{
-            ERROR( "Invalid chunked data format" );
-            return ( EXIT_FAILURE );
-        }
-        std::string chunk_length_hex = body.substr( pos, next_crlf_pos - pos );
-        chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
-        pos = next_crlf_pos + 2;
-        std::string chunk_data = body.substr( pos, chunk_length );
-		body_temp += chunk_data;
-        pos += chunk_length + 2;
-		if ( chunk_length == 0 )
-		{
-			http._request.body.clear();
-			// perque meessage body en la repsonseee?? per fer el compose pero nye
-			http._message_body = body_temp;
-			http.compose_response();
-		}
-    }
+		http.setStatusCode( BAD_REQUEST );
+		http.getResponseHeaders()["connection"] = "close";
+	}
 	return ( EXIT_SUCCESS );
 }
-
 
 int
 handle_chunk ( std::string & body )
