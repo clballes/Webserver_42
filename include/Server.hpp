@@ -54,6 +54,7 @@ class Server
 		int setErrorPage ( int, const std::string & );
 		int setRoute ( const std::string & );
 		int setRedirection ( const std::string &, std::string = "" );
+		int setUploadDirectory ( const std::string &, std::string = "" );
 
 		typedef std::map< std::string,
 				Location, std::greater< std::string > > t_route_map;

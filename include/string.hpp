@@ -6,6 +6,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 
 #ifndef LF
 #define LF					012
@@ -37,3 +38,5 @@ std::string get_word ( const std::string &, std::string delimiter );
 int unchunk ( const std::string &, std::string & );
 
 bool compare_file_extension( const std::string & a, const std::string & b );
+
+template< typename T > std::string my_to_string ( const T & );

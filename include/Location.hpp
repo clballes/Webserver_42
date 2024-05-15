@@ -10,8 +10,12 @@
 #include <sstream>
 #include <vector>
 #include <cstdlib>		/* EXIT_SUCCESS, EXIT_FAILURE */
+#include <unistd.h>
+#include <sys/stat.h>
 #include "define.hpp"
 #include "log.hpp"
+#include "file.hpp"
+#include "string.hpp"
 
 class Location
 {
@@ -28,6 +32,7 @@ class Location
 		int setRoot ( const std::string & );
 		int setIndex ( const std::string & );
 		int setRedirection ( const std::string & );
+		int setUploadDirectory ( const std::string & );
 
 		bool isDefault ( void ) const;
 		bool getFlag ( int ) const;
@@ -49,6 +54,7 @@ class Location
 		std::pair<int, std::string> _redirection;
 		bool						_isDefault;
 		std::vector< std::string >	_index;
+		std::string					_upload_directory;
 };
 
 #endif /* !_LOCATION_HPP_ */

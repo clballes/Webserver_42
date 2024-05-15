@@ -325,6 +325,12 @@ Server::setRedirection ( const std::string & arg, std::string location )
 }
 
 int
+Server::setUploadDirectory ( const std::string & arg, std::string location )
+{
+	return ( this->getRoute( location ).setUploadDirectory( arg ) );
+}
+
+int
 Server::check ( void )
 {
 	if ( this->_server_name.empty() == true )
@@ -341,6 +347,7 @@ Server::check ( void )
 		return ( EXIT_FAILURE );
 	}
 
+	/*
 	for ( t_route_map::const_iterator it = this->_routes.begin();
 			it != this->_routes.end(); ++it )
 	{
@@ -351,6 +358,7 @@ Server::check ( void )
 			return ( EXIT_FAILURE );
 		}
 	}
+	*/
 
 	return ( EXIT_SUCCESS );
 }

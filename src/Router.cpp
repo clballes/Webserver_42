@@ -19,12 +19,13 @@ Router::_opts[] =
 	{ DIRECTIVE, "limit_except", no, yes, "location", &set_limit_except },
 	{ DIRECTIVE, "root", no, yes, "server,location", &set_root },
 	{ DIRECTIVE, "index", no, no, "server,location", &set_index },
-	{ DIRECTIVE, "autoindex", no, no, "server, location", &set_autoindex },
+	{ DIRECTIVE, "autoindex", no, no, "server,location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
 	// { DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
-	{ DIRECTIVE, "client_max_body_size", no, no, "server, location", &set_client_max_body_size },
+	{ DIRECTIVE, "client_max_body_size", no, no, "server,location", &set_client_max_body_size },
 	{ DIRECTIVE, "redirection", no, no, "location", &set_redirection },
+	{ DIRECTIVE, "upload_directory", no, no, "server,location", &set_upload_directory },
 	{ 0, 0x0, 0, 0, 0x0, 0x0 },
 };
 
@@ -682,4 +683,10 @@ int
 set_redirection ( Server & instance, std::string & arg, std::string location )
 {
 	return ( instance.setRedirection( arg, location ) );
+}
+
+int
+set_upload_directory ( Server & instance, std::string & arg, std::string location )
+{
+	return ( instance.setUploadDirectory( arg, location ) );
 }

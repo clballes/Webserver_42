@@ -211,3 +211,16 @@ compare_file_extension( const std::string & a, const std::string & b )
 		return ( true );
 	return ( false );
 }
+
+template< typename T >
+std::string my_to_string ( const T & value )
+{
+    std::stringstream ss;
+
+    ss << value;
+    return ( ss.str() );
+}
+
+template std::string my_to_string< int > ( const int & );
+template std::string my_to_string< unsigned long > ( const unsigned long & );
+template std::string my_to_string< unsigned short > ( const unsigned short & );

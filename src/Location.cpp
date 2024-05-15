@@ -4,8 +4,6 @@
 /* Wed Apr 17 17:14:14 2024                                                   */
 
 #include "Location.hpp"
-#include "file.hpp"
-#include <unistd.h>
 
 Location::Location ( void ): _isDefault( false )
 {
@@ -180,18 +178,47 @@ Location::setIndex ( const std::string & arg )
 int
 Location::setRedirection ( const std::string & arg )
 {
-	std::size_t spacePos = arg.find(' ');
-
-    std::string statusCodeStr = arg.substr(0, spacePos);
+	std::size_t		spacePos;
+    std::string		route, statusCodeStr;
     int statusCode;
-    std::istringstream(statusCodeStr) >> statusCode;
-	if (statusCode != 301 && statusCode != 302 && statusCode != 308 && statusCode != 303 && statusCode != 307 )
+
+	spacePos = arg.find( ' ' );
+	statusCodeStr = arg.substr( 0, spacePos );
+    std::istringstream( statusCodeStr ) >> statusCode;
+	if ( statusCode != 301
+			&& statusCode != 302
+			&& statusCode != 308
+			&& statusCode != 303
+			&& statusCode != 307 )
 	{
-		return (EXIT_FAILURE);
+		return ( EXIT_FAILURE );
 	}
-	//nose si em faltaria parsejar si la ruta existeix de la direccio o ja petara despres
-    // Extract the route
-    std::string route = arg.substr(spacePos + 1);
-	this->_redirection = std::make_pair(statusCode, route);
+	// TODO: nose si em faltaria parsejar si la ruta existeix de la direccio o ja petara despres
+    route = arg.substr( spacePos + 1 );
+	this->_redirection = std::make_pair( statusCode, route );
 	return ( EXIT_SUCCESS );
+}
+
+int
+Location::setUploadDirectory ( const std::string & arg )
+{
+	struct stat file_info;
+	std::string mod_arg( arg );
+	
+	while ( mod_arg.size() > 1 && mod_arg.back() == '/' )
+		mod_arg.erase( mod_arg.length() - 1, 1 );
+	if ( mod_arg.back() != '/' )
+		mod_arg.append( "/" );
+    if ( stat( mod_arg.c_str(), &file_info ) == -1 )
+	{
+		ERROR( arg << ": " << std::strerror( errno ) );
+        return ( EXIT_FAILURE );
+	}
+	if ( S_ISDIR( file_info.st_mode ) )
+	{
+		this->_upload_directory = mod_arg;
+		return ( EXIT_SUCCESS );
+	}
+	ERROR( arg << ": not a directory" );
+	return ( EXIT_FAILURE );
 }

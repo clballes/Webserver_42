@@ -13,7 +13,6 @@ class HTTP;
 bool is_regular_file ( const std::string & filename );
 bool routeExists ( const std::string & route );
 bool can_access_file ( const std::string & filename, int mask );
-template< typename T > std::string my_to_string ( const T & );
 int load_file( std::string &, const std::string & );
 
 int generate_html( HTTP & http );
