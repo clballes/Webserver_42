@@ -15,7 +15,9 @@
 - [ ] test: chunk request with more than 3 requests/connection
 - [ ] test: multipart-form with more than 3 requests/connection
 
-- [ ] puyma: chunked requests (es el EOF tambe si) / multipart form 
+- [ ] puyma: request timeout
+- [ ] puyma: upload\_files
+- [ ] puyma: chunked requests / multipart form 
 
 - [ ] clballes: config tests
 - [ ] clballes: upload some file to the server test
