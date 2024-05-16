@@ -29,9 +29,9 @@ CGI::~CGI ( void )
 void
 CGI::setmap ( void )
 {
-	t_headers & headers = _http.getRequestHeaders();
 	const t_request & request = this->_http.getRequest();
 	const std::string & cgi_pass = this->_server.getCGIpass( request.target );
+	t_headers & headers = this->_http.getRequest().headers;
 	
 	if ( headers.find( "auth-scheme" ) != headers.end()
 			&& headers["auth-scheme"] != "" )
@@ -225,7 +225,7 @@ int
 CGI::check_headers ( void )
 {
 	int flag;
-    t_headers & headers = _http.getResponseHeaders();
+    t_headers & headers = _http.getResponse().headers;
 
     flag = 0;
     if ( headers.find( "status" ) != headers.end() )

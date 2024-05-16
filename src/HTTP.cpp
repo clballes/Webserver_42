@@ -21,7 +21,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_connection( router_instance.getConnection( fd ) ),
 	_server( router_instance.getDefaultServer() ),
 	_cgi_ptr( NULL ),
-	_status_code( 0 ),
+	_state( 0 ),
 	_expect( false )
 {
 	this->_request.method = 0x0;
@@ -66,18 +66,6 @@ HTTP::getResponse ( void )
 	return ( this->_response );
 }
 
-t_headers &
-HTTP::getRequestHeaders ( void )
-{
-	return ( this->_request.headers );
-}
-
-t_headers &
-HTTP::getResponseHeaders ( void )
-{
-	return ( this->_response.headers );
-}
-
 void
 HTTP::setMessageBody ( const std::string & message )
 {
@@ -99,6 +87,6 @@ HTTP::setResponseHeaders ( const std::string & name,
 void
 HTTP::setStatusCode ( int value )
 {
-	this->_status_code = value;
+	this->_response.status_code = value;
 	return ;
 }

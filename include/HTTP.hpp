@@ -10,7 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <unistd.h> 		/* close */
+#include <unistd.h>
 #include <cstdlib>
 #include <cstring>
 #include <sys/stat.h>
@@ -26,42 +26,16 @@
 #include "file.hpp"
 #include "HTTP_status_codes.hpp"
 
+#include "t_headers.hpp"
+#include "t_request.hpp"
+#include "t_response.hpp"
+#include "t_http_method.hpp"
+
 class HTTP;
 class CGI;
 class Router;
 class Server;
 class Connection;
-
-typedef std::map< std::string, std::string > t_headers;
-
-typedef struct s_http_method
-{
-	const char *	method;
-	int				( *method_func )( HTTP & );
-	int				code;
-
-} t_http_method;
-
-typedef struct s_request
-{
-	int 			http_version;
-	t_http_method *	method;
-	std::string		host;
-	std::string		target;
-	std::string		query;
-	std::string		body;
-	std::string		file;
-	struct stat		file_info;
-	t_headers		headers;
-
-} t_request;
-
-typedef struct s_response
-{
-	std::string		body;
-	t_headers		headers;
-
-} t_response;
 
 class HTTP: public IEvent
 {
@@ -78,13 +52,10 @@ class HTTP: public IEvent
 		int send_response ( void );
 		int compose_response ( void );
 		int compute_response ( void );
-		int check_index ( void ); // can be made in-file static
 
 		Server & getServer ( void );
 		t_request & getRequest ( void );
-		t_headers & getRequestHeaders ( void );
 		t_response & getResponse ( void );
-		t_headers & getResponseHeaders ( void );
 		
 		void setMessageBody( const std::string & );
 		void setStatusCode( int );
@@ -103,7 +74,7 @@ class HTTP: public IEvent
 		Server &                _server;
 		CGI *					_cgi_ptr;
 
-		int						_status_code;
+		int						_state;
 		std::string				_buffer_recv;
 		std::string				_buffer_send;
 		t_request				_request;
@@ -115,12 +86,11 @@ class HTTP: public IEvent
 		int parse_start_line ( std::string & ); // can be made in-file static
 		int parse_field_line ( std::string & ); // can be made in-file static
 		
-		static int http_get ( HTTP & );
-		static int http_head ( HTTP & );
-		static int http_post ( HTTP & );
-		static int http_put ( HTTP & );
-		static int http_delete ( HTTP & );
-		static int autoindex ( HTTP & );
+		static int http_get ( void * HTTP );
+		static int http_head ( void * HTTP );
+		static int http_post ( void * HTTP );
+		static int http_put ( void * HTTP );
+		static int http_delete ( void * HTTP );
 };
 
 #endif /* !_HTTP_HPP_ */

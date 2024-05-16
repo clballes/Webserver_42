@@ -62,16 +62,16 @@ HTTP::parse ( void )
 int
 HTTP::parse_start_line( std::string & line )
 {
-	this->_status_code = parse_method( this->_request, line );
-	if ( this->_status_code != EXIT_SUCCESS )
+	this->_response.status_code = parse_method( this->_request, line );
+	if ( this->_response.status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
-	this->_status_code = parse_target( this->_request, line );
-	if ( this->_status_code != EXIT_SUCCESS )
+	this->_response.status_code = parse_target( this->_request, line );
+	if ( this->_response.status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
-	this->_status_code = parse_http_version( this->_request, line );
-	if ( this->_status_code != EXIT_SUCCESS )
+	this->_response.status_code = parse_http_version( this->_request, line );
+	if ( this->_response.status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	if ( line.back() != CR )
 		return ( EXIT_FAILURE );
@@ -228,8 +228,8 @@ HTTP::parse_field_line ( std::string & line )
 static int
 parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 {
-	const t_headers &	headers = http.getRequestHeaders();
 	t_request &			request = http.getRequest();
+	const t_headers &	headers = request.headers;
 	std::size_t			len;
 	
 	len = 0;
@@ -252,7 +252,7 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 	else
 	{
 		http.setStatusCode( BAD_REQUEST );
-		http.getResponseHeaders()["connection"] = "close";
+		http.getResponse().headers["connection"] = "close";
 	}
 	return ( EXIT_SUCCESS );
 }

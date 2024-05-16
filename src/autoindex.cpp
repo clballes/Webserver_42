@@ -4,7 +4,6 @@
 /* Thu Mar 14 12:02:15 2024                                                   */
 
 #include "HTTP.hpp"
-#include <sstream>
 #include <dirent.h>
 #include <sys/stat.h>
 #include "file.hpp"
@@ -21,13 +20,13 @@
  */
 
 int
-HTTP::autoindex ( HTTP & http )
+autoindex ( const t_request & request, std::string & dst )
 {
 	std::string page;
 	std::string directory_name;
 	DIR*        directory;
 
-	directory_name = http._request.file;
+	directory_name = request.file;
 	directory = opendir( directory_name.c_str() );
 	if ( directory == NULL )
 	{
@@ -38,7 +37,7 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "<!DOCTYPE html>" );
 	page.append( "<head>" );
 	page.append( "<title>" );
-	page.append( http._request.target );
+	page.append( request.target );
 	page.append( "</title>" );
 	// Add style tags
 	page.append( "<style>" );
@@ -53,7 +52,7 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "</head>" );
 	page.append( "<body>" );
 	page.append( "<h1>Index of " );
-	page.append( http._request.target );
+	page.append( request.target );
 	page.append( "</h1>" );
 	page.append( "<table>" );
 	page.append("<thead>" );
@@ -90,9 +89,9 @@ HTTP::autoindex ( HTTP & http )
 						"padding-inline-end: 0.7em;\">" );
 			}
 			page.append( "<a href=\"http://" );
-			page.append( http._request.headers["host"] );
-			if ( http._request.target.size() > 1 )
-				page.append( http._request.target );
+			page.append( request.headers["host"] );
+			if ( request.target.size() > 1 )
+				page.append( request.target );
 			if ( page.back() != '/' )
 				page.append( "/" );
 			page.append( ent->d_name );
@@ -107,6 +106,6 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "</body>" );
 	page.append( "</html>" );
     closedir( directory );
-	http._response.body.append( page.c_str() );
+	dst.append( page.c_str() );
 	return ( OK );
 }

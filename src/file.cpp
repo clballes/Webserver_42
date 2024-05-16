@@ -4,11 +4,6 @@
 /* Wed Apr 10 14:49:21 2024                                                   */
 
 #include "file.hpp"
-#include <unistd.h>
-#include <iostream>
-#include <sys/stat.h>
-#include "HTTP.hpp" // Include the header file where HTTP is defined
-
 
 bool
 is_regular_file( const std::string & filename )
@@ -35,7 +30,7 @@ bool routeExists( const std::string & route )
 }
 
 int
-load_file ( std::string & message_body, const std::string & target )
+load_file ( const std::string & target, std::string & dst )
 {
 	std::ifstream file;
 	std::ifstream::pos_type pos;
@@ -46,8 +41,8 @@ load_file ( std::string & message_body, const std::string & target )
 		// TODO: sanity checks
 		pos = file.tellg();
 		file.seekg( 0, std::ios::beg );
-		message_body.resize( pos );
-		file.read( (char *) message_body.data(), pos );
+		dst.resize( pos );
+		file.read( (char *) dst.data(), pos );
 	}
 	if ( file.good() == false )
 	{
@@ -75,30 +70,141 @@ parse_string( const std::string & input )
 }
 
 int
-generate_html ( HTTP & http )
+generate_html ( const t_request & request, std::string & dst )
 {
-    std::ostringstream html;
-    html << "<!DOCTYPE html>\n";
-    html << "<html>\n";
-    html << "<head>\n";
-    html << "<title>POST Request Successful</title>\n";
-    html << "<style>\n";
-    // Adding some basic styles
-    html << "body { font-family: Arial, sans-serif; }\n";
-    html << "h1 { color: #333; }\n";
-    html << "p { color: #666; }\n";
-    html << "</style>\n";
-    html << "</head>\n";
-    html << "<body>\n";
-    html << "<h1>POST Request Successful</h1>\n";
-    html << "<p>Your POST request was successfully received and processed.</p>\n";
-    std::string res = urldecode(http.getRequest().body);
-    std::vector<std::pair<std::string, std::string> > pairs = parse_string(res);
-    for (std::vector<std::pair<std::string, std::string> >::const_iterator it = pairs.begin(); it != pairs.end(); ++it) {
-        html << "<p><strong>Key:</strong> " << it->first << " <strong>Value:</strong> " << it->second << "</p>\n";
+    std::string	html, res;
+	std::vector< std::pair< std::string, std::string > > pairs;
+	std::vector< std::pair< std::string, std::string > >::const_iterator it;
+
+    html.append( "<!DOCTYPE html>\n"
+		"<html>\n"
+		"<head>\n"
+		"<title>POST Request Successful</title>\n"
+		"<style>\n"
+		// Adding some basic styles
+		"body { font-family: Arial, sans-serif; }\n"
+		"h1 { color: #333; }\n"
+		"p { color: #666; }\n"
+		"</style>\n"
+		"</head>\n"
+		"<body>\n"
+		"<h1>POST Request Successful</h1>\n"
+		"<p>Your POST request was successfully received and processed.</p>\n" );
+	res.assign( request.body );
+	(void) urldecode( res );
+    pairs = parse_string( res );
+    for ( it = pairs.begin(); it != pairs.end(); ++it )
+	{
+        html.append( "<p><strong>Key:</strong> " );
+		html.append( it->first );
+		html.append( " <strong>Value:</strong> " );
+		html.append( it->second );
+		html.append( "</p>\n" );
     }
-    html << "</body>\n";
-    html << "</html>\n";
-    http.setMessageBody(html.str());
-    return (EXIT_SUCCESS);
+    html.append( "</body>\n" );
+    html.append( "</html>\n" );
+    dst.append( html );
+    return ( EXIT_SUCCESS );
+}
+
+/*
+ * From RFC9112:
+ * When making a request directly to an origin server,
+ * other than a CONNECT or server-wide OPTIONS request
+ * (as detailed below), a client MUST send only the
+ * absolute path and query components of the target URI
+ * as the request-target. If the target URI's path
+ * component is empty, the client MUST send "/" as the
+ * path within the origin-form of request-target.
+ */
+
+int
+autoindex ( const t_request & request, std::string & dst )
+{
+	std::string page;
+	std::string directory_name;
+	DIR*        directory;
+
+	directory_name = request.file;
+	directory = opendir( directory_name.c_str() );
+	if ( directory == NULL )
+	{
+		WARN( directory_name << ": " << strerror( errno ) );
+		return ( NOT_FOUND );
+	}
+	// HTML init content tags ( html, head, title, body ).
+	page.append( "<!DOCTYPE html>" );
+	page.append( "<head>" );
+	page.append( "<title>" );
+	page.append( request.target );
+	page.append( "</title>" );
+	// Add style tags
+	page.append( "<style>" );
+	page.append( "img.icon {" );
+	page.append( "    vertical-align: middle;" );
+	page.append( "    margin-right: 8px;" );
+	page.append( "}" );
+	page.append( "a.link {" );
+	page.append( "    vertical-align: middle;" );
+	page.append( "}" );
+	page.append( "</style>" );
+	page.append( "</head>" );
+	page.append( "<body>" );
+	page.append( "<h1>Index of " );
+	page.append( request.target );
+	page.append( "</h1>" );
+	page.append( "<table>" );
+	page.append("<thead>" );
+	page.append( "<tr class=\"header\" ><th tabindex=\"0\" role=\"button\">Name</th></tr></thead>" );
+	page.append( "<tbody>" );
+	for ( struct dirent *ent = readdir( directory );
+			ent != 0x0; ent = readdir( directory ) )
+	{
+		if ( std::strcmp( ent->d_name, "." ) != 0
+				&& std::strcmp( ent->d_name, ".." ) != 0 )
+		{
+			page.append( "<tr>" );
+			page.append( "<td data-value=\"" );
+			page.append( ent->d_name );
+			page.append( "\">" );
+			if ( ! is_regular_file( ent->d_name ) )
+			{
+				page.append( "<img src=\"/assets/dir_icon.png\" "
+						"alt=\"Directory Icon\" "
+						"style=\"width: 16px; "
+						"height: 16px; "
+						"padding-inline-start: 1em; "
+						"vertical-align:middle; "
+						"padding-inline-end: 0.7em;\">" );
+			}
+			else
+			{
+				page.append( "<img src=\"/assets/file_icon.png\" "
+						"alt=\"File Icon\" "
+						"style=\"width: 16px; "
+						"height: 16px; "
+						"padding-inline-start: 1em; "
+						"vertical-align:middle; "
+						"padding-inline-end: 0.7em;\">" );
+			}
+			page.append( "<a href=\"http://" );
+			page.append( request.headers.at( "host" ) );
+			if ( request.target.size() > 1 )
+				page.append( request.target );
+			if ( page.back() != '/' )
+				page.append( "/" );
+			page.append( ent->d_name );
+			page.append( "\" style=\"vertical-align: middle;\">" );
+			page.append( ent->d_name );
+			page.append( "</a>" );
+			page.append( "</td>" );
+			page.append( "</tr>" );
+		}
+	}
+	// HTML end tags
+	page.append( "</body>" );
+	page.append( "</html>" );
+    closedir( directory );
+	dst.append( page.c_str() );
+	return ( OK );
 }

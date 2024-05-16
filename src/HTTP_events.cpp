@@ -14,7 +14,7 @@ HTTP::dispatch ( struct kevent & ev )
 		this->deregister_recv();
 		delete this;
 	}
-	if ( ev.filter == EVFILT_READ )
+	else if ( ev.filter == EVFILT_READ )
 	{
 		(void) this->recv_request( ev.data );
 	}
