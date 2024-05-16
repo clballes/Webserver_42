@@ -1,12 +1,30 @@
 #!/usr/bin/env python3
 
-import os
+import cgi
 
-print("Content-Type: text/html\n")  # Required header indicating HTML content
+print("Content-type: text/html\n")
 
-print("<html><head><title>CGI Python Script</title></head><body>")
-print("<h1>Hello CGI World!</h1>")
-print("<p>This is a simple CGI Python script.</p>")
+print("<html>")
+print("<head>")
+print("<title>CGI Tester</title>")
+print("</head>")
+print("<body>")
+print("<h1>CGI Tester</h1>")
+print("<p>This is a simple CGI tester script.</p>")
 
+form = cgi.FieldStorage()
 
-print("</body></html>")
+if "file" in form:
+    file_path = form["file"].value
+    try:
+        with open(file_path, "r") as f:
+            file_content = f.read()
+        print("<h2>File Content:</h2>")
+        print("<pre>{}</pre>".format(file_content))
+    except IOError:
+        print("<p>Error: Unable to open file '{}'.</p>".format(file_path))
+else:
+    print("<p>No file specified.</p>")
+
+print("</body>")
+print("</html>")
