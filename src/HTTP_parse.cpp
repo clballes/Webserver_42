@@ -49,6 +49,8 @@ HTTP::parse ( void )
 		start = pos + 1;
 		pos = this->_buffer_recv.find_first_of( LF, start );
 	}
+	if ( line != "\r" )
+		return ( EXIT_FAILURE );
 	return ( parse_body( *this, this->_buffer_recv, pos ) );
 }
 
@@ -218,7 +220,7 @@ HTTP::parse_field_line ( std::string & line )
 		field_value = line.substr( pos, len - pos );
 		trim_f( field_value, &std::isspace );
 	}
-	this->_request_headers.insert( this->_request_headers.end(),
+	this->_request.headers.insert( this->_request.headers.end(),
 			std::pair< std::string, std::string> ( field_name, field_value ) );
 	return ( EXIT_SUCCESS );
 }

@@ -90,7 +90,7 @@ HTTP::autoindex ( HTTP & http )
 						"padding-inline-end: 0.7em;\">" );
 			}
 			page.append( "<a href=\"http://" );
-			page.append( http._request_headers["host"] );
+			page.append( http._request.headers["host"] );
 			if ( http._request.target.size() > 1 )
 				page.append( http._request.target );
 			if ( page.back() != '/' )
@@ -107,6 +107,6 @@ HTTP::autoindex ( HTTP & http )
 	page.append( "</body>" );
 	page.append( "</html>" );
     closedir( directory );
-	http._message_body.append( page.c_str() );
+	http._response.body.append( page.c_str() );
 	return ( OK );
 }

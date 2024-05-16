@@ -27,7 +27,7 @@ HTTP::http_get ( HTTP & http )
 			http._status_code = FORBIDDEN;
 	}
 	else if ( S_ISREG( http._request.file_info.st_mode ) )
-		http._status_code = load_file( http._message_body, http._request.file );
+		http._status_code = load_file( http._response.body, http._request.file );
 	else
 		http._status_code = NOT_FOUND;
 	return ( EXIT_SUCCESS );
@@ -75,7 +75,7 @@ HTTP::http_delete ( HTTP & http )
 		if ( remove( http._request.target.c_str() ) == 0 )
 		{
 			http._status_code = OK;
-			http._message_body.append( "<!DOCTYPE html><body><h1>File deleted.</h1></body></html>" );
+			http._response.body.append( "<!DOCTYPE html><body><h1>File deleted.</h1></body></html>" );
 		}
 		else
 			http._status_code = FORBIDDEN;

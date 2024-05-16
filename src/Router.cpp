@@ -326,10 +326,9 @@ Router::listen ( void )
 		if ( this->register_read_socket( *i ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
-	const struct timespec t = {2, 0};
 	while ( this->good() )
 	{
-		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, &t );
+		n_events = ::kevent( IEvent::kq, 0x0, 0, &ev, 1, 0 );
 		if ( this->good() == false )
 			return ( EXIT_FAILURE );
 		if ( n_events == -1 )

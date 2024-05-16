@@ -26,33 +26,42 @@
 #include "file.hpp"
 #include "HTTP_status_codes.hpp"
 
-typedef std::map< std::string, std::string > t_headers;
-
 class HTTP;
 class CGI;
 class Router;
 class Server;
 class Connection;
 
+typedef std::map< std::string, std::string > t_headers;
+
 typedef struct s_http_method
 {
-	const char * method;
-	int ( *method_func )( HTTP & );
-	int code;
+	const char *	method;
+	int				( *method_func )( HTTP & );
+	int				code;
+
 } t_http_method;
 
 typedef struct s_request
 {
-	t_http_method * method;
-	std::string host;
-	std::string target;
-	std::string file;
-	struct stat file_info;
-	std::string query;
-	std::string body;
-	int http_version;
+	int 			http_version;
+	t_http_method *	method;
+	std::string		host;
+	std::string		target;
+	std::string		query;
+	std::string		body;
+	std::string		file;
+	struct stat		file_info;
+	t_headers		headers;
 
 } t_request;
+
+typedef struct s_response
+{
+	std::string		body;
+	t_headers		headers;
+
+} t_response;
 
 class HTTP: public IEvent
 {
@@ -64,8 +73,9 @@ class HTTP: public IEvent
 		void dispatch ( struct kevent & );
 		int register_recv ( void );
 		int register_send ( void );
-		int request_recv ( int64_t );
-		int request_send ( void );
+		int deregister_recv ( void );
+		int recv_request ( int64_t );
+		int send_response ( void );
 		int compose_response ( void );
 		int compute_response ( void );
 		int check_index ( void ); // can be made in-file static
@@ -73,6 +83,7 @@ class HTTP: public IEvent
 		Server & getServer ( void );
 		t_request & getRequest ( void );
 		t_headers & getRequestHeaders ( void );
+		t_response & getResponse ( void );
 		t_headers & getResponseHeaders ( void );
 		
 		void setMessageBody( const std::string & );
@@ -93,12 +104,10 @@ class HTTP: public IEvent
 		CGI *					_cgi_ptr;
 
 		int						_status_code;
-		t_headers				_request_headers;
-		t_headers				_response_headers;
 		std::string				_buffer_recv;
 		std::string				_buffer_send;
-		std::string				_message_body;
 		t_request				_request;
+		t_response				_response;
 		bool					_keep_alive;
 		bool					_expect;
 
