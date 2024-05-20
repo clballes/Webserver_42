@@ -22,6 +22,14 @@ HTTP::dispatch ( struct kevent & ev )
 	{
 		(void) this->send_response();
 	}
+	else if ( ev.filter == EVFILT_TIMER )
+	{
+		NOTICE( "request timed out" );
+		this->deregister_recv();
+		this->setStatusCode( REQUEST_TIMEOUT );
+		this->_response.headers["connection"] = "close";
+		this->compose_response();
+	}
 	return ;
 }
 
