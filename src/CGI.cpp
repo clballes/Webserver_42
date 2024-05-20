@@ -8,15 +8,11 @@
 #define READ 0
 #define WRITE 1
 
-std::size_t
-CGI::timer_id_threshold = INT_MAX;
-
 static char ** map2array ( const std::map< std::string, std::string > & );
 
 CGI::CGI ( HTTP & http , Server & server):
 	_http( http ), _server ( server )
 {
-	this->_timer_id = CGI::timer_id_threshold++;
 	this->setmap();
 	return ;
 }
@@ -67,7 +63,7 @@ CGI::register_process ( void )
 		ERROR( "kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
-	EV_SET( &ev, this->_timer_id, EVFILT_TIMER, EV_ADD | EV_ENABLE,
+	EV_SET( &ev, this->_pid, EVFILT_TIMER, EV_ADD | EV_ENABLE,
 			NOTE_SECONDS, CGI_TIMEOUT, (void *) this );
     if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
 	{
@@ -96,13 +92,12 @@ CGI::deregister_timer ( void )
 {
 	struct kevent ev;
 
-	EV_SET( &ev, this->_timer_id, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
+	EV_SET( &ev, this->_pid, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
-	CGI::timer_id_threshold -= 1;
 	return ( EXIT_SUCCESS );
 }
 
@@ -132,14 +127,8 @@ CGI::dispatch ( struct kevent & ev )
 			return ;
 		}
 		close( this->_pipefd[READ] );
-		if ( parse_headers( buffer ) == EXIT_FAILURE )
-		{
-			this->_http.setStatusCode( BAD_GATEWAY );
-		}
-		if ( check_headers() == EXIT_FAILURE )
-		{
-			this->_http.setStatusCode( INTERNAL_SERVER_ERROR );
-		}
+		(void) parse_headers( buffer );
+		(void) check_headers();
 		this->_http.compose_response();
 		delete this;
 	}
@@ -234,7 +223,9 @@ CGI::check_headers ( void )
         ++flag;
     if ( headers.find( "location" ) != headers.end() )
         ++flag;
-    return ( ( flag == 0 ) ? EXIT_FAILURE : EXIT_SUCCESS );
+	if ( flag == 0 )
+		this->_http.setStatusCode( UNPROCESSABLE_CONTENT );
+    return ( EXIT_SUCCESS );
 }
 
 int
@@ -245,6 +236,11 @@ CGI::parse_headers ( std::string & line )
 	std::string								sub_line;
 
 	start = 0;
+	if ( line.empty() )
+	{
+		this->_http.setStatusCode( NO_CONTENT );
+		return ( EXIT_SUCCESS );
+	}
 	pos = line.find_first_of( LF, start );
 	if ( pos == std::string::npos )
 		pos = line.length();
