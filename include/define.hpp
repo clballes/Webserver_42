@@ -43,6 +43,7 @@
 #endif
 
 #define CGI_TIMEOUT			8
+#define REQ_TIMEOUT			30
 
 #include "HTTP_status_codes.hpp"
 
