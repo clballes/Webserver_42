@@ -494,10 +494,7 @@ set_limit_except( Server & instance, std::string & arg, std::string location )
 	while ( iss >> word )
 	{
 		if ( word == "GET" )
-		{
 			limit_flag ^= HTTP_GET;
-			limit_flag ^= HTTP_HEAD;
-		}
 		else if ( word == "PUT" )
 			limit_flag ^= HTTP_PUT;
 		else if ( word == "POST" )
