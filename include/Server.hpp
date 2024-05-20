@@ -43,6 +43,7 @@ class Server
 		in_addr_t getHost ( void ) const;
 		in_port_t getPort ( void ) const;
 		const std::pair<int, std::string> & getRedirection ( std::string location ) const;
+		const std::string & getUploadDirectory ( std::string location = "" ) const;
 
 		int setListen( struct sockaddr_in & );
 		int setFlag ( int, bool, std::string = "" );

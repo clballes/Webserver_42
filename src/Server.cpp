@@ -154,16 +154,14 @@ Server::getClientMaxBodySize (  std::string location ) const
 const std::pair<int, std::string> & Server::getRedirection ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
-	const std::pair<int, std::string> & redirection = loc.getRedirection();
-	return ( redirection );
+	return ( loc.getRedirection() );
 }
 
 const std::string &
 Server::getCGIpass ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
-	const std::string & cgi_pass = loc.getCGIpass();
-	return ( cgi_pass );
+	return ( loc.getCGIpass() );
 }
 
 
@@ -171,14 +169,20 @@ const std::string &
 Server::getRoot ( std::string location ) const
 {
 	const Location & loc = this->getRoute( location );
-	const std::string & root = loc.getRoot();
-	return ( root );
+	return ( loc.getRoot() );
 }
 
 const std::vector< std::string > &
 Server::getServerNames ( void ) const
 {
 	return ( this->_server_name );
+}
+
+const std::string &
+Server::getUploadDirectory ( std::string location ) const
+{
+	const Location & loc = this->getRoute( location );
+	return ( loc.getUploadDirectory() );
 }
 
 bool

@@ -76,6 +76,12 @@ Location::getIndex ( void ) const
 	return ( const_cast< std::vector< std::string > & >( this->_index ) );
 }
 
+const std::string &
+Location::getUploadDirectory ( void ) const
+{
+	return ( this->_upload_directory );
+}
+
 bool
 Location::isDefault ( void ) const
 {
