@@ -11,8 +11,14 @@ HTTP::http_head ( void * http_ptr )
 	HTTP * http;
 
 	http = static_cast< HTTP * >( http_ptr );
-	if ( S_ISDIR( http->_request.file_info.st_mode )
-			|| S_ISREG( http->_request.file_info.st_mode ) )
+	if ( S_ISDIR( http->_request.file_info.st_mode ) )
+	{
+		if ( http->_server.getFlag( F_AUTOINDEX, http->_request.target ) )
+			http->_response.status_code = OK;
+		else
+			http->_response.status_code = FORBIDDEN;
+	}
+	else if ( S_ISREG( http->_request.file_info.st_mode ) )
 		http->_response.status_code = OK;
 	else
 		http->_response.status_code = NOT_FOUND;
@@ -33,9 +39,7 @@ HTTP::http_get ( void * http_ptr )
 					http->_response.body );
 		}
 		else
-		{
 			http->_response.status_code = FORBIDDEN;
-		}
 	}
 	else if ( S_ISREG( http->_request.file_info.st_mode ) )
 	{
@@ -43,9 +47,7 @@ HTTP::http_get ( void * http_ptr )
 				http->_response.body );
 	}
 	else
-	{
 		http->_response.status_code = NOT_FOUND;
-	}
 	return ( EXIT_SUCCESS );
 }
 
