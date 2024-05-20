@@ -70,6 +70,8 @@ HTTP::http_put ( void * http_ptr )
 	std::ofstream file;
 
 	http = static_cast< HTTP * >( http_ptr );
+	if ( ! http->_server.getUploadDirectory( http->_request.target ).empty() )
+		http->_request.file.insert( 0, http->_server.getUploadDirectory( http->_request.target ) );
 	if ( S_ISREG( http->_request.file_info.st_mode )
 			|| S_ISDIR( http->_request.file_info.st_mode ) )
 	{

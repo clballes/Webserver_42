@@ -1,4 +1,5 @@
 - [ ] siege
+- [ ] tester
 - [ ] leaks
 - [ ] leaks: graceful\_stop SIGQUIT SIGTERM
 - [ ] test: required directives ( Server check() )
@@ -14,10 +15,7 @@
 - [ ] test: chunk request with more than 3 requests/connection
 - [ ] test: multipart-form with more than 3 requests/connection
 - [ ] test: request timeout
+- [ ] test: upload\_files
 
-- [ ] puyma: upload\_files
 - [ ] puyma: chunked requests / multipart form 
-
 - [ ] clballes: config tests
-- [ ] clballes: upload some file to the server test
-- [x] clballes: POST basic html & parsing
