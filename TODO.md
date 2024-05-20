@@ -1,7 +1,6 @@
 - [ ] siege
 - [ ] leaks
-- [ ] leaks: graceful\_stop SIGQUIT
-- [ ] leaks: SIGTERM
+- [ ] leaks: graceful\_stop SIGQUIT SIGTERM
 - [ ] test: required directives ( Server check() )
 - [ ] test: wrong number of arguments ( conf )
 - [ ] test: wrong input(s)
@@ -14,8 +13,8 @@
 - [ ] test: expect: 100-continue header
 - [ ] test: chunk request with more than 3 requests/connection
 - [ ] test: multipart-form with more than 3 requests/connection
+- [ ] test: request timeout
 
-- [ ] puyma: request timeout
 - [ ] puyma: upload\_files
 - [ ] puyma: chunked requests / multipart form 
 
