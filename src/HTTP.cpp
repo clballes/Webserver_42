@@ -5,6 +5,9 @@
 
 #include "HTTP.hpp"
 
+void clear_request ( t_request & );
+void clear_response ( t_response & );
+
 t_http_method
 HTTP::methods[] = {
 	{ "GET", &HTTP::http_get, HTTP_GET },
@@ -24,10 +27,8 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 	_state( 0 ),
 	_expect( false )
 {
-	this->_request.method = 0x0;
-	std::memset( &this->_request.file_info, 0,
-			sizeof( this->_request.file_info ) );
-	this->_request.http_version = 0;
+	clear_request( this->_request );
+	clear_response( this->_response );
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1
@@ -88,5 +89,29 @@ void
 HTTP::setStatusCode ( int value )
 {
 	this->_response.status_code = value;
+	return ;
+}
+
+void
+clear_request ( t_request & request )
+{
+	request.http_version = 0;
+	request.method = NULL;
+	request.host.clear();
+	request.target.clear();
+	request.query.clear();
+	request.body.clear();
+	request.file.clear();
+	std::memset( &request.file_info, 0, sizeof( request.file_info ) );
+	request.headers.clear();
+	return ;
+}
+
+void
+clear_response ( t_response & response )
+{
+	response.status_code = 0;
+	response.body.clear();
+	response.headers.clear();
 	return ;
 }

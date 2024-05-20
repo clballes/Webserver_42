@@ -133,9 +133,10 @@ translate_target ( HTTP & http )
 		root_location.append( "/" );
 		request.file.replace( 0, 1, root_location );
 	}
-	if ( request.file.back() == '/' )
-		check_index( http );
 	stat( request.file.c_str(), &request.file_info );
+	if ( S_ISDIR( request.file_info.st_mode ) )
+		check_index( http );
+
 	return ;
 }
 

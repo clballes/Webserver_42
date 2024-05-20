@@ -8,8 +8,8 @@
 // There is no need to check if this->_request.method is NULL
 // as this check is done in the parse() call;
 
-static void clear_request ( t_request & );
-static void clear_response ( t_response & );
+void clear_request ( t_request & );
+void clear_response ( t_response & );
 
 int
 HTTP::compute_response ( void )
@@ -37,13 +37,16 @@ HTTP::compute_response ( void )
 int
 HTTP::compose_response ( void )
 {
-	if ( this->_response.status_code >= 300 && this->_response.status_code <= 511 )
+	if ( this->_response.status_code >= 300 && this->_response.status_code <= 511
+			&& this->_request.method != NULL && this->_request.method->code != HTTP_HEAD )
 		load_file( this->_server.getErrorPage( this->_response.status_code ),
 			   this->_response.body );
 	this->_buffer_send.append( "HTTP/1.1 " );
 	this->_buffer_send.append( my_to_string( this->_response.status_code ) );
 	this->_buffer_send.append( " \r\n" );
 	this->_response.headers["content-length"] = my_to_string( this->_response.body.size() );
+	if ( this->_request.method != NULL && this->_request.method->code == HTTP_HEAD )
+		this->_response.headers.erase( "content-length" );
 	// Add response headers if any + ending CRLF.
 	for ( t_headers::iterator it = this->_response.headers.begin();
 			it != this->_response.headers.end(); ++it )
@@ -56,6 +59,7 @@ HTTP::compose_response ( void )
 	this->_buffer_send.append( "\r\n" );
 	// Add [message body] if any.
 	this->_buffer_send.append( this->_response.body );
+	this->_buffer_recv.clear();
 	this->send_response();
 	return ( EXIT_SUCCESS );
 }
@@ -79,31 +83,6 @@ HTTP::send_response ( void )
 	}
 	clear_request( this->_request );
 	clear_response( this->_response );
-	this->_buffer_recv.clear();
 	this->_buffer_send.clear();
 	return ( EXIT_SUCCESS );
-}
-
-static void
-clear_request ( t_request & request )
-{
-	request.http_version = 0;
-	request.method = NULL;
-	request.host.clear();
-	request.target.clear();
-	request.query.clear();
-	request.body.clear();
-	request.file.clear();
-	std::memset( &request.file_info, 0, sizeof( request.file_info ) );
-	request.headers.clear();
-	return ;
-}
-
-static void
-clear_response ( t_response & response )
-{
-	response.status_code = 0;
-	response.body.clear();
-	response.headers.clear();
-	return ;
 }
