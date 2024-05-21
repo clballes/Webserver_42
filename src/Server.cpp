@@ -52,7 +52,7 @@ Server::getRoute ( const std::string & location ) const
 	t_route_map::const_iterator		it;
 	std::string						target( location );
 	std::string						cmp_str;
-	
+
 	it = this->_routes.begin();
 	while ( it != this->_routes.end() )
 	{
@@ -233,11 +233,12 @@ Server::getListen ( void ) const
 int
 Server::setRoute ( const std::string & location )
 {
+	LOG( location );
 	std::string mod_location( location );
 
-	while ( mod_location.back() == '/' )
+	while ( mod_location.size() > 1 && mod_location.back() == '/' )
 		mod_location.erase( mod_location.length() - 1, 1 );
-	if ( mod_location.back() != '/' ) 
+	if ( mod_location.back() != '/' )
 		mod_location.append( "/" );
 	if ( mod_location.size() > 1 && mod_location[0] == '*' )
 		mod_location.erase( mod_location.length() - 1, 1 );
@@ -324,7 +325,7 @@ Server::setErrorPage ( int n, const std::string & path )
 int
 Server::setRedirection ( const std::string & arg, std::string location )
 {
-	
+
 	return ( this->getRoute( location ).setRedirection( arg ) );
 }
 

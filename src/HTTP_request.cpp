@@ -26,11 +26,19 @@ HTTP::recv_request ( int64_t data )
 	{
 		INFO( "Client closed connection" );
 		delete this;
-		return ( EXIT_SUCCESS );	
+		return ( EXIT_SUCCESS );
 	}
 	this->_buffer_recv.append( buffer );
+
+	// Will try to parse a line ending with /r(/n)
+	// depending on the HTTP _status.
+	if ( this->parse() == EXIT_FAILURE )
+	{
+		WARN( "HTTP request does not comply with HTTP/1.x specification." );
+	}
+
 	// TODO: expect header
-	if ( isComplete( this->_buffer_recv, this->_request ) == true )
+	if ( this->_status == COMPLETE )
 	{
 		/*
 		// If request sent "expect: 100-continue" header

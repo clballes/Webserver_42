@@ -31,6 +31,11 @@
 #include "t_response.hpp"
 #include "t_http_method.hpp"
 
+#define PENDING_START_LINE	0
+#define PENDING_HEADERS		1
+#define PENDING_BODY		2
+#define COMPLETE			3
+
 class HTTP;
 class CGI;
 class Router;
@@ -56,11 +61,11 @@ class HTTP: public IEvent
 		Server & getServer ( void );
 		t_request & getRequest ( void );
 		t_response & getResponse ( void );
-		
+
 		void setMessageBody( const std::string & );
 		void setStatusCode( int );
 		void setResponseHeaders( const std::string &, const std::string & );
-		
+
 		static t_http_method methods[];
 		static int handle_chunk_expect ( HTTP & ); // can be made in-file static
 
@@ -75,17 +80,15 @@ class HTTP: public IEvent
 		CGI *					_cgi_ptr;
 
 		int						_state;
+		bool					_keep_alive;
+		bool					_expect;
 		std::string				_buffer_recv;
 		std::string				_buffer_send;
 		t_request				_request;
 		t_response				_response;
-		bool					_keep_alive;
-		bool					_expect;
 
 		int parse ( void );
-		int parse_start_line ( std::string & ); // can be made in-file static
-		int parse_field_line ( std::string & ); // can be made in-file static
-		
+
 		static int http_get ( void * HTTP );
 		static int http_head ( void * HTTP );
 		static int http_post ( void * HTTP );

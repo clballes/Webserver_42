@@ -4,54 +4,51 @@
 /* Tue Apr  9 16:50:09 2024                                                   */
 
 #include "HTTP.hpp"
+#include <string>
 
+static int parse_start_line ( HTTP &, const std::string & );
 static int parse_method ( t_request &, std::string & );
 static int parse_target ( t_request &, std::string & );
 static int parse_http_version ( t_request &, std::string & );
-static int parse_body( HTTP & http, const std::string &, std::size_t );
 static std::string parse_query ( std::string & );
-static int handle_chunk ( std::string & );
+
+static int parse_headers ( HTTP &, const std::string & );
+
+static int parse_body( HTTP & http, const std::string &, std::size_t );
 static size_t how_many_methods( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
 
 int
 HTTP::parse ( void )
 {
-	std::string::size_type  start, pos;
-	std::string             line;
+	std::string line;
+	std::string::size_type pos;
 
-	start = 0;
-	pos = this->_buffer_recv.find_first_of( LF, start );
-	if ( pos == std::string::npos )
-		pos = this->_buffer_recv.length();
-	while ( pos != std::string::npos )
+	pos = this->_buffer_recv.find( LF );
+	if ( pos == std::string::npos && this->_state != PENDING_BODY )
+		return ( EXIT_SUCCESS );
+	if ( this->_state == PENDING_START_LINE )
 	{
-		line = this->_buffer_recv.substr( start, pos - start );
-		if ( start == 0 )
-		{
-			if ( parse_start_line( line ) == EXIT_FAILURE )
-				return ( EXIT_FAILURE );
-		}
-		else if ( line.empty() || ( line.length() == 1 && line[0] == '\r' ) )
-		{
-			// Once found an empty line or containing a single CR
-			// header parsing is over.
-			++pos;
-			break ;
-		}
-		else if ( std::isgraph( line[0] ) != 0 )
-		{
-			if ( parse_field_line( line ) == EXIT_FAILURE )
-				return ( EXIT_FAILURE );
-		}
-		else if ( ( pos - start ) != 1 )
+		line = this->_buffer_recv.substr( 0, pos );
+		this->_buffer_recv.erase( 0, pos );
+		if ( parse_start_line( this, line ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
-		start = pos + 1;
-		pos = this->_buffer_recv.find_first_of( LF, start );
 	}
-	if ( line != "\r" )
-		return ( EXIT_FAILURE );
-	return ( parse_body( *this, this->_buffer_recv, pos ) );
+	else if ( this->_state == PENDING_HEADERS )
+	{
+		line = this->_buffer_recv.substr( 0, pos );
+		this->_buffer_recv.erase( 0, pos );
+		if ( line == "\r" || line.empty() )
+			this->_state = PENDING_BODY;
+		else if ( parse_headers( this, line ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+	}
+	else if ( this->_state == PENDING_BODY )
+	{
+		if ( parse_body( this ) == EXIT_FAILURE )
+			return ( EXIT_FAILURE );
+	}
+	return ( EXIT_SUCCESS );
 }
 
 // From RFT9112:
@@ -59,9 +56,20 @@ HTTP::parse ( void )
 // start-line = request-line / status-line
 // request-line = method SP request-target SP HTTP-version
 
-int
-HTTP::parse_start_line( std::string & line )
+static int
+parse_start_line ( HTTP & http, const std::string & line )
 {
+	std::string				line;
+	std::string::size_type	pos;
+
+	pos = http._buffer_recv.find( LF );
+	if ( pos == std::string::npos )
+	{
+		// nothing to do yet
+		return ( EXIT_SUCCESS );
+	}
+	line = http._buffer_recv.substr( 0, pos );
+	http._buffer_recv.erase( 0, pos );
 	this->_response.status_code = parse_method( this->_request, line );
 	if ( this->_response.status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
@@ -132,9 +140,9 @@ parse_target( t_request & request, std::string & line )
 			value.erase( value.length() - 1, 1 );
 		}
 		value.append( "/" );
-	}	
-	request.target = value;	
-	urldecode( request.target );	
+	}
+	request.target = value;
+	urldecode( request.target );
 	return ( EXIT_SUCCESS );
 }
 
@@ -185,6 +193,31 @@ parse_query( std::string & target )
 	return ( value );
 }
 
+int
+HTTP::parse_headers( void , const std::string & line)
+{
+	std::string field_name, field_value;
+	std::string::size_type pos, len, end_line;
+
+   	len = line.length();
+   	pos = line.find_first_of( ":" );
+    if ( len == 0 )
+   	field_name = line.substr( 0, pos );
+   	(void) strtolower( field_name );
+   	++pos;
+   	if ( pos != len )
+   	{
+  		field_value = line.substr( pos, len - pos );
+  		trim_f( field_value, &std::isspace );
+   	}
+   	this->_request.headers.insert( this->_request.headers.end(),
+ 			std::pair< std::string, std::string> ( field_name, field_value ) );
+   	return ( EXIT_SUCCESS );
+	if ( line == "\r"  )
+		this->_state == PENDING_BODY;
+	return ( EXIT_SUCCESS );
+}
+
 // From RFC3986 section 3.5
 // https://www.rfc-editor.org/rfc/rfc3986#section-3.5
 //
@@ -196,7 +229,7 @@ parse_query( std::string & target )
 // from the rest of the URI prior to a dereference, and thus the
 // identifying information within the fragment itself is dereferenced
 // solely by the user agent, regardless of the URI scheme.
-// 
+//
 // This translates to: the fragment is not send to the server.
 
 // No whitespace is allowed between the field name and colon.
@@ -204,12 +237,14 @@ parse_query( std::string & target )
 // any received request message that contains whitespace between
 // a header field name and colon.
 
+/*
 int
 HTTP::parse_field_line ( std::string & line )
 {
 	std::string field_name, field_value;
 	std::string::size_type pos, len;
 
+	// isgraph
 	len = line.length();
 	pos = line.find_first_of( ":" );
 	field_name = line.substr( 0, pos );
@@ -224,6 +259,7 @@ HTTP::parse_field_line ( std::string & line )
 			std::pair< std::string, std::string> ( field_name, field_value ) );
 	return ( EXIT_SUCCESS );
 }
+*/
 
 static int
 parse_body ( HTTP & http, const std::string & buffer, size_t pos )
@@ -231,7 +267,7 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 	t_request &			request = http.getRequest();
 	const t_headers &	headers = request.headers;
 	std::size_t			len;
-	
+
 	len = 0;
 	if ( pos >= buffer.length() )
 		return ( EXIT_SUCCESS );
@@ -254,45 +290,6 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 		http.setStatusCode( BAD_REQUEST );
 		http.getResponse().headers["connection"] = "close";
 	}
-	return ( EXIT_SUCCESS );
-}
-
-int
-handle_chunk ( std::string & body )
-{
-	std::string::size_type	pos;
-    std::string::size_type	chunk_length;
-
-	// TODO: unchunk chunked request
-	(void) pos; (void) chunk_length; (void) body;
-	// pos = 0;
-    // while ( pos < body.size() )
-	// {
-    //     // Find the position of the next '\r\n'
-    //     std::string::size_type next_crlf_pos = body.find( "\r\n", pos );
-    //     if ( next_crlf_pos == std::string::npos )
-	// 	{
-    //         ERROR( "Invalid chunked data format" );
-    //         return ( EXIT_FAILURE );
-    //     }
-
-    //     std::string chunk_length_hex = body.substr( pos, next_crlf_pos - pos );
-    //     chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
-
-    //     // Move past the '\r\n' to the start of the chunk data
-    //     pos = next_crlf_pos + 2;
-
-    //     // Extract the chunk data
-    //     std::string chunk_data = body.substr( pos, chunk_length );
-	// 	//store the extracted chunks in the body requested
-	// 	body += chunk_data;
-    //     pos += chunk_length + 2;
-	// 	if ( chunk_length == 0 )
-	// 	{
-	// 		LOG( " WE ARE AT THE END OF THE LINE " );
-	// 		//nose si cal afegir despres els trailer que son additional headers
-	// 	}
-    // }
 	return ( EXIT_SUCCESS );
 }
 
