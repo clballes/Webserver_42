@@ -83,6 +83,7 @@ HTTP::send_response ( void )
 	}
 	clear_request( this->_request );
 	clear_response( this->_response );
+	this->_state = PENDING_START_LINE;
 	this->_buffer_send.clear();
 	return ( EXIT_SUCCESS );
 }
