@@ -261,7 +261,8 @@ parse_body ( HTTP & http, const std::string & buffer )
 
 	len = 0;
 	std::size_t pos = 0; (void) pos;
-	return ( 0 );
+	http.setState( COMPLETE );
+	return ( EXIT_SUCCESS );
 
 	if ( pos >= buffer.length() )
 		return ( EXIT_SUCCESS );

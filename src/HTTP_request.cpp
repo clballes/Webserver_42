@@ -5,7 +5,6 @@
 
 #include "HTTP.hpp"
 
-static bool isComplete ( const std::string &, const t_request & );
 static void translate_target ( HTTP & );
 static void check_index ( HTTP & );
 
@@ -41,7 +40,6 @@ HTTP::recv_request ( int64_t data )
 		WARN( "HTTP request does not comply with HTTP/1.x specification." );
 		return ( EXIT_FAILURE );
 	}
-	(void) isComplete;
 	// TODO: expect header
 	if ( this->_state == COMPLETE )
 	{
@@ -71,6 +69,7 @@ HTTP::recv_request ( int64_t data )
 			}
 		}
 		*/
+		/*
 		if ( this->parse() == EXIT_FAILURE )
 		{
 			WARN( "HTTP request does not comply with HTTP/1.x specification." );
@@ -80,6 +79,7 @@ HTTP::recv_request ( int64_t data )
 			this->compose_response();
 			return ( EXIT_FAILURE );
 		}
+		*/
 		// Check client_max_body_size limit
 		// 0 == unlimited
 		if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0
@@ -113,15 +113,6 @@ HTTP::recv_request ( int64_t data )
 		return ( this->compute_response() );
 	}
 	return ( EXIT_SUCCESS);
-}
-
-static bool
-isComplete ( const std::string & buffer, const t_request & request )
-{
-	if ( buffer.find( "\r\n\r\n" ) != std::string::npos )
-		return ( true );
-	(void) request;
-	return ( false );
 }
 
 static void

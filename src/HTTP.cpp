@@ -93,6 +93,13 @@ HTTP::setStatusCode ( int value )
 }
 
 void
+HTTP::setState ( int value )
+{
+	this->_state = value;
+	return ;
+}
+
+void
 clear_request ( t_request & request )
 {
 	request.http_version = 0;

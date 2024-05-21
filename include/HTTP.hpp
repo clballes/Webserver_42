@@ -64,6 +64,7 @@ class HTTP: public IEvent
 
 		void setMessageBody( const std::string & );
 		void setStatusCode( int );
+		void setState( int );
 		void setResponseHeaders( const std::string &, const std::string & );
 
 		static t_http_method methods[];
