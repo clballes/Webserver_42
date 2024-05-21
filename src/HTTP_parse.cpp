@@ -269,34 +269,55 @@ parse_body ( HTTP & http, const std::string & buffer )
 	std::size_t			len;
 
 	len = 0;
-	std::size_t pos = 0; (void) pos;
-	http.setState( COMPLETE );
-	return ( EXIT_SUCCESS );
+	// TODO:: mirar quan sera complet
+	if ( headers.find( "transfer-encoding" ) != headers.end() )
+	{
+		if ( headers.at( "transfer-encoding" ) == "chunked" )
+		{
+			request.body.append( buffer );
+			if (request.body.compare())
+				http.setState( COMPLETE );
 
-	if ( pos >= buffer.length() )
-		return ( EXIT_SUCCESS );
+			//handle_chunk( request.body );
+			return ( EXIT_SUCCESS );
+		}
+		else //si no es chunked not implemented
+		{
+			http.setStatusCode( NOT_IMPLEMENTED );
+		}
+	}
 	if ( headers.find( "content-length" ) != headers.end() )
 	{
 		len = std::atoi( headers.at( "content-length" ).c_str() );
 		request.body.assign( buffer.c_str(), pos, len );
-	}
-	else if ( headers.find( "transfer-encoding" ) != headers.end() )
-	{
-		request.body.assign( buffer.c_str(), pos, std::string::npos );
-		if ( headers.at( "transfer-encoding" ) == "chunked" )
+		if (request.body.length() != len)
 		{
-			//handle_chunk( request.body );
-			return ( EXIT_SUCCESS );
+			break ;
 		}
+		else
+			http.setState( COMPLETE );
 	}
 	else
 	{
+		// no seria una bad request sino no content creiem
 		http.setStatusCode( BAD_REQUEST );
 		http.getResponse().headers["connection"] = "close";
 	}
+	// http.setState( COMPLETE );
 	return ( EXIT_SUCCESS );
 }
 
+static int
+content_len()
+{
+
+}
+
+static int
+content_len()
+{
+	
+}
 // The how_many_methods() and get_method_longest_len() calls
 // iterates through the methods stored in a t_http_method and
 // returns the numbers of iterations done and
