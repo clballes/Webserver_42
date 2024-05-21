@@ -21,13 +21,16 @@ HTTP::parse ( void )
 
 	pos = this->_buffer_recv.find( LF );
 	if ( pos == std::string::npos && this->_state != PENDING_BODY )
-		return ( EXIT_SUCCESS );
+		return ( EXIT_FAILURE );
 	if ( this->_state == PENDING_START_LINE )
 	{
 		line = this->_buffer_recv.substr( 0, pos );
 		this->_buffer_recv.erase( 0, ++pos );
 		if ( parse_start_line( *this, line ) == EXIT_FAILURE )
+		{
+			this->setState( BAD_REQUEST );
 			return ( EXIT_FAILURE );
+		}
 		this->_state = PENDING_HEADERS;
 	}
 	else if ( this->_state == PENDING_HEADERS )
@@ -37,12 +40,18 @@ HTTP::parse ( void )
 		if ( line == "\r" || line.empty() )
 			this->_state = PENDING_BODY;
 		else if ( parse_field_line( *this, line ) == EXIT_FAILURE )
+		{
+			this->setState( BAD_REQUEST );
 			return ( EXIT_FAILURE );
+		}
 	}
 	else if ( this->_state == PENDING_BODY )
 	{
 		if ( parse_body( *this, this->_buffer_recv ) == EXIT_FAILURE )
+		{
+			//this->setState( BAD_REQUEST );
 			return ( EXIT_FAILURE );
+		}
 	}
 	return ( EXIT_SUCCESS );
 }
