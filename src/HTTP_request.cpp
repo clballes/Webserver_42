@@ -28,12 +28,10 @@ HTTP::recv_request ( int64_t data )
 		return ( EXIT_SUCCESS );
 	}
 	this->_buffer_recv.append( buffer );
-
-	// Will try to parse a line ending with /r(/n)
-	// depending on the HTTP _status.
 	while ( this->_state != BAD_REQUEST && this->_state != COMPLETE )
 	{
-		this->parse();
+		if ( this->parse() != EXIT_SUCCESS )
+			break ;
 	}
 	if ( this->_state == BAD_REQUEST )
 	{
@@ -139,8 +137,10 @@ translate_target ( HTTP & http )
 	}
 	stat( request.file.c_str(), &request.file_info );
 	if ( S_ISDIR( request.file_info.st_mode ) )
+	{
 		check_index( http );
-
+		stat( request.file.c_str(), &request.file_info );
+	}
 	return ;
 }
 
