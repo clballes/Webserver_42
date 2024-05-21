@@ -32,11 +32,16 @@ HTTP::recv_request ( int64_t data )
 
 	// Will try to parse a line ending with /r(/n)
 	// depending on the HTTP _status.
-	if ( this->parse() == EXIT_FAILURE )
+	while ( this->_state != BAD_REQUEST && ! this->_buffer_recv.empty() )
+	{
+		this->parse();
+	}
+	if ( this->_state == BAD_REQUEST )
 	{
 		WARN( "HTTP request does not comply with HTTP/1.x specification." );
+		return ( EXIT_FAILURE );
 	}
-(void) isComplete;
+	(void) isComplete;
 	// TODO: expect header
 	if ( this->_state == COMPLETE )
 	{

@@ -7,13 +7,9 @@
 #include <string>
 
 static int parse_start_line ( HTTP &, std::string );
-static int parse_method ( t_request &, std::string & );
-static int parse_target ( t_request &, std::string & );
-static int parse_http_version ( t_request &, std::string & );
-static std::string parse_query ( std::string & );
-static int parse_headers ( HTTP &, const std::string & );
-//static int parse_body ( HTTP &, const std::string &, std::size_t );
-static int parse_body ( HTTP & );
+static int parse_field_line ( HTTP &, const std::string & );
+static int parse_body ( HTTP &, const std::string & );
+
 static size_t how_many_methods ( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
 
@@ -29,26 +25,32 @@ HTTP::parse ( void )
 	if ( this->_state == PENDING_START_LINE )
 	{
 		line = this->_buffer_recv.substr( 0, pos );
-		this->_buffer_recv.erase( 0, pos );
+		this->_buffer_recv.erase( 0, ++pos );
 		if ( parse_start_line( *this, line ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
+		this->_state = PENDING_HEADERS;
 	}
 	else if ( this->_state == PENDING_HEADERS )
 	{
 		line = this->_buffer_recv.substr( 0, pos );
-		this->_buffer_recv.erase( 0, pos );
+		this->_buffer_recv.erase( 0, ++pos );
 		if ( line == "\r" || line.empty() )
 			this->_state = PENDING_BODY;
-		else if ( parse_headers( *this, line ) == EXIT_FAILURE )
+		else if ( parse_field_line( *this, line ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	else if ( this->_state == PENDING_BODY )
 	{
-		if ( parse_body( *this ) == EXIT_FAILURE )
+		if ( parse_body( *this, this->_buffer_recv ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
 }
+
+static int parse_method ( t_request &, std::string & );
+static int parse_target ( t_request &, std::string & );
+static int parse_http_version ( t_request &, std::string & );
+static std::string parse_query ( std::string & );
 
 // From RFT9112:
 //
@@ -185,15 +187,15 @@ parse_query( std::string & target )
 }
 
 int
-parse_headers ( HTTP & http , const std::string & line)
+parse_field_line ( HTTP & http , const std::string & line)
 {
 	t_request & request = http.getRequest();
 	std::string field_name, field_value;
 	std::string::size_type pos, len;
 
+	//isgraph
    	len = line.length();
    	pos = line.find_first_of( ":" );
-    if ( len == 0 )
    	field_name = line.substr( 0, pos );
    	(void) strtolower( field_name );
    	++pos;
@@ -251,21 +253,16 @@ HTTP::parse_field_line ( std::string & line )
 */
 
 static int
-parse_body ( HTTP & http )
-{
-	(void) http;
-	return ( EXIT_SUCCESS );
-}
-
-/*
-static int
-parse_body ( HTTP & http, const std::string & buffer, size_t pos )
+parse_body ( HTTP & http, const std::string & buffer )
 {
 	t_request &			request = http.getRequest();
 	const t_headers &	headers = request.headers;
 	std::size_t			len;
 
 	len = 0;
+	std::size_t pos = 0; (void) pos;
+	return ( 0 );
+
 	if ( pos >= buffer.length() )
 		return ( EXIT_SUCCESS );
 	if ( headers.find( "content-length" ) != headers.end() )
@@ -289,7 +286,6 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 	}
 	return ( EXIT_SUCCESS );
 }
-*/
 
 // The how_many_methods() and get_method_longest_len() calls
 // iterates through the methods stored in a t_http_method and
