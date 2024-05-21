@@ -36,9 +36,9 @@ HTTP::recv_request ( int64_t data )
 	{
 		WARN( "HTTP request does not comply with HTTP/1.x specification." );
 	}
-
+(void) isComplete;
 	// TODO: expect header
-	if ( this->_status == COMPLETE )
+	if ( this->_state == COMPLETE )
 	{
 		/*
 		// If request sent "expect: 100-continue" header

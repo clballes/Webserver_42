@@ -6,16 +6,15 @@
 #include "HTTP.hpp"
 #include <string>
 
-static int parse_start_line ( HTTP &, const std::string & );
+static int parse_start_line ( HTTP &, std::string );
 static int parse_method ( t_request &, std::string & );
 static int parse_target ( t_request &, std::string & );
 static int parse_http_version ( t_request &, std::string & );
 static std::string parse_query ( std::string & );
-
 static int parse_headers ( HTTP &, const std::string & );
-
-static int parse_body( HTTP & http, const std::string &, std::size_t );
-static size_t how_many_methods( t_http_method * ptr );
+//static int parse_body ( HTTP &, const std::string &, std::size_t );
+static int parse_body ( HTTP & );
+static size_t how_many_methods ( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
 
 int
@@ -31,7 +30,7 @@ HTTP::parse ( void )
 	{
 		line = this->_buffer_recv.substr( 0, pos );
 		this->_buffer_recv.erase( 0, pos );
-		if ( parse_start_line( this, line ) == EXIT_FAILURE )
+		if ( parse_start_line( *this, line ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	else if ( this->_state == PENDING_HEADERS )
@@ -40,12 +39,12 @@ HTTP::parse ( void )
 		this->_buffer_recv.erase( 0, pos );
 		if ( line == "\r" || line.empty() )
 			this->_state = PENDING_BODY;
-		else if ( parse_headers( this, line ) == EXIT_FAILURE )
+		else if ( parse_headers( *this, line ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	else if ( this->_state == PENDING_BODY )
 	{
-		if ( parse_body( this ) == EXIT_FAILURE )
+		if ( parse_body( *this ) == EXIT_FAILURE )
 			return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );
@@ -57,29 +56,21 @@ HTTP::parse ( void )
 // request-line = method SP request-target SP HTTP-version
 
 static int
-parse_start_line ( HTTP & http, const std::string & line )
+parse_start_line ( HTTP & http, std::string line )
 {
-	std::string				line;
-	std::string::size_type	pos;
+	t_response & response = http.getResponse();
+	t_request & request = http.getRequest();
 
-	pos = http._buffer_recv.find( LF );
-	if ( pos == std::string::npos )
-	{
-		// nothing to do yet
-		return ( EXIT_SUCCESS );
-	}
-	line = http._buffer_recv.substr( 0, pos );
-	http._buffer_recv.erase( 0, pos );
-	this->_response.status_code = parse_method( this->_request, line );
-	if ( this->_response.status_code != EXIT_SUCCESS )
+	response.status_code = parse_method( request, line );
+	if ( response.status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
-	this->_response.status_code = parse_target( this->_request, line );
-	if ( this->_response.status_code != EXIT_SUCCESS )
+	response.status_code = parse_target( request, line );
+	if ( response.status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	line.erase( 0, line.find_first_of( SP, 0 ) + 1 );
-	this->_response.status_code = parse_http_version( this->_request, line );
-	if ( this->_response.status_code != EXIT_SUCCESS )
+	response.status_code = parse_http_version( request, line );
+	if ( response.status_code != EXIT_SUCCESS )
 		return ( EXIT_FAILURE );
 	if ( line.back() != CR )
 		return ( EXIT_FAILURE );
@@ -194,10 +185,11 @@ parse_query( std::string & target )
 }
 
 int
-HTTP::parse_headers( void , const std::string & line)
+parse_headers ( HTTP & http , const std::string & line)
 {
+	t_request & request = http.getRequest();
 	std::string field_name, field_value;
-	std::string::size_type pos, len, end_line;
+	std::string::size_type pos, len;
 
    	len = line.length();
    	pos = line.find_first_of( ":" );
@@ -210,11 +202,8 @@ HTTP::parse_headers( void , const std::string & line)
   		field_value = line.substr( pos, len - pos );
   		trim_f( field_value, &std::isspace );
    	}
-   	this->_request.headers.insert( this->_request.headers.end(),
+   	request.headers.insert( request.headers.end(),
  			std::pair< std::string, std::string> ( field_name, field_value ) );
-   	return ( EXIT_SUCCESS );
-	if ( line == "\r"  )
-		this->_state == PENDING_BODY;
 	return ( EXIT_SUCCESS );
 }
 
@@ -262,6 +251,14 @@ HTTP::parse_field_line ( std::string & line )
 */
 
 static int
+parse_body ( HTTP & http )
+{
+	(void) http;
+	return ( EXIT_SUCCESS );
+}
+
+/*
+static int
 parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 {
 	t_request &			request = http.getRequest();
@@ -281,7 +278,7 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 		request.body.assign( buffer.c_str(), pos, std::string::npos );
 		if ( headers.at( "transfer-encoding" ) == "chunked" )
 		{
-			handle_chunk( request.body );
+			//handle_chunk( request.body );
 			return ( EXIT_SUCCESS );
 		}
 	}
@@ -292,6 +289,7 @@ parse_body ( HTTP & http, const std::string & buffer, size_t pos )
 	}
 	return ( EXIT_SUCCESS );
 }
+*/
 
 // The how_many_methods() and get_method_longest_len() calls
 // iterates through the methods stored in a t_http_method and
