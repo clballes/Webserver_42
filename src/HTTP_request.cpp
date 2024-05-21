@@ -31,7 +31,7 @@ HTTP::recv_request ( int64_t data )
 
 	// Will try to parse a line ending with /r(/n)
 	// depending on the HTTP _status.
-	while ( this->_state != BAD_REQUEST && ! this->_buffer_recv.empty() )
+	while ( this->_state != BAD_REQUEST && this->_state != COMPLETE )
 	{
 		this->parse();
 	}
