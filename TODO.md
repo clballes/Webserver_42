@@ -14,6 +14,3 @@
 - [ ] test: expect: 100-continue header
 - [ ] test: request timeout
 - [ ] test: upload\_files
-
-- [ ] puyma: chunked requests / multipart form 
-- [ ] clballes: config tests
