@@ -42,7 +42,6 @@ HTTP::recv_request ( int64_t data )
 		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
-	// TODO: expect header
 	if ( this->_state == COMPLETE )
 	{
 		this->deregister_timer();
