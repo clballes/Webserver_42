@@ -102,7 +102,6 @@ HTTP::deregister_timer ( void )
 	EV_SET( &ev, this->_socket_fd, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
-		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
 	return ( EXIT_SUCCESS );

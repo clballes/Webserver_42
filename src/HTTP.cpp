@@ -44,6 +44,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 HTTP::~HTTP ( void )
 {
 	(void) close( this->_socket_fd );
+	this->deregister_timer();
 	return ;
 }
 
