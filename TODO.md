@@ -1,0 +1,16 @@
+- [ ] siege
+- [ ] tester
+- [ ] leaks
+- [ ] leaks: graceful\_stop SIGQUIT SIGTERM
+- [ ] test: required directives ( Server check() )
+- [ ] test: wrong number of arguments ( conf )
+- [ ] test: wrong input(s)
+- [ ] test: default values
+- [ ] test: HTTP methods with wrong directory control ( . .. )
+- [ ] test: config
+- [ ] test: multiple (lots of) servers
+- [ ] test: chunked requests
+- [ ] test: post (multiform)
+- [ ] test: expect: 100-continue header
+- [ ] test: request timeout
+- [ ] test: upload\_files

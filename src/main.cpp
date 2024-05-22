@@ -1,94 +1,64 @@
 /*                                                                            */
 /* main.cpp                                                                   */
 /* mpuig-ma <mpuig-ma@student.42barcelona.com>                                */
-/* Thu Jan 25 14:26:11 2024                                                   */
+/* Mon Mar 25 11:48:33 2024                                                   */
 
-#include "webserv.hpp"
-#include "init.hpp"
-#include "parse.hpp"
-#include <fstream>
+#include <cstdlib>		/* EXIT_SUCESS, EXIT_FAILURE */
+#include "Router.hpp"	/* class Router */
+#include "define.hpp"	/* DEFAULT_CONF */
+
+void
+set_verbose_level ( char * const * envp )
+{
+	const char		env_var[] = "DEBUG_LEVEL=";
+	const size_t	len = std::strlen( env_var );
+	size_t			iterator;
+	char *			pos;
+
+	#ifdef DEBUG_LEVEL
+		_webserv_verbose_level = DEBUG_LEVEL;
+	#endif
+	iterator = 0;
+	while ( envp != NULL && envp[iterator] != NULL )
+	{
+		pos = std::strchr( envp[iterator], '=' );
+		if ( pos != NULL
+				&& std::strncmp( envp[iterator], env_var, len ) == 0 )
+		{
+			if ( *( envp[iterator] + len ) == '\0' )
+				_webserv_verbose_level = _MODE_NOTICE;
+			else
+				_webserv_verbose_level = std::atoi( envp[iterator] + len );
+		}
+		++iterator;
+	}
+	return ;
+}
 
 int
-main ( int argc, char * const * argv )
+main ( int argc, char * const * argv, char * const * envp )
 {
-	std::string   conf_filename;
-	std::ifstream conf_file;
+	Router router;
 
-	// Check / set argument options
-
-	decode_arguments( argc, argv );
-	
-	// If argv[optind] is set ( == NULL ),
-	// falls back to using DEFAULT_CONF ( macro )
-	
-	conf_filename = (argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
-
-	// isRegularFile() is in `parse.cpp', for the moment.
-	// Check if `conf_filename' is a regular file.
-
-	if ( isRegularFile( conf_filename ) == false )
+	set_verbose_level( envp );
+	INFO( "verbose_level=" << _webserv_verbose_level );
+	if ( argc > 2 )
 	{
-		std::cerr << PROGRAM_NAME;
-		std::cerr << ": " << conf_filename;
-		std::cerr << ": " << ::strerror( errno ) << std::endl;
+		std::cerr << "usage: " << EXEC_NAME << " [configuration file]\n";
 		return ( EXIT_FAILURE );
 	}
-	
-	// Open ( or try to ) `conf_file'.
-	
-	conf_file.open( conf_filename );
-
-	// Check if file has been properly opened.
-
-	if ( conf_file.good() != true )
-	{
-		std::cerr << ( argv[optind] == 0x0 ? DEFAULT_CONF : argv[optind] );
-		std::cerr << ": " << ::strerror( errno ) << std::endl;
-		return ( EXIT_FAILURE );
-	}
-	LOG( conf_filename << ": open OK" );
-
-	// Add `conf_file' is contents.
-	// Server_conf::add() also parses them. 
-	
-	if ( ServerConf::add( conf_file ) == EXIT_FAILURE )
-	{
-		conf_file.close();
-		return ( EXIT_FAILURE );
-	}
-	
-	// Once done, close file;
-
-	conf_file.close();
-	LOG( conf_filename << ": closed OK" );
-
-	// Initialize n Server instances based on the configuration file.
-	// new `Server's in Server::servers will have to be FREEd.
-
-	for ( ServerConf::iterator it = ServerConf::instances.begin();
-			it != ServerConf::instances.end(); ++it )
-	{
-		Server::servers.push_back( new Server( *( *it ) ) );
-		if ( ! Server::servers.back()->good )
-		{
-			Server::clear();
-			return ( EXIT_FAILURE );
-		}
-
-	}
-
-	ServerConf::clear();
-	Server::servers.shrink_to_fit();
-
-	// Start program's purpose.
-
-	if ( ::webserv() != EXIT_SUCCESS )
-	{
-		std::cerr << "Quitting ";
-		std::cerr << PROGRAM_NAME;
-		std::cerr << std::endl;
-		return ( EXIT_FAILURE );
-	}
-
-	return ( EXIT_SUCCESS );
+	router.load( argv[1] == 0x0 ? DEFAULT_CONF : argv[1] );
+	return ( router.good() == false ? EXIT_FAILURE : router.listen() );
 }
+
+/* 
+ * Note for the future.
+ * The Router class might be split into a Router class and a Controller class.
+ * The Controller shoud handle the configuration of servers whilst
+ * the Router shoudl route connections to each corresponding server
+ * and is instantiated by the Controller.
+ *
+ * As of now the class Router does both functions 
+ * which -we must admit- is kind of weird.
+ *
+ */

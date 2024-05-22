@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chunked Request Example</title>
+  </head>
+  <body>
+    <form id="myForm">
+      <input type="text" name="data" id="data" value="Hello, world!" />
+      <button type="button" onclick="sendChunkedRequest()">
+        Send Chunked Request
+      </button>
+    </form>
+
+  <script>
+    function sendChunkedRequest() {
+      var formData = document.getElementById("data").value;
+      var chunkSize = 5;
+      var chunks = [];
+
+      for (var i = 0; i < formData.length; i += chunkSize) {
+        chunks.push(formData.substr(i, chunkSize));
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/www", true);
+      xhr.setRequestHeader("Content-Type", "text/plain");
+      xhr.setRequestHeader("Transfer-Encoding", "chunked");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            console.log("Chunked request sent successfully.");
+          } else {
+            console.error("Error sending chunked request:", xhr.status);
+          }
+        }
+      };
+
+      // Send each chunk separately
+      for (var j = 0; j < chunks.length; j++) {
+        xhr.send(chunks[j]);
+      }
+    }
+  </script>
+  </body>
+</html>

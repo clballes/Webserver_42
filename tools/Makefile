@@ -8,10 +8,16 @@ CPPFLAGS		:=	-MMD -iquotes$(INC_DIR)
 #CPPFLAGS		+=	-g -fsanitize='address,undefined'
 CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
 
-%.o: %.cpp
-	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-all: getaddrinfo
+all: getaddrinfo client
 
 getaddrinfo: getaddrinfo.o
-	$(CC) $(CPPFLAGS) $(CXXFLAGS) getaddrinfo.o -o $(basename $@)
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) $< -o $(basename $@)
+
+clean:
+	rm -f getaddrinfo.o getaddrinfo.d
+
+fclean: clean
+	rm -f getaddrinfo
+
+re: fclean all
+
