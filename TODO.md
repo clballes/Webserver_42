@@ -12,8 +12,6 @@
 - [ ] test: chunked requests
 - [ ] test: post (multiform)
 - [ ] test: expect: 100-continue header
-- [ ] test: chunk request with more than 3 requests/connection
-- [ ] test: multipart-form with more than 3 requests/connection
 - [ ] test: request timeout
 - [ ] test: upload\_files
 

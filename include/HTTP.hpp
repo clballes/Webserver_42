@@ -52,7 +52,9 @@ class HTTP: public IEvent
 		void dispatch ( struct kevent & );
 		int register_recv ( void );
 		int register_send ( void );
+		int register_timer ( void );
 		int deregister_recv ( void );
+		int deregister_timer ( void );
 		int recv_request ( int64_t );
 		int send_response ( void );
 		int compose_response ( void );

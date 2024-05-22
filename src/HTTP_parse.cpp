@@ -9,7 +9,7 @@
 static int parse_start_line ( HTTP &, std::string );
 static int parse_field_line ( HTTP &, const std::string & );
 static int parse_body ( HTTP &, const std::string & );
-static int handle_chunk ( HTTP &, const std::string & buffer, std::string & body );
+static int handle_chunk ( HTTP &, const std::string &, std::string & );
 
 static size_t how_many_methods ( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
@@ -50,7 +50,6 @@ HTTP::parse ( void )
 	{
 		if ( parse_body( *this, this->_buffer_recv ) == EXIT_FAILURE )
 		{
-			//this->setState( BAD_REQUEST );
 			return ( EXIT_FAILURE );
 		}
 	}
@@ -89,7 +88,7 @@ parse_start_line ( HTTP & http, std::string line )
 	return ( EXIT_SUCCESS );
 }
 
-int
+static int
 parse_method( t_request & request, std::string & line )
 {
 	std::string::size_type  pos;
@@ -121,7 +120,7 @@ parse_method( t_request & request, std::string & line )
 //
 // All `/' found at the end are removed.
 
-int
+static int
 parse_target( t_request & request, std::string & line )
 {
 	std::string::size_type	pos;
@@ -153,7 +152,7 @@ parse_target( t_request & request, std::string & line )
 // this call check if `line' ends with CR and
 // compares it's value with the supported HTTP version.
 
-int
+static int
 parse_http_version ( t_request & request, std::string & line )
 {
 	std::string::size_type  pos;
@@ -179,7 +178,7 @@ parse_http_version ( t_request & request, std::string & line )
 // mark ("?") character and terminated by a number sign ("#") character
 // or by the end of the URI.
 
-std::string
+static std::string
 parse_query( std::string & target )
 {
 	std::string value;
@@ -195,6 +194,25 @@ parse_query( std::string & target )
 	}
 	return ( value );
 }
+
+// From RFC3986 section 3.5
+// https://www.rfc-editor.org/rfc/rfc3986#section-3.5
+//
+// A fragment identifier component is indicated by the presence of a
+// number sign ("#") character and terminated by the end of the URI.
+// [...]
+// the fragment identifier is not used in the scheme-specific
+// processing of a URI; instead, the fragment identifier is separated
+// from the rest of the URI prior to a dereference, and thus the
+// identifying information within the fragment itself is dereferenced
+// solely by the user agent, regardless of the URI scheme.
+//
+// This translates to: the fragment is not send to the server.
+
+// No whitespace is allowed between the field name and colon.
+// A server MUST reject, with a response status code of 400 (Bad Request),
+// any received request message that contains whitespace between
+// a header field name and colon.
 
 int
 parse_field_line ( HTTP & http , const std::string & line)
@@ -218,26 +236,6 @@ parse_field_line ( HTTP & http , const std::string & line)
  			std::pair< std::string, std::string> ( field_name, field_value ) );
 	return ( EXIT_SUCCESS );
 }
-
-// From RFC3986 section 3.5
-// https://www.rfc-editor.org/rfc/rfc3986#section-3.5
-//
-// A fragment identifier component is indicated by the presence of a
-// number sign ("#") character and terminated by the end of the URI.
-// [...]
-// the fragment identifier is not used in the scheme-specific
-// processing of a URI; instead, the fragment identifier is separated
-// from the rest of the URI prior to a dereference, and thus the
-// identifying information within the fragment itself is dereferenced
-// solely by the user agent, regardless of the URI scheme.
-//
-// This translates to: the fragment is not send to the server.
-
-// No whitespace is allowed between the field name and colon.
-// A server MUST reject, with a response status code of 400 (Bad Request),
-// any received request message that contains whitespace between
-// a header field name and colon.
-
 
 static int
 parse_body ( HTTP & http, const std::string & buffer )
@@ -274,9 +272,7 @@ parse_body ( HTTP & http, const std::string & buffer )
 			return ( EXIT_FAILURE );
 	}
 	else
-	{
 		http.setState( COMPLETE );
-	}
 	return ( EXIT_SUCCESS );
 }
 

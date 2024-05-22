@@ -36,11 +36,17 @@ HTTP::recv_request ( int64_t data )
 	if ( this->_state == BAD_REQUEST )
 	{
 		WARN( "HTTP request does not comply with HTTP/1.x specification." );
+		this->_buffer_recv.clear();
+		if ( this->_response.status_code == 0 )
+			this->setStatusCode( BAD_REQUEST );
+		this->compose_response();
 		return ( EXIT_FAILURE );
 	}
 	// TODO: expect header
 	if ( this->_state == COMPLETE )
 	{
+		this->deregister_timer();
+		this->register_timer();
 		if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0
 				&& ( this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ) )
 		{
@@ -49,9 +55,7 @@ HTTP::recv_request ( int64_t data )
 			return ( EXIT_FAILURE );
 		}
 		if ( this->_request.headers.find( "host" ) != this->_request.headers.end() )
-		{
 			this->_request.host = this->_request.headers.at( "host" );
-		}
 		this->_server = this->_router.getServer( this->_request.host,
 				this->_connection.getHost(), this->_connection.getPort() );
 		translate_target( *this );

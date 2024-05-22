@@ -45,13 +45,8 @@ HTTP::register_recv ( void )
 		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
 		return ( EXIT_FAILURE );
 	}
-	EV_SET( &ev, this->_socket_fd, EVFILT_TIMER, EV_ADD | EV_ENABLE,
-			NOTE_SECONDS, REQ_TIMEOUT, (void *) this );
-    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
-	{
-		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
-        return ( EXIT_FAILURE );
-    }
+	if ( this->register_timer() == EXIT_FAILURE )
+		return ( EXIT_FAILURE );
 	return ( EXIT_SUCCESS );
 }
 
@@ -70,6 +65,20 @@ HTTP::register_send ( void )
 	return ( EXIT_SUCCESS );
 }
 
+int
+HTTP::register_timer ( void )
+{
+	struct kevent ev;
+
+	EV_SET( &ev, this->_socket_fd, EVFILT_TIMER, EV_ADD | EV_ENABLE,
+		NOTE_SECONDS, REQ_TIMEOUT, (void *) this );
+    if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
+	{
+		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
+        return ( EXIT_FAILURE );
+    }
+	return ( EXIT_SUCCESS );
+}
 
 int
 HTTP::deregister_recv ( void )
@@ -80,6 +89,16 @@ HTTP::deregister_recv ( void )
 			EV_DISABLE | EV_DELETE, 0, 0, 0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0 ) == -1 )
 		WARN( std::strerror( errno ) );
+	if ( this->deregister_timer() == EXIT_FAILURE )
+		return ( EXIT_FAILURE );
+	return ( EXIT_SUCCESS );
+}
+
+int
+HTTP::deregister_timer ( void )
+{
+	struct kevent ev;
+
 	EV_SET( &ev, this->_socket_fd, EVFILT_TIMER, EV_DISABLE | EV_DELETE, 0, 0, 0x0 );
 	if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, NULL ) == -1 )
 	{
