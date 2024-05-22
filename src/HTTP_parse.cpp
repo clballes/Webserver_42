@@ -9,7 +9,7 @@
 static int parse_start_line ( HTTP &, std::string );
 static int parse_field_line ( HTTP &, const std::string & );
 static int parse_body ( HTTP &, const std::string & );
-static int handle_chunk ( HTTP &, const std::string &, std::string & );
+static int handle_chunk ( std::string &, std::string & );
 
 static size_t how_many_methods ( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
@@ -251,7 +251,7 @@ parse_body ( HTTP & http, const std::string & buffer )
 		{
 			while ( http.getState() != COMPLETE )
 			{
-				if (handle_chunk( http, buffer, http.getResponse().body ) == EXIT_FAILURE)
+				if ( handle_chunk( buffer, http.getResponse().body ) == EXIT_FAILURE )
 					break;
 				else
 					http.setState( COMPLETE );
@@ -317,37 +317,28 @@ get_method_longest_len ( t_http_method * ptr )
 
 
 int
-handle_chunk (HTTP &  http, const std::string & buffer, std::string & body )
+handle_chunk ( std::string & buffer, std::string & body )
 {
-	(void)http;
-	std::string::size_type	pos;
-    std::string::size_type	chunk_length;
+	std::string::size_type	pos, chunk_length;
 
 	pos = 0;
     while ( pos < buffer.size() )
 	{
         std::string::size_type crlf_pos = buffer.find( "\r\n", pos );
+        if ( crlf_pos == std::string::npos )
+            return ( EXIT_FAILURE );
         std::string::size_type next_crlf_pos = buffer.find( "\r\n", crlf_pos );
-        if ( crlf_pos == std::string::npos ){
-            return ( EXIT_FAILURE );
-        }
 		if ( next_crlf_pos == std::string::npos )
-		{
             return ( EXIT_FAILURE );
-        }
 
         std::string chunk_length_hex = buffer.substr( pos, crlf_pos - pos );
         chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
         pos = crlf_pos + 2;
-
         std::string chunk_data = buffer.substr( pos, chunk_length );
-
 		body += chunk_data;
         pos += chunk_length + 2;
 		if ( chunk_length == 0 )
-		{
 			return (EXIT_SUCCESS);
-		}
     }
 	return ( EXIT_SUCCESS );
 }
