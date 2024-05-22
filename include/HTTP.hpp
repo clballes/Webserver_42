@@ -63,6 +63,7 @@ class HTTP: public IEvent
 		Server & getServer ( void );
 		t_request & getRequest ( void );
 		t_response & getResponse ( void );
+		int getState ( void );
 
 		void setMessageBody( const std::string & );
 		void setStatusCode( int );
@@ -70,7 +71,6 @@ class HTTP: public IEvent
 		void setResponseHeaders( const std::string &, const std::string & );
 
 		static t_http_method methods[];
-		static int handle_chunk_expect ( HTTP & ); // can be made in-file static
 
 	private:
 

@@ -122,3 +122,9 @@ clear_response ( t_response & response )
 	response.headers.clear();
 	return ;
 }
+
+int
+HTTP::getState ( void )
+{
+	return this->_state;
+}

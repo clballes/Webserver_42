@@ -45,6 +45,8 @@ HTTP::recv_request ( int64_t data )
 	// TODO: expect header
 	if ( this->_state == COMPLETE )
 	{
+		this->deregister_timer();
+		this->register_timer();
 		// Check client_max_body_size limit. 0 == unlimited
 		if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0
 				&& ( this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ) )
