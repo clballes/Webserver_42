@@ -49,7 +49,6 @@ HTTP::parse ( void )
 	{
 		if ( parse_body( *this, this->_buffer_recv ) == EXIT_FAILURE )
 		{
-			//this->setState( BAD_REQUEST );
 			return ( EXIT_FAILURE );
 		}
 	}
@@ -88,7 +87,7 @@ parse_start_line ( HTTP & http, std::string line )
 	return ( EXIT_SUCCESS );
 }
 
-int
+static int
 parse_method( t_request & request, std::string & line )
 {
 	std::string::size_type  pos;
@@ -120,7 +119,7 @@ parse_method( t_request & request, std::string & line )
 //
 // All `/' found at the end are removed.
 
-int
+static int
 parse_target( t_request & request, std::string & line )
 {
 	std::string::size_type	pos;
@@ -152,7 +151,7 @@ parse_target( t_request & request, std::string & line )
 // this call check if `line' ends with CR and
 // compares it's value with the supported HTTP version.
 
-int
+static int
 parse_http_version ( t_request & request, std::string & line )
 {
 	std::string::size_type  pos;
@@ -178,7 +177,7 @@ parse_http_version ( t_request & request, std::string & line )
 // mark ("?") character and terminated by a number sign ("#") character
 // or by the end of the URI.
 
-std::string
+static std::string
 parse_query( std::string & target )
 {
 	std::string value;
@@ -194,6 +193,25 @@ parse_query( std::string & target )
 	}
 	return ( value );
 }
+
+// From RFC3986 section 3.5
+// https://www.rfc-editor.org/rfc/rfc3986#section-3.5
+//
+// A fragment identifier component is indicated by the presence of a
+// number sign ("#") character and terminated by the end of the URI.
+// [...]
+// the fragment identifier is not used in the scheme-specific
+// processing of a URI; instead, the fragment identifier is separated
+// from the rest of the URI prior to a dereference, and thus the
+// identifying information within the fragment itself is dereferenced
+// solely by the user agent, regardless of the URI scheme.
+//
+// This translates to: the fragment is not send to the server.
+
+// No whitespace is allowed between the field name and colon.
+// A server MUST reject, with a response status code of 400 (Bad Request),
+// any received request message that contains whitespace between
+// a header field name and colon.
 
 int
 parse_field_line ( HTTP & http , const std::string & line)
@@ -218,48 +236,24 @@ parse_field_line ( HTTP & http , const std::string & line)
 	return ( EXIT_SUCCESS );
 }
 
-// From RFC3986 section 3.5
-// https://www.rfc-editor.org/rfc/rfc3986#section-3.5
-//
-// A fragment identifier component is indicated by the presence of a
-// number sign ("#") character and terminated by the end of the URI.
-// [...]
-// the fragment identifier is not used in the scheme-specific
-// processing of a URI; instead, the fragment identifier is separated
-// from the rest of the URI prior to a dereference, and thus the
-// identifying information within the fragment itself is dereferenced
-// solely by the user agent, regardless of the URI scheme.
-//
-// This translates to: the fragment is not send to the server.
-
-// No whitespace is allowed between the field name and colon.
-// A server MUST reject, with a response status code of 400 (Bad Request),
-// any received request message that contains whitespace between
-// a header field name and colon.
-
-/*
-int
-HTTP::parse_field_line ( std::string & line )
+static int
+parse_body ( HTTP & http, const std::string & buffer )
 {
-	std::string field_name, field_value;
-	std::string::size_type pos, len;
+	t_request & request = http.getRequest();
+	t_response & response = http.getResponse();
+	t_headers & headers = request.headers;
 
-	// isgraph
-	len = line.length();
-	pos = line.find_first_of( ":" );
-	field_name = line.substr( 0, pos );
-	(void) strtolower( field_name );
-	++pos;
-	if ( pos != len )
+	if ( headers.find( "content-length" ) != headers.end() )
+	{}
+	else if ( headers.find( "transfer-encoding" ) != headers.end() )
+	{}
+	else
 	{
-		field_value = line.substr( pos, len - pos );
-		trim_f( field_value, &std::isspace );
+		http.setStatusCode( BAD_REQUEST ); //?
+		http.getResponse().headers["connection"]
 	}
-	this->_request.headers.insert( this->_request.headers.end(),
-			std::pair< std::string, std::string> ( field_name, field_value ) );
 	return ( EXIT_SUCCESS );
 }
-*/
 
 static int
 parse_body ( HTTP & http, const std::string & buffer )
@@ -271,16 +265,13 @@ parse_body ( HTTP & http, const std::string & buffer )
 	len = 0;
 	std::size_t pos = 0; (void) pos;
 	http.setState( COMPLETE );
+	http.deregister_timer();
+	http.register_timer();
 	return ( EXIT_SUCCESS );
 
 	if ( pos >= buffer.length() )
 		return ( EXIT_SUCCESS );
-	if ( headers.find( "content-length" ) != headers.end() )
-	{
-		len = std::atoi( headers.at( "content-length" ).c_str() );
-		request.body.assign( buffer.c_str(), pos, len );
-	}
-	else if ( headers.find( "transfer-encoding" ) != headers.end() )
+	if ( headers.find( "transfer-encoding" ) != headers.end() )
 	{
 		request.body.assign( buffer.c_str(), pos, std::string::npos );
 		if ( headers.at( "transfer-encoding" ) == "chunked" )
@@ -289,9 +280,14 @@ parse_body ( HTTP & http, const std::string & buffer )
 			return ( EXIT_SUCCESS );
 		}
 	}
+	else if ( headers.find( "content-length" ) != headers.end() )
+	{
+		len = std::atoi( headers.at( "content-length" ).c_str() );
+		request.body.assign( buffer.c_str(), pos, len );
+	}
 	else
 	{
-		http.setStatusCode( BAD_REQUEST );
+		http.setStatusCode( BAD_REQUEST ); //?
 		http.getResponse().headers["connection"] = "close";
 	}
 	return ( EXIT_SUCCESS );
