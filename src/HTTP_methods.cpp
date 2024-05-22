@@ -85,6 +85,10 @@ HTTP::http_put ( void * http_ptr )
 				std::ofstream::out | std::ofstream::trunc | std::ofstream::binary );
 		http->_response.status_code = CREATED;
 	}
+	if (!file.good())
+	{
+		http->_response.status_code = FORBIDDEN;
+	}
 	if ( http->_request.body.empty() )
 		http->_response.status_code = NO_CONTENT;
 	else
@@ -108,6 +112,8 @@ HTTP::http_delete ( void * http_ptr )
 		else
 			http->_response.status_code = FORBIDDEN;
 	}
+	else if( S_ISDIR( http->_request.file_info.st_mode ))
+		http->_response.status_code = FORBIDDEN;
 	else
 		http->_response.status_code = NOT_FOUND;
 	return ( EXIT_SUCCESS );
