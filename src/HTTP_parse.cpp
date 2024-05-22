@@ -251,7 +251,7 @@ parse_body ( HTTP & http, const std::string & buffer )
 		{
 			while ( http.getState() != COMPLETE )
 			{
-				if ( handle_chunk( buffer, http.getResponse().body ) == EXIT_FAILURE )
+				if ( handle_chunk( const_cast<std::string&>(buffer), http.getResponse().body ) == EXIT_FAILURE )
 					break;
 				else
 					http.setState( COMPLETE );
@@ -275,8 +275,6 @@ parse_body ( HTTP & http, const std::string & buffer )
 		}
 		else
 			return ( EXIT_FAILURE );
-		else
-			return ( EXIT_FAILURE);
 	}
 	else
 		http.setState( COMPLETE );
@@ -318,27 +316,55 @@ get_method_longest_len ( t_http_method * ptr )
 }
 
 
+// int
+// handle_chunk ( std::string & buffer, std::string & body )
+// {
+// 	std::string::size_type	pos, chunk_length;
+
+// 	pos = 0;
+//     while ( pos < buffer.size() )
+// 	{
+//         std::string::size_type crlf_pos = buffer.find( "\r\n", pos );
+//         if ( crlf_pos == std::string::npos )
+//             return ( EXIT_FAILURE );
+//         std::string::size_type next_crlf_pos = buffer.find( "\r\n", crlf_pos );
+// 		if ( next_crlf_pos == std::string::npos )
+//             return ( EXIT_FAILURE );
+//         std::string chunk_length_hex = buffer.substr( pos, crlf_pos - pos );
+		
+//         chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
+//         pos = crlf_pos + 2;
+//         std::string chunk_data = buffer.substr( pos, chunk_length );
+		
+		
+// 		body += chunk_data;
+//         pos += chunk_length + 2;
+// 		if ( chunk_length == 0 )
+// 			return (EXIT_SUCCESS);
+//     }
+// 	return ( EXIT_SUCCESS );
+// }
+
 int
 handle_chunk ( std::string & buffer, std::string & body )
 {
-	std::string::size_type	pos, chunk_length;
+	std::string::size_type	chunk_length;
 
-	pos = 0;
-    while ( pos < buffer.size() )
+    while ( ! buffer.empty() )
 	{
-        std::string::size_type crlf_pos = buffer.find( "\r\n", pos );
+        std::string::size_type crlf_pos = buffer.find( "\r\n", 0 );
         if ( crlf_pos == std::string::npos )
             return ( EXIT_FAILURE );
         std::string::size_type next_crlf_pos = buffer.find( "\r\n", crlf_pos );
 		if ( next_crlf_pos == std::string::npos )
             return ( EXIT_FAILURE );
-
-        std::string chunk_length_hex = buffer.substr( pos, crlf_pos - pos );
+        std::string chunk_length_hex = buffer.substr( 0, crlf_pos );
         chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
-        pos = crlf_pos + 2;
-        std::string chunk_data = buffer.substr( pos, chunk_length );
+		buffer.erase(0, crlf_pos + 2); 
+        std::string chunk_data = buffer.substr( 0, chunk_length );
+		buffer.erase(0, chunk_length + 2); 
+
 		body += chunk_data;
-        pos += chunk_length + 2;
 		if ( chunk_length == 0 )
 			return (EXIT_SUCCESS);
     }
