@@ -270,6 +270,8 @@ parse_body ( HTTP & http, const std::string & buffer )
 			http.setState( COMPLETE );
 		else if ( request.body.length() > len )
 			return ( EXIT_FAILURE );
+		else
+			return ( EXIT_FAILURE);
 	}
 	else
 		http.setState( COMPLETE );
