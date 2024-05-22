@@ -9,6 +9,7 @@
 static int parse_start_line ( HTTP &, std::string );
 static int parse_field_line ( HTTP &, const std::string & );
 static int parse_body ( HTTP &, const std::string & );
+static int handle_chunk ( HTTP &, const std::string & buffer, std::string & body );
 
 static size_t how_many_methods ( t_http_method * ptr );
 static size_t get_method_longest_len ( t_http_method * ptr );
@@ -269,55 +270,40 @@ parse_body ( HTTP & http, const std::string & buffer )
 	std::size_t			len;
 
 	len = 0;
-	// TODO:: mirar quan sera complet
 	if ( headers.find( "transfer-encoding" ) != headers.end() )
 	{
 		if ( headers.at( "transfer-encoding" ) == "chunked" )
 		{
-			request.body.append( buffer );
-			if (request.body.compare())
-				http.setState( COMPLETE );
-
-			//handle_chunk( request.body );
-			return ( EXIT_SUCCESS );
+			while ( http.getState() != COMPLETE )
+			{
+				if (handle_chunk( http, buffer, http.getResponse().body ) == EXIT_FAILURE)
+					break;
+				else
+					http.setState( COMPLETE );
+			}
 		}
-		else //si no es chunked not implemented
+		else
 		{
 			http.setStatusCode( NOT_IMPLEMENTED );
 		}
 	}
-	if ( headers.find( "content-length" ) != headers.end() )
+	else if ( headers.find( "content-length" ) != headers.end() )
 	{
 		len = std::atoi( headers.at( "content-length" ).c_str() );
-		request.body.assign( buffer.c_str(), pos, len );
-		if (request.body.length() != len)
-		{
-			break ;
-		}
-		else
+		request.body.assign( buffer );
+		if (request.body.length() == len)
 			http.setState( COMPLETE );
+		else if ( request.body.length() > len )
+			return ( EXIT_FAILURE );
 	}
 	else
 	{
-		// no seria una bad request sino no content creiem
 		http.setStatusCode( BAD_REQUEST );
 		http.getResponse().headers["connection"] = "close";
 	}
-	// http.setState( COMPLETE );
 	return ( EXIT_SUCCESS );
 }
 
-static int
-content_len()
-{
-
-}
-
-static int
-content_len()
-{
-	
-}
 // The how_many_methods() and get_method_longest_len() calls
 // iterates through the methods stored in a t_http_method and
 // returns the numbers of iterations done and
@@ -350,4 +336,45 @@ get_method_longest_len ( t_http_method * ptr )
 		++ptr;
 	}
 	return ( n );
+}
+
+
+int
+handle_chunk (HTTP &  http, const std::string & buffer, std::string & body )
+{
+	(void)http;
+	std::string::size_type	pos;
+    std::string::size_type	chunk_length;
+
+	pos = 0;
+    while ( pos < buffer.size() )
+	{
+        // Find the position of the next '\r\n'
+        std::string::size_type crlf_pos = buffer.find( "\r\n", pos );
+        std::string::size_type next_crlf_pos = buffer.find( "\r\n", crlf_pos );
+        if ( crlf_pos == std::string::npos ){
+            return ( EXIT_FAILURE );
+        }
+		if ( next_crlf_pos == std::string::npos )
+		{
+            return ( EXIT_FAILURE );
+        }
+
+        std::string chunk_length_hex = buffer.substr( pos, crlf_pos - pos );
+        chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
+        // Move past the '\r\n' to the start of the chunk data
+        pos = crlf_pos + 2;
+
+        // Extract the chunk data
+        std::string chunk_data = buffer.substr( pos, chunk_length );
+
+		//store the extracted chunks in the buffer requested
+		body += chunk_data;
+        pos += chunk_length + 2;
+		if ( chunk_length == 0 )
+		{
+			return (EXIT_SUCCESS);
+		}
+    }
+	return ( EXIT_SUCCESS );
 }
