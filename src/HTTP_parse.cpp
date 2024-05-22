@@ -238,29 +238,6 @@ parse_field_line ( HTTP & http , const std::string & line)
 // any received request message that contains whitespace between
 // a header field name and colon.
 
-/*
-int
-HTTP::parse_field_line ( std::string & line )
-{
-	std::string field_name, field_value;
-	std::string::size_type pos, len;
-
-	// isgraph
-	len = line.length();
-	pos = line.find_first_of( ":" );
-	field_name = line.substr( 0, pos );
-	(void) strtolower( field_name );
-	++pos;
-	if ( pos != len )
-	{
-		field_value = line.substr( pos, len - pos );
-		trim_f( field_value, &std::isspace );
-	}
-	this->_request.headers.insert( this->_request.headers.end(),
-			std::pair< std::string, std::string> ( field_name, field_value ) );
-	return ( EXIT_SUCCESS );
-}
-*/
 
 static int
 parse_body ( HTTP & http, const std::string & buffer )
@@ -290,7 +267,7 @@ parse_body ( HTTP & http, const std::string & buffer )
 	else if ( headers.find( "content-length" ) != headers.end() )
 	{
 		len = std::atoi( headers.at( "content-length" ).c_str() );
-		request.body.assign( buffer );
+		request.body.append( buffer );
 		if (request.body.length() == len)
 			http.setState( COMPLETE );
 		else if ( request.body.length() > len )
@@ -298,8 +275,7 @@ parse_body ( HTTP & http, const std::string & buffer )
 	}
 	else
 	{
-		http.setStatusCode( BAD_REQUEST );
-		http.getResponse().headers["connection"] = "close";
+		http.setState( COMPLETE );
 	}
 	return ( EXIT_SUCCESS );
 }
@@ -349,7 +325,6 @@ handle_chunk (HTTP &  http, const std::string & buffer, std::string & body )
 	pos = 0;
     while ( pos < buffer.size() )
 	{
-        // Find the position of the next '\r\n'
         std::string::size_type crlf_pos = buffer.find( "\r\n", pos );
         std::string::size_type next_crlf_pos = buffer.find( "\r\n", crlf_pos );
         if ( crlf_pos == std::string::npos ){
@@ -362,13 +337,10 @@ handle_chunk (HTTP &  http, const std::string & buffer, std::string & body )
 
         std::string chunk_length_hex = buffer.substr( pos, crlf_pos - pos );
         chunk_length = strtol( chunk_length_hex.c_str(), NULL, 16 );
-        // Move past the '\r\n' to the start of the chunk data
         pos = crlf_pos + 2;
 
-        // Extract the chunk data
         std::string chunk_data = buffer.substr( pos, chunk_length );
 
-		//store the extracted chunks in the buffer requested
 		body += chunk_data;
         pos += chunk_length + 2;
 		if ( chunk_length == 0 )
