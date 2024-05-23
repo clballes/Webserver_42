@@ -21,7 +21,6 @@ Router::_opts[] =
 	{ DIRECTIVE, "index", no, no, "server,location", &set_index },
 	{ DIRECTIVE, "autoindex", no, no, "server,location", &set_autoindex },
 	{ DIRECTIVE, "cgi_pass", no, no, "location", &set_cgi_pass },
-	// { DIRECTIVE, "cgi_param", no, no, "location", &set_cgi_param },
 	{ DIRECTIVE, "error_page", yes, no, "server", &set_error_page },
 	{ DIRECTIVE, "client_max_body_size", no, no, "server,location", &set_client_max_body_size },
 	{ DIRECTIVE, "redirection", no, no, "location", &set_redirection },
@@ -637,7 +636,6 @@ set_listen( Server & instance, std::string & arg, std::string )
 	}
 	if ( address == NULL || ecode == EXIT_FAILURE )
 	{
-		LOG( "HERE" );
 		return ( EXIT_FAILURE );
 	}
 	return ( EXIT_SUCCESS );

@@ -233,7 +233,6 @@ Server::getListen ( void ) const
 int
 Server::setRoute ( const std::string & location )
 {
-	LOG( location );
 	std::string mod_location( location );
 
 	while ( mod_location.size() > 1 && mod_location.back() == '/' )
