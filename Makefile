@@ -12,8 +12,8 @@ BUILD_DIR		:=	build
 CC				:=	c++
 CPPFLAGS		:=	-MMD
 CPPFLAGS		+=	-I$(INC_DIR)
-CPPFLAGS		+=	-g -fsanitize='address,undefined'
-CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98
+#CPPFLAGS		+=	-g -fsanitize='address,undefined'
+CXXFLAGS		:=	-Wall -Werror -Wextra -std=c++98 -O2
 CXXFLAGS		+=	-DDEBUG_LEVEL=3 -DREUSE_SOCKET
 
 SRC_FILES		:=	$(SRC_DIR)/main.cpp \

@@ -224,7 +224,7 @@ CGI::check_headers ( void )
     if ( headers.find( "location" ) != headers.end() )
         ++flag;
 	if ( flag == 0 )
-		this->_http.setStatusCode( UNPROCESSABLE_CONTENT );
+		this->_http.setStatusCode( INTERNAL_SERVER_ERROR );
     return ( EXIT_SUCCESS );
 }
 
@@ -255,11 +255,14 @@ CGI::parse_headers ( std::string & line )
 			{
                 std::string str = sub_line.substr( 0, pos_point );
                 std::string str2;
-                if ( str.compare( "Status" ) == 0 )
+                if ( str.compare( "status" ) == 0 )
+				{
                     str2 = sub_line.substr( pos_point + 2, 3 );
+					this->_http.setStatusCode( std::atoi(str2.c_str()));
+				}
 				else
                     str2 = sub_line.substr( pos_point + 2 );
-                str2 = normalize( str2 );
+                // str2 = normalize( str2 );
                 headers[str] = str2;
             }
 			else if ( sub_line.empty()

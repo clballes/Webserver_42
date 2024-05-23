@@ -24,7 +24,7 @@ HTTP::dispatch ( struct kevent & ev )
 	}
 	else if ( ev.filter == EVFILT_TIMER )
 	{
-		NOTICE( "request timed out" );
+		//NOTICE( "request timed out" );
 		this->deregister_recv();
 		this->setStatusCode( REQUEST_TIMEOUT );
 		this->_response.headers["connection"] = "close";

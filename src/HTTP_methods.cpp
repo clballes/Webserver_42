@@ -105,7 +105,7 @@ HTTP::http_delete ( void * http_ptr )
 	http = static_cast< HTTP * >( http_ptr );
 	if ( S_ISREG( http->_request.file_info.st_mode ) )
 	{
-		if ( remove( http->_request.target.c_str() ) == 0 )
+		if ( remove( http->_request.file.c_str() ) == 0 )
 		{
 			http->_response.status_code = OK;
 			http->_response.body.append( "<!DOCTYPE html><body><h1>File deleted.</h1></body></html>" );

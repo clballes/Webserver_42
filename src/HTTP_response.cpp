@@ -71,10 +71,11 @@ HTTP::send_response ( void )
 	
 	n = ::send( this->_socket_fd, this->_buffer_send.c_str(),
 			this->_buffer_send.length(), 0x0 );
-	if ( n == -1 )
-	{}
-	else if ( n == 0 )
-	{}
+	if ( n == -1  || n == 0 )
+	{
+		delete this;
+		return (EXIT_SUCCESS);
+	}
 	if ( this->_request.headers.find( "connection" ) != this->_request.headers.end()
 			&& this->_request.headers.at( "connection" ) != "keep-alive" )
 	{

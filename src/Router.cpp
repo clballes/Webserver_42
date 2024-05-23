@@ -500,6 +500,8 @@ set_limit_except( Server & instance, std::string & arg, std::string location )
 			limit_flag ^= HTTP_POST;
 		else if ( word == "HEAD" )
 			limit_flag ^= HTTP_HEAD;
+		else if ( word == "DELETE" )
+			limit_flag ^= HTTP_DELETE;
 		else
 		{
 			ERROR( "invalid method \"" << word << "\"" );

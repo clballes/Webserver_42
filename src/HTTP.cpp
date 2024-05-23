@@ -36,6 +36,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 			|| fcntl( this->_socket_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC ) == -1 )
 	{
 		ERROR( "HTTP: error creating new client" );
+		delete this;
 		return ;
 	}
 	this->register_recv();
@@ -44,6 +45,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 
 HTTP::~HTTP ( void )
 {
+	LOG("Destructor: " << this->_socket_fd);
 	(void) close( this->_socket_fd );
 	this->deregister_recv();
 	this->deregister_timer();
@@ -82,9 +84,6 @@ HTTP::setResponseHeaders ( const std::string & name,
 		const std::string & value )
 {
 	this->_response.headers[name] = value;
-	//TODO: what is this for ???
-	//if ( name == "status" )
-	//	this->setStatusCode( std::atoi( value.c_str() ) );
 	return ;
 }
 
