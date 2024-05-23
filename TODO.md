@@ -9,8 +9,5 @@
 - [ ] test: HTTP methods with wrong directory control ( . .. )
 - [ ] test: config
 - [ ] test: multiple (lots of) servers
-- [ ] test: chunked requests
-- [ ] test: post (multiform)
 - [ ] test: expect: 100-continue header
 - [ ] test: request timeout
-- [ ] test: upload\_files
