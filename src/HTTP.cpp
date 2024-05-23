@@ -29,6 +29,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 {
 	clear_request( this->_request );
 	clear_response( this->_response );
+	this->_server = this->_router.getDefaultServer();
 	this->_socket_fd = ::accept( fd,
 			(struct sockaddr *) &this->_address, &this->_address_len );
 	if ( this->_socket_fd == -1
@@ -44,6 +45,7 @@ HTTP::HTTP ( Router & router_instance, int fd ):
 HTTP::~HTTP ( void )
 {
 	(void) close( this->_socket_fd );
+	this->deregister_recv();
 	this->deregister_timer();
 	return ;
 }
