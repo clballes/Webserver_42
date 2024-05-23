@@ -60,14 +60,14 @@ CGI::register_process ( void )
 		   NOTE_EXIT | NOTE_EXITSTATUS, 0, (void *) this );
     if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
 	{
-		ERROR( "kevent: " << std::strerror( errno ) );
+		//ERROR( "kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
 	EV_SET( &ev, this->_pid, EVFILT_TIMER, EV_ADD | EV_ENABLE,
 			NOTE_SECONDS, CGI_TIMEOUT, (void *) this );
     if ( ::kevent( IEvent::kq, &ev, 1, 0x0, 0, 0x0 ) == -1 )
 	{
-		ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
+		//ERROR( PROGRAM_NAME << ": kevent: " << std::strerror( errno ) );
         return ( EXIT_FAILURE );
     }
     return ( EXIT_SUCCESS );
