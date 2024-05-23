@@ -5,6 +5,8 @@
 
 #include "HTTP.hpp"
 
+static void set_host ( t_request & );
+static int check_client_body_size ( HTTP & );
 static void translate_target ( HTTP & );
 static void check_index ( HTTP & );
 
@@ -19,6 +21,7 @@ HTTP::recv_request ( int64_t data )
 	if ( n == -1 )
 	{
 		ERROR( std::strerror( errno ) );
+		delete this;
 		return ( EXIT_FAILURE );
 	}
 	else if ( n == 0 )
@@ -46,22 +49,40 @@ HTTP::recv_request ( int64_t data )
 	{
 		this->deregister_timer();
 		this->register_timer();
-		if ( this->_server.getClientMaxBodySize( this->_request.target ) != 0
-				&& ( this->_request.body.size() > this->_server.getClientMaxBodySize( this->_request.target ) ) )
+		set_host( this->_request );
+		this->_server = this->_router.getServer( this->_request.host,
+				this->_connection.getHost(), this->_connection.getPort() );
+		if ( check_client_body_size( *this ) == EXIT_FAILURE )
 		{
 			this->setStatusCode( CONTENT_TOO_LARGE );
 			this->compose_response();
 			return ( EXIT_FAILURE );
 		}
-		if ( this->_request.headers.find( "host" ) != this->_request.headers.end() )
-			this->_request.host = this->_request.headers.at( "host" );
-		this->_server = this->_router.getServer( this->_request.host,
-				this->_connection.getHost(), this->_connection.getPort() );
 		translate_target( *this );
 		check_index ( *this );
 		return ( this->compute_response() );
 	}
 	return ( EXIT_SUCCESS);
+}
+
+static void
+set_host ( t_request & request )
+{
+	if ( request.headers.find( "host" ) != request.headers.end() )
+		request.host = request.headers.at( "host" );
+	return ;
+}
+
+static int
+check_client_body_size ( HTTP & http )
+{
+	t_request &	request = http.getRequest();
+	std::size_t	MaxBodySize;
+	
+	MaxBodySize = http.getServer().getClientMaxBodySize( request.target );
+	if ( MaxBodySize != 0 && request.body.size() > MaxBodySize )
+		return ( EXIT_FAILURE );
+	return ( EXIT_SUCCESS );
 }
 
 static void

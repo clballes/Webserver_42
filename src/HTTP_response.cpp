@@ -46,7 +46,7 @@ HTTP::compose_response ( void )
 	this->_buffer_send.append( " \r\n" );
 	this->_response.headers["content-length"] = my_to_string( this->_response.body.size() );
 	if ( this->_request.method != NULL && this->_request.method->code == HTTP_HEAD )
-		this->_response.headers.erase( "content-length" );
+		this->_response.headers["content-length"] = "0";
 	// Add response headers if any + ending CRLF.
 	for ( t_headers::iterator it = this->_response.headers.begin();
 			it != this->_response.headers.end(); ++it )
@@ -67,8 +67,14 @@ HTTP::compose_response ( void )
 int
 HTTP::send_response ( void )
 {
-	::send( this->_socket_fd, this->_buffer_send.c_str(),
+	ssize_t			n;
+	
+	n = ::send( this->_socket_fd, this->_buffer_send.c_str(),
 			this->_buffer_send.length(), 0x0 );
+	if ( n == -1 )
+	{}
+	else if ( n == 0 )
+	{}
 	if ( this->_request.headers.find( "connection" ) != this->_request.headers.end()
 			&& this->_request.headers.at( "connection" ) != "keep-alive" )
 	{
